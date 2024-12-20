@@ -63,8 +63,7 @@ static const char* _ds_ws_get_client_info(ds_conn_t *ds_conn)
 {
   OA_NIY(ds_conn->conn);
 
-  // FIXME:
-  return "client_info-undefined-under-taosws-for-the-moment";
+  return CALL_ws_get_client_info();
 }
 
 static int _ds_ws_get_current_db_with_ds_res(ds_conn_t *ds_conn, char *db, size_t len, ds_res_t *ds_res, ds_err_t *ds_err)
@@ -202,7 +201,7 @@ static int _ds_tsdb_get_current_db(ds_conn_t *ds_conn, char *db, size_t len, ds_
 
   OA_NIY(ds_conn->conn);
 
-  int required = 0; // FIXME: what usage?
+  int required = 0;
   r = CALL_taos_get_current_db((TAOS*)ds_conn->taos, db, (int)len, &required);
   if (r) {
     ds_err->err = taos_errno(NULL);

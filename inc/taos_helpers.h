@@ -77,7 +77,6 @@ static inline setConfRet call_taos_set_config(const char *file, int line, const 
 {
   LOGD_TAOS(file, line, func, "taos_set_config(config:%s) ...", config);
   setConfRet r = taos_set_config(config);
-  // FIXME: how to dump errno/errmsg?
   LOGD_TAOS(file, line, func, "taos_set_config(config:%s) => (%d,%.*s)", config, r.retCode, (int)sizeof(r.retMsg), r.retMsg);
   return r;
 }

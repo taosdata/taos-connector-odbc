@@ -806,7 +806,7 @@ struct tables_args_s {
   wildex_t        *schema_pattern;
   wildex_t        *table_pattern;
   wildex_t        *type_pattern;
-  char             db[1024];  // FIXME: big enough? check [taosc]
+  char             db[1024];    // already big enough! see TSDB_DB_NAME_LEN(65) in tdef.h
   uint8_t          select_current_db:1;
 };
 

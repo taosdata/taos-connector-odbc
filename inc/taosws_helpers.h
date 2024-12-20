@@ -93,6 +93,14 @@ static inline const char *call_ws_get_server_info(const char *file, int line, co
   return s;
 }
 
+static inline const char *call_ws_get_client_info(const char *file, int line, const char *func)
+{
+  LOGD_TAOSWS(file, line, func, "ws_get_server_info() ...");
+  const char *s = ws_get_client_info();
+  LOGD_TAOSWS(file, line, func, "ws_get_server_info() => %s", s);
+  return s;
+}
+
 static inline int call_ws_close(const char *file, int line, const char *func, WS_TAOS *taos)
 {
   LOGD_TAOSWS(file, line, func, "ws_close(ws_taos:%p) ...", taos);
@@ -354,6 +362,7 @@ static inline int32_t call_ws_stmt_close(const char *file, int line, const char 
 #define CALL_ws_enable_log(...)                          call_ws_enable_log(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_ws_connect(...)                             call_ws_connect(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_ws_get_server_info(...)                     call_ws_get_server_info(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define CALL_ws_get_client_info(...)                     call_ws_get_client_info(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_ws_close(...)                               call_ws_close(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_ws_query(...)                               call_ws_query(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_ws_stop_query(...)                          call_ws_stop_query(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
