@@ -4444,7 +4444,19 @@ static SQLRETURN _stmt_param_check_sqlc_double_sql_real(stmt_t *stmt, param_stat
   sql_data_t    *data       = &param_state->sql_data;
 
   double v = sqlc_data->dbl;
-  // TODO: check if 'Numeric value out of range'
+
+  if (v > FLT_MAX || v < -FLT_MAX) {
+    stmt_append_err_format(stmt, "HY000", 0,
+        "General error:conversion from `SQL_DOUBLE` to `SQL_FLOAT` failed,numeric value out of range for SQL_REAL,value:%lf", v);
+    return SQL_ERROR;
+  }
+
+  if ((v != 0) && (fabs(v) < FLT_MIN)) {
+    stmt_append_err_format(stmt, "HY000", 0,
+        "Warning: value too small for SQL_REAL, will be rounded to 0,value:%lf", v);
+    v = 0.0;
+  }
+
   data->flt  = (float)v;
   data->type = SQL_REAL;
 
