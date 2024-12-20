@@ -803,9 +803,11 @@ static int run_insert_with_param_binds(handles_t *handles, param_binds_t *param_
 {
   int r = 0;
 
-  size_t          nr_rows  = 0;
-  size_t          nr_batch = 0;
-  const char     *sql     = NULL;
+  size_t          nr_rows   = 0;
+  size_t          nr_batch  = 0;
+  const char     *sql       = NULL;
+  char           *endptr    = NULL;
+  long long       num       = 0;
 
   for (; i<argc; ++i) {
     const char *arg = argv[i];
@@ -816,7 +818,15 @@ static int run_insert_with_param_binds(handles_t *handles, param_binds_t *param_
         DUMP("<rows> is expected after --rows");
         return -1;
       }
-      nr_rows = (size_t)strtoll(argv[i], NULL, 0); // TODO: error check
+
+      errno = 0;
+      num = strtoll(argv[i], &endptr, 0);
+      if (endptr == argv[i] || *endptr != '\0' || errno != 0) {
+        DUMP("error: invalid rows number '%s'", argv[i]);
+        return -1;
+      }
+
+      nr_rows = (size_t)num;
       continue;
     }
     if (0 == strcasecmp(arg, "--batch")) {
@@ -824,7 +834,15 @@ static int run_insert_with_param_binds(handles_t *handles, param_binds_t *param_
         DUMP("<batch> is expected after --batch");
         return -1;
       }
-      nr_batch = (size_t)strtoll(argv[i], NULL, 0); // TODO: error check
+
+      errno = 0;
+      num = strtoll(argv[i], &endptr, 0);
+      if (endptr == argv[i] || *endptr != '\0' || errno != 0) {
+        DUMP("error: invalid batch number '%s'", argv[i]);
+        return -1;
+      }
+
+      nr_batch = (size_t)num;
       continue;
     }
     if (0 == strcasecmp(arg, "--sql")) {

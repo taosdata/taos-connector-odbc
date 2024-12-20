@@ -1873,7 +1873,6 @@ static int run(const char *test_case)
 int main(int argc, char *argv[])
 {
   int r = 0;
-
   int tested = 0;
 
   for (int i=1; i<argc; ++i) {
@@ -1887,7 +1886,15 @@ int main(int argc, char *argv[])
         return 1;
       }
       ++i;
-      long long times = strtoll(argv[i], NULL, 0); // FIXME: error check
+
+      errno = 0;
+      char *endptr;
+      long long times = strtoll(argv[i], &endptr, 0);
+      if (endptr == argv[i] || *endptr != '\0' || errno != 0) {
+        fprintf(stderr, "error: invalid times number '%s'\n", argv[i]);
+        return 1;
+      }
+
       if (times > 0 && (size_t)times > iconv_case.times) {
         iconv_case.times = (size_t)times;
       }
