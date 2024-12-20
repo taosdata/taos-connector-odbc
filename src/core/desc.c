@@ -274,6 +274,14 @@ SQLRETURN descriptor_bind_col(descriptor_t *ARD,
       ARD_record->DESC_CONCISE_TYPE      = TargetType;
       ARD_record->DESC_OCTET_LENGTH      = BufferLength;
       break;
+    case SQL_C_BINARY:
+      ARD_record->DESC_LENGTH            = 0; // FIXME:
+      ARD_record->DESC_PRECISION         = 0;
+      ARD_record->DESC_SCALE             = 0;
+      ARD_record->DESC_TYPE              = TargetType;
+      ARD_record->DESC_CONCISE_TYPE      = TargetType;
+      ARD_record->DESC_OCTET_LENGTH      = BufferLength;
+      break;
     default:
       stmt_append_err_format(owner, "HY000", 0,
           "General error:#%d Column converstion to `%s[0x%x/%d]` not implemented yet",

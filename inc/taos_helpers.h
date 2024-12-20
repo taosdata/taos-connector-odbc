@@ -77,7 +77,6 @@ static inline setConfRet call_taos_set_config(const char *file, int line, const 
 {
   LOGD_TAOS(file, line, func, "taos_set_config(config:%s) ...", config);
   setConfRet r = taos_set_config(config);
-  // FIXME: how to dump errno/errmsg?
   LOGD_TAOS(file, line, func, "taos_set_config(config:%s) => (%d,%.*s)", config, r.retCode, (int)sizeof(r.retMsg), r.retMsg);
   return r;
 }
@@ -200,14 +199,10 @@ static inline int call_taos_stmt_get_col_fields(const char *file, int line, cons
   return r;
 }
 
-EXTERN_C_BEGIN
-void bridge_taos_stmt_reclaim_fields(TAOS_STMT *stmt, TAOS_FIELD_E *fields) FA_HIDDEN;
-EXTERN_C_END
-
 static inline void call_taos_stmt_reclaim_fields(const char *file, int line, const char *func, TAOS_STMT *stmt, TAOS_FIELD_E *fields)
 {
   LOGD_TAOS(file, line, func, "taos_stmt_reclaim_fields(stmt:%p,fields:%p) ...", stmt, fields);
-  bridge_taos_stmt_reclaim_fields(stmt, fields);
+  taos_stmt_reclaim_fields(stmt, fields);
   LOGD_TAOS(file, line, func, "taos_stmt_reclaim_fields(stmt:%p,fields:%p) => void", stmt, fields);
 }
 

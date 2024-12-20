@@ -174,6 +174,75 @@ static int handles_init(handles_t *handles, const char *connstr)
   return -1;
 }
 
+static SQLSMALLINT sqltype_2_ctype(SQLLEN v, SQLLEN is_unsigned)
+{
+  SQLSMALLINT TargetType = 0;
+  switch (v) {
+    case SQL_CHAR:
+    case SQL_VARCHAR:
+    case SQL_LONGVARCHAR:
+      TargetType = SQL_C_CHAR;
+      break;
+    case SQL_WCHAR:
+    case SQL_WVARCHAR:
+    case SQL_WLONGVARCHAR:
+      TargetType = SQL_C_WCHAR;
+      break;
+    case SQL_DECIMAL:
+    case SQL_NUMERIC:
+      TargetType = SQL_C_NUMERIC;
+      break;
+    case SQL_SMALLINT:
+      TargetType = is_unsigned ? SQL_C_USHORT : SQL_C_SSHORT;
+      break;
+    case SQL_INTEGER:
+      TargetType = is_unsigned ? SQL_C_ULONG : SQL_C_SLONG;
+      break;
+    case SQL_REAL:
+    case SQL_FLOAT:
+      TargetType = SQL_C_FLOAT;
+      break;
+    case SQL_DOUBLE:
+      TargetType = SQL_C_DOUBLE;
+      break;
+    case SQL_BIT:
+      TargetType = SQL_C_BIT;
+      break;
+    case SQL_TINYINT:
+      TargetType = is_unsigned ? SQL_C_UTINYINT : SQL_C_STINYINT;
+      break;
+    case SQL_BIGINT:
+      TargetType = is_unsigned ? SQL_C_UBIGINT : SQL_C_SBIGINT;
+      break;
+    case SQL_BINARY:
+    case SQL_VARBINARY:
+    case SQL_LONGVARBINARY:
+      TargetType = SQL_C_BINARY;
+      break;
+    case SQL_DATETIME:
+      TargetType = SQL_C_TYPE_DATE;
+      break;
+    case SQL_TYPE_DATE:
+      TargetType = SQL_C_DATE;
+      break;
+    case SQL_TYPE_TIME:
+      TargetType = SQL_C_TIME;
+      break;
+    case SQL_TYPE_TIMESTAMP:
+      TargetType = SQL_C_TIMESTAMP;
+      break;
+    case SQL_GUID:
+      TargetType = SQL_C_GUID;
+      break;
+    case SQL_ALL_TYPES:
+      TargetType = SQL_C_DEFAULT;
+      break;
+    default:
+      TargetType = SQL_C_CHAR;
+  }
+  return TargetType;
+}
+
 static int _dump_result_sets(handles_t *handles)
 {
   SQLRETURN sr = SQL_SUCCESS;
@@ -437,22 +506,54 @@ static int _check_with_values_ap(int line, const char *func, handles_t *handles,
       sr = CALL_SQLDescribeCol(handles->hstmt, (SQLUSMALLINT)i_col+1, (SQLCHAR*)colName, sizeof(colName), &NameLength, &DataType, &ColumnSize, &DecimalDigits, &Nullable);
       if (FAILED(sr)) return -1;
 
+      SQLLEN is_unsigned = SQL_FALSE;
+
+      sr = CALL_SQLColAttribute(handles->hstmt, (SQLUSMALLINT)i_col+1, SQL_DESC_UNSIGNED, NULL, 0, NULL, &is_unsigned);
+      if (FAILED(sr)) return -1;
+
+      SQLSMALLINT c_type = sqltype_2_ctype(DataType, is_unsigned);
+      SQLSMALLINT target_type = c_type;
+      if (c_type != SQL_C_BINARY)
+        target_type = SQL_C_CHAR;
+
       char buf[4096]; buf[0] = '\0';
       SQLLEN len = 0;
-      sr = CALL_SQLGetData(handles->hstmt, (SQLUSMALLINT)i_col+1, SQL_C_CHAR, buf, sizeof(buf), &len);
+      sr = CALL_SQLGetData(handles->hstmt, (SQLUSMALLINT)i_col+1, target_type, buf, sizeof(buf), &len);
       if (FAILED(sr)) return -1;
-      const char *v = va_arg(ap, const char*);
-      if (len == SQL_NULL_DATA) {
-        if (v) {
-          DCASE("[%zd,%zd]:expected [%s], but got ==null==", i_row+1, i_col+1, v);
-          return -1;
+      switch (target_type) {
+        case SQL_C_CHAR:
+        {
+          const char *v = va_arg(ap, const char*);
+          if (len == SQL_NULL_DATA) {
+            if (v) {
+              DCASE("[%zd,%zd]:expected [%s], but got ==null==", i_row+1, i_col+1, v);
+              return -1;
+            }
+            continue;
+          }
+          if (len == SQL_NTS) len = (SQLLEN)strlen(buf);
+          if (strlen(v) != (size_t)len || strncmp(buf, v, (size_t)len)) {
+            DCASE("[%zd,%zd]:expected [%s], but got ==%.*s==", i_row+1, i_col+1, v, (int)len, buf);
+            return -1;
+          }
+          break;
         }
-        continue;
-      }
-      if (len == SQL_NTS) len = (SQLLEN)strlen(buf);
-      if (strlen(v) != (size_t)len || strncmp(buf, v, (size_t)len)) {
-        DCASE("[%zd,%zd]:expected [%s], but got ==%.*s==", i_row+1, i_col+1, v, (int)len, buf);
-        return -1;
+        case SQL_C_BINARY:
+        {
+          char* expected = va_arg(ap, char*);
+          if (memcmp(buf, expected, len)) {
+            char hex_expected[1024] = {0};
+            char hex_actual[1024] = {0};
+            (void)tod_hexify(hex_expected, sizeof(hex_expected), expected, len);
+            (void)tod_hexify(hex_actual, sizeof(hex_actual), buf, len);
+            DCASE("[%zd,%zd]:expected [%s], but got ==%s==", i_row+1, i_col+1, hex_expected, hex_actual);
+            return -1;
+          }
+          break;
+        }
+        default:
+          DCASE("[%zd,%zd]:invalid target type, sql_type[%d][%s], c_type:[%d][%s]", i_row+1, i_col+1, DataType, sql_data_type(DataType), c_type, sqlc_data_type(c_type));
+          return -1;
       }
     }
   }
@@ -465,75 +566,6 @@ static int _check_with_values_ap(int line, const char *func, handles_t *handles,
 
   DCASE("expected %zd rows, but got ==more rows==", nr_rows);
   return -1;
-}
-
-static SQLSMALLINT sqltype_2_ctype(SQLLEN v, SQLLEN is_unsigned)
-{
-  SQLSMALLINT TargetType = 0;
-  switch (v) {
-    case SQL_CHAR:
-    case SQL_VARCHAR:
-    case SQL_LONGVARCHAR:
-      TargetType = SQL_C_CHAR;
-      break;
-    case SQL_WCHAR:
-    case SQL_WVARCHAR:
-    case SQL_WLONGVARCHAR:
-      TargetType = SQL_C_WCHAR;
-      break;
-    case SQL_DECIMAL:
-    case SQL_NUMERIC:
-      TargetType = SQL_C_NUMERIC;
-      break;
-    case SQL_SMALLINT:
-      TargetType = is_unsigned ? SQL_C_USHORT : SQL_C_SSHORT;
-      break;
-    case SQL_INTEGER:
-      TargetType = is_unsigned ? SQL_C_ULONG : SQL_C_SLONG;
-      break;
-    case SQL_REAL:
-    case SQL_FLOAT:
-      TargetType = SQL_C_FLOAT;
-      break;
-    case SQL_DOUBLE:
-      TargetType = SQL_C_DOUBLE;
-      break;
-    case SQL_BIT:
-      TargetType = SQL_C_BIT;
-      break;
-    case SQL_TINYINT:
-      TargetType = is_unsigned ? SQL_C_UTINYINT : SQL_C_STINYINT;
-      break;
-    case SQL_BIGINT:
-      TargetType = is_unsigned ? SQL_C_UBIGINT : SQL_C_SBIGINT;
-      break;
-    case SQL_BINARY:
-    case SQL_VARBINARY:
-    case SQL_LONGVARBINARY:
-      TargetType = SQL_C_BINARY;
-      break;
-    case SQL_DATETIME:
-      TargetType = SQL_C_TYPE_DATE;
-      break;
-    case SQL_TYPE_DATE:
-      TargetType = SQL_C_DATE;
-      break;
-    case SQL_TYPE_TIME:
-      TargetType = SQL_C_TIME;
-      break;
-    case SQL_TYPE_TIMESTAMP:
-      TargetType = SQL_C_TIMESTAMP;
-      break;
-    case SQL_GUID:
-      TargetType = SQL_C_GUID;
-      break;
-    case SQL_ALL_TYPES:
-      TargetType = SQL_C_DEFAULT;
-      break;
-    default:
-      TargetType = SQL_C_CHAR;
-  }
-  return TargetType;
 }
 
 static int _check_col_bind_with_values_ap(int line, const char *func, handles_t *handles, const char *sql, size_t nr_rows, size_t nr_cols, va_list ap)
@@ -756,6 +788,19 @@ static int _check_col_bind_with_values_ap(int line, const char *func, handles_t 
           }
           break;
         }
+        case SQL_C_BINARY:
+        {
+          char* expected = va_arg(ap, char*);
+          if (memcmp(bufs[i_col], expected, lens[i_col])) {
+            char hex_expected[1024] = {0};
+            char hex_actual[1024] = {0};
+            (void)tod_hexify(hex_expected, sizeof(hex_expected), expected, lens[i_col]);
+            (void)tod_hexify(hex_actual, sizeof(hex_actual), bufs[i_col], lens[i_col]);
+            DCASE("[%zd,%zd]:expected [%s], but got ==%s==", i_row+1, i_col+1, hex_expected, hex_actual);
+            return -1;
+          }
+          break;
+        }
         default:
           DCASE("[%zd,%zd]:invalid target type, sql_type[%d][%s], c_type:[%d][%s]", i_row+1, i_col+1, sql_types[i_col], sql_data_type(sql_types[i_col]), c_types[i_col], sqlc_data_type(c_types[i_col]));
           return -1;
@@ -809,9 +854,9 @@ static int test_all_types_with_col_bind(handles_t *handles, const char *connstr,
   sqls =
     "drop database if exists foo;"
     "create database if not exists foo;"
-    "create stable if not exists foo.test_types (ts timestamp, i32 int, u32 int unsigned, i64 bigint, u64 bigint unsigned, flt float, dbl double, bin binary(64), i16 smallint, u16 smallint unsigned, i8 tinyint, u8 tinyint unsigned, b bool, mark nchar(10), name varchar(64)) tags(tag1 int);"
+    "create stable if not exists foo.test_types (ts timestamp, i32 int, u32 int unsigned, i64 bigint, u64 bigint unsigned, flt float, dbl double, bin binary(64), i16 smallint, u16 smallint unsigned, i8 tinyint, u8 tinyint unsigned, b bool, mark nchar(10), name varchar(64), vb varbinary(20), geo geometry(256)) tags(tag1 int);"
     "create table foo.d0 using foo.test_types (tag1) tags (1);"
-    "insert into foo.d0 values('2024-08-25 10:20:45.678', -1, 2, -3, 4, 5.5, 6.6666666666, 'test', -32768, 65535, -128, 255, true, '中文2', 'test123');";
+    "insert into foo.d0 values('2024-08-25 10:20:45.678', -1, 2, -3, 4, 5.5, 6.6666666666, 'test', -32768, 65535, -128, 255, true, '中文2', 'test123', '\\x4eba', 'POINT(1 2)');";
 
   r = _execute_batches_of_statements(handles, sqls);
   if (r) return -1;
@@ -884,6 +929,16 @@ static int test_all_types_with_col_bind(handles_t *handles, const char *connstr,
   sql = "select name from foo.test_types";
   const char name[] = "test123";
   r = CHECK_WITH_VALUES(handles, 1, sql, 1, 1, name);
+  if (r) return -1;
+
+  sql = "select vb from foo.test_types";
+  const char vb[] = { 0x4e, 0xba };
+  r = CHECK_WITH_VALUES(handles, 1, sql, 1, 1, vb);
+  if (r) return -1;
+
+  sql = "select geo from foo.test_types";
+  const char geo[] = { 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf0, 0x3f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40 };
+  r = CHECK_WITH_VALUES(handles, 1, sql, 1, 1, geo);
   if (r) return -1;
 
   return 0;

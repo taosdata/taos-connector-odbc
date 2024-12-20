@@ -27,30 +27,6 @@
 #include "os_port.h"
 #include "taos_helpers.h"
 
-typedef void (*taos_stmt_reclaim_fields_f)(TAOS_STMT *stmt, TAOS_FIELD_E *fields);
-
-static taos_stmt_reclaim_fields_f loaded_taos_stmt_reclaim_fields = NULL;
-
-static void init_taos_apis(void)
-{
-  void *p = dlsym(RTLD_DEFAULT, "taos_stmt_reclaim_fields");
-  loaded_taos_stmt_reclaim_fields = (taos_stmt_reclaim_fields_f)p;
-}
-
-void bridge_taos_stmt_reclaim_fields(TAOS_STMT *stmt, TAOS_FIELD_E *fields)
-{
-  static pthread_once_t once = PTHREAD_ONCE_INIT;
-  pthread_once(&once, init_taos_apis);
-  if (loaded_taos_stmt_reclaim_fields) {
-    loaded_taos_stmt_reclaim_fields(stmt, fields);
-    return;
-  }
-#ifdef _WIN32
-  W("no `taos_stmt_reclaim_fields` exported in taos.dll, thus memory leakage is expected");
-#else
-  free(fields);
-#endif
-}
 
 int helper_get_tsdb_ws(int time_precision, const char *name, uint8_t col_type, const void *col_data, uint32_t col_len,
     int i_row, int i_col, tsdb_data_t *tsdb, char *buf, size_t len)
@@ -140,6 +116,16 @@ int helper_get_tsdb_ws(int time_precision, const char *name, uint8_t col_type, c
         tsdb->str.str = col;
         tsdb->str.len = strnlen(col, col_len); // FIXME:
         tsdb->str.encoder = NULL;
+      } break;
+    case TSDB_DATA_TYPE_VARBINARY:
+      {
+        tsdb->bin.bin = (const unsigned char*)col_data;
+        tsdb->bin.len = col_len;
+      } break;
+    case TSDB_DATA_TYPE_GEOMETRY:
+      {
+        tsdb->geo.geo = (const unsigned char*)col_data;
+        tsdb->geo.len = col_len;
       } break;
     case TSDB_DATA_TYPE_TIMESTAMP:
       {

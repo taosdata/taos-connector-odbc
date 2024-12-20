@@ -243,7 +243,21 @@ static int run(handles_t *handles, int argc, char *argv[])
         DUMP("<port> expected after --port");
         return -1;
       }
-      port = (uint16_t)strtoll(argv[++i], NULL, 0); // TODO: error check
+      char *endptr;
+      long long port_ll;
+      errno = 0;
+      port_ll = strtoll(argv[++i], &endptr, 0);
+      if (endptr == argv[i] || *endptr != '\0' || errno != 0) {
+        DUMP("error: invalid port number '%s'", argv[i]);
+        return -1;
+      }
+
+      if (port_ll < 0 || port_ll > UINT16_MAX) {
+        DUMP("error: port number out of range. must be between 0 and %u", UINT16_MAX);
+        return -1;
+      }
+
+      port = (uint16_t)port_ll;
       changed = 1;
       continue;
     }
