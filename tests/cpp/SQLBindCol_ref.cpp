@@ -93,6 +93,9 @@ static int test_case1(const char *conn_str, int ws)
       rc = CALL_SQLSetConnectAttr(hdbc, SQL_LOGIN_TIMEOUT, (SQLPOINTER)5, 0);
       A(SUCCEEDED(rc), "");
 
+      rc = CALL_SQLSetConnectAttr(hdbc, SQL_ATTR_TXN_ISOLATION, (SQLPOINTER)SQL_TXN_SERIALIZABLE, 0);
+      A(SUCCEEDED(rc), "");
+
       // Connect to data source
       rc = CALL_SQLDriverConnect(hdbc, NULL,
             (SQLCHAR*)conn_str, SQL_NTS,
