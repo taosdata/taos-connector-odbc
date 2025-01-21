@@ -95,9 +95,9 @@ static inline const char *call_ws_get_server_info(const char *file, int line, co
 
 static inline const char *call_ws_get_client_info(const char *file, int line, const char *func)
 {
-  LOGD_TAOSWS(file, line, func, "ws_get_server_info() ...");
+  LOGD_TAOSWS(file, line, func, "ws_get_client_info() ...");
   const char *s = ws_get_client_info();
-  LOGD_TAOSWS(file, line, func, "ws_get_server_info() => %s", s);
+  LOGD_TAOSWS(file, line, func, "ws_get_client_info() => %s", s);
   return s;
 }
 
