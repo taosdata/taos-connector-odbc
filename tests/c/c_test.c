@@ -835,6 +835,109 @@ static int _check_with_values(int line, const char *func, handles_t *handles, in
 }
 
 #define CHECK_WITH_VALUES(...)       _check_with_values(__LINE__, __func__, ##__VA_ARGS__)
+#define CHECK_BIND_RESULT(ret)                                              \
+  do {                                                                      \
+    if ((ret) != SQL_SUCCESS && (ret) != SQL_SUCCESS_WITH_INFO) {           \
+      goto end;                                                             \
+    }                                                                       \
+  } while(0)
+
+static int list_table_columns(handles_t* handles, const char* catalog, const char* schema, const char* table)
+{
+  RETCODE ret;
+
+  ret = CALL_SQLColumns(handles->hstmt,
+                  (SQLCHAR*)catalog, SQL_NTS,
+                  (SQLCHAR*)schema,  SQL_NTS,
+                  (SQLCHAR*)table,   SQL_NTS,
+                  (SQLCHAR*)NULL,    SQL_NTS);
+
+  if (ret != SQL_SUCCESS && ret != SQL_SUCCESS_WITH_INFO) {
+    return -1;
+  }
+
+  SQLCHAR table_cat[256], table_schem[256], table_name[256], column_name[256];
+  SWORD data_type;
+  SQLCHAR type_name[256];
+  SQLINTEGER column_size;
+  SQLINTEGER buffer_length;
+  SQLSMALLINT decimal_digits, num_prec_radix, nullable;
+  SQLCHAR remarks[256], column_def[256];
+  SWORD sql_data_type, sql_datetime_sub;
+  SQLINTEGER char_octet_length;
+  SQLINTEGER ordinal_position;
+  SQLCHAR is_nullable[256];
+
+  SQLLEN table_cat_ind, table_schem_ind, table_name_ind, column_name_ind;
+  SQLLEN type_name_ind, remarks_ind, column_def_ind, sql_datetime_sub_ind, char_octet_length_ind, is_nullable_ind;
+
+  ret = CALL_SQLBindCol(handles->hstmt, 1, SQL_C_CHAR, table_cat, sizeof(table_cat), &table_cat_ind);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 2, SQL_C_CHAR, table_schem, sizeof(table_schem), &table_schem_ind);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 3, SQL_C_CHAR, table_name, sizeof(table_name), &table_name_ind);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 4, SQL_C_CHAR, column_name, sizeof(column_name), &column_name_ind);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 5, SQL_C_SHORT, &data_type, 0, NULL);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 6, SQL_C_CHAR, type_name, sizeof(type_name), &type_name_ind);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 7, SQL_C_SLONG, &column_size, 0, NULL);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 8, SQL_C_SLONG, &buffer_length, 0, NULL);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 9, SQL_C_SHORT, &decimal_digits, 0, NULL);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 10, SQL_C_SHORT, &num_prec_radix, 0, NULL);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 11, SQL_C_SHORT, &nullable, 0, NULL);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 12, SQL_C_CHAR, remarks, sizeof(remarks), &remarks_ind);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 13, SQL_C_CHAR, column_def, sizeof(column_def), &column_def_ind);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 14, SQL_C_SHORT, &sql_data_type, 0, NULL);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 15, SQL_C_SHORT, &sql_datetime_sub, 0, &sql_datetime_sub_ind);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 16, SQL_C_SLONG, &char_octet_length, 0, &char_octet_length_ind);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 17, SQL_C_SLONG, &ordinal_position, 0, NULL);
+  CHECK_BIND_RESULT(ret);
+  ret = CALL_SQLBindCol(handles->hstmt, 18, SQL_C_CHAR, is_nullable, sizeof(is_nullable), &is_nullable_ind);
+  CHECK_BIND_RESULT(ret);
+
+  do {
+    ret = CALL_SQLFetch(handles->hstmt);
+    if (ret == SQL_NO_DATA) {
+      ret = SQL_SUCCESS;
+      break;
+    } else if (ret != SQL_SUCCESS && ret != SQL_SUCCESS_WITH_INFO) {
+      goto end;
+    }
+
+    D("Column: %s", (column_name_ind == SQL_NULL_DATA) ? "NULL" : (char*)column_name);
+    D("Data Type: %d", data_type);
+    D("Type Name: %s", (type_name_ind == SQL_NULL_DATA) ? "NULL" : (char*)type_name);
+    D("Column Size: %d", column_size);
+    D("Buffer Length: %d", buffer_length);
+    D("Decimal Digits: %d", decimal_digits);
+    D("Num Prec Radix: %d", num_prec_radix);
+    D("Nullable: %d", nullable);
+    D("Remarks: %s", (remarks_ind == SQL_NULL_DATA) ? "NULL" : (char*)remarks);
+    D("Column Def: %s", (column_def_ind == SQL_NULL_DATA) ? "NULL" : (char*)column_def);
+    D("SQL Data Type: %d", sql_data_type);
+    D("SQL DateTime Sub: %d", sql_datetime_sub);
+    D("Char Octet Length: %d", char_octet_length);
+    D("Ordinal Position: %d", ordinal_position);
+    D("Is Nullable: %s", (is_nullable_ind == SQL_NULL_DATA) ? "NULL" : (char*)is_nullable);
+    D("----------------------------------------");
+  } while(1);
+
+end:
+  return ret;
+}
 
 static int test_all_types_with_col_bind(handles_t *handles, const char *connstr, int ws)
 {
@@ -940,6 +1043,9 @@ static int test_all_types_with_col_bind(handles_t *handles, const char *connstr,
   const char geo[] = { 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf0, 0x3f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40 };
   r = CHECK_WITH_VALUES(handles, 1, sql, 1, 1, geo);
   if (r) return -1;
+
+  r = list_table_columns(handles, "foo", NULL, "test_types");
+  if (r < 0) return -1;
 
   return 0;
 }
