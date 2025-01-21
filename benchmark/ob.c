@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 
 #define DUMP(fmt, ...) fprintf(stderr, "[%d]:%s():" fmt "\n", __LINE__, __func__, ##__VA_ARGS__)
