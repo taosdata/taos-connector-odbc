@@ -70,7 +70,7 @@ const custprod_item_t custprod_array[] = {
 
 const custprod_item_t *conn_get_custprod_by_index(size_t index)
 {
-  if (index >=0 && index < sizeof(custprod_array)/sizeof(custprod_array[0]))
+  if (index < sizeof(custprod_array)/sizeof(custprod_array[0]))
     return &custprod_array[index];
   else
     return NULL;
