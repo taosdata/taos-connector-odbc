@@ -231,7 +231,7 @@ static int _prepare_describe_insert(TAOS_STMT *stmt, const prepare_case_t *prepa
     }
     if (_errCode == taos_errno(NULL)) return 0;
     E("sql @[%dL]::%s", __line__, _sql);
-    E("failed:[0x%x/%d]%s", taos_errno(NULL), taos_errno(NULL), taos_stmt_errstr(stmt));
+    E("failed:[0x%x]!=[0x%x/%d]%s", _errCode, taos_errno(NULL), taos_errno(NULL), taos_stmt_errstr(stmt));
     return -1;
   }
   CALL_taos_stmt_reclaim_fields(stmt, fields); fields = NULL;

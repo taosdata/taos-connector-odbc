@@ -172,6 +172,22 @@ static int test_conn_parser(void)
       },
     },{
       __LINE__,
+      "Driver={MySQL ODBC 3.51 中文 driver};URL={http://localhost:6041};DATABASE=hello",
+      {
+        .driver                 = "MySQL ODBC 3.51 中文 driver",
+        .url                    = "http://localhost:6041",
+        .db                     = "hello",
+      },
+    },{
+      __LINE__,
+      "Driver={MySQL ODBC 3.51 中文 driver};DATABASE=hello;URL={http://localhost:6041}",
+      {
+        .driver                 = "MySQL ODBC 3.51 中文 driver",
+        .url                    = "http://localhost:6041",
+        .db                     = "hello",
+      },
+    },{
+      __LINE__,
       "DSN=TAOS_ODBC_DSN;UNSIGNED_PROMOTION=1;CONN_MODE=1;CHARSET_ENCODER_FOR_PARAM_BIND=UTF-8",
       {
         .dsn                    = "TAOS_ODBC_DSN",
