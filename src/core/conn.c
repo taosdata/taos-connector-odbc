@@ -1811,7 +1811,7 @@ SQLRETURN conn_set_attr(
     case SQL_ATTR_TRANSLATE_OPTION:
       break;
     case SQL_ATTR_TXN_ISOLATION:
-      conn->txn_isolation = *(int32_t*)ValuePtr;
+      conn->txn_isolation = (SQLINTEGER)(SQLLEN)ValuePtr;
       return SQL_SUCCESS;
     case SQL_ATTR_MAX_ROWS:
       if ((SQLULEN)ValuePtr == 0) return SQL_SUCCESS;
