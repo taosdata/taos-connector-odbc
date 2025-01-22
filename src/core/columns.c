@@ -495,6 +495,8 @@ static SQLRETURN _get_data(stmt_base_t *base, SQLUSMALLINT Col_or_Param_Num, tsd
     {"SMALLINT UNSIGNED",         TSDB_DATA_TYPE_USMALLINT,           2},
     {"INT UNSIGNED",              TSDB_DATA_TYPE_UINT,                4},
     {"BIGINT UNSIGNED",           TSDB_DATA_TYPE_UBIGINT,             8},
+    {"VARBINARY",                 TSDB_DATA_TYPE_VARBINARY,          -1},
+    {"GEOMETRY",                  TSDB_DATA_TYPE_GEOMETRY,           -1},
   };
 
   for (size_t i=0; i<=sizeof(supported)/sizeof(supported[0]); ++i) {
@@ -563,6 +565,8 @@ static SQLRETURN _get_data(stmt_base_t *base, SQLUSMALLINT Col_or_Param_Num, tsd
           {TSDB_DATA_TYPE_USMALLINT,          SQL_SMALLINT},
           {TSDB_DATA_TYPE_UINT,               SQL_INTEGER},
           {TSDB_DATA_TYPE_UBIGINT,            SQL_BIGINT},
+          {TSDB_DATA_TYPE_VARBINARY,          SQL_VARBINARY},
+          {TSDB_DATA_TYPE_GEOMETRY,           SQL_VARBINARY},
         };
 
         for (size_t i=0; i<=sizeof(supported)/sizeof(supported[0]); ++i) {
@@ -635,6 +639,8 @@ static SQLRETURN _get_data(stmt_base_t *base, SQLUSMALLINT Col_or_Param_Num, tsd
           {TSDB_DATA_TYPE_USMALLINT,          2},
           {TSDB_DATA_TYPE_UINT,               4},
           {TSDB_DATA_TYPE_UBIGINT,            8},
+          {TSDB_DATA_TYPE_VARBINARY,         -1},
+          {TSDB_DATA_TYPE_GEOMETRY,          -1},
         };
 
         for (size_t i=0; i<=sizeof(supported)/sizeof(supported[0]); ++i) {
@@ -701,6 +707,8 @@ static SQLRETURN _get_data(stmt_base_t *base, SQLUSMALLINT Col_or_Param_Num, tsd
           {TSDB_DATA_TYPE_USMALLINT,          SQL_SMALLINT},
           {TSDB_DATA_TYPE_UINT,               SQL_INTEGER},
           {TSDB_DATA_TYPE_UBIGINT,            SQL_BIGINT},
+          {TSDB_DATA_TYPE_VARBINARY,          SQL_VARBINARY},
+          {TSDB_DATA_TYPE_GEOMETRY,           SQL_VARBINARY},
         };
 
         for (size_t i=0; i<=sizeof(supported)/sizeof(supported[0]); ++i) {
