@@ -14,7 +14,8 @@
         "sql":"insert into t (ts, name) values (now, ?)",
         "executes": [
           {
-            "params": [{"timestamp":1662961478755},"none0"]
+            "params": [{"timestamp":1662961478755},"none0"],
+            "positive": false
           }
         ]
       },{
@@ -116,7 +117,7 @@
         "executes": [
           {
             "params": [{"timestamp":1662861478889}, "world"],
-            "positive": true
+            "positive": false
           }
         ]
       },{
