@@ -339,12 +339,24 @@ static inline SQLRETURN call_SQLBindParameter(const char *file, int line, const 
 static inline SQLRETURN call_SQLSetStmtAttr(const char *file, int line, const char *func,
     SQLHSTMT StatementHandle, SQLINTEGER Attribute, SQLPOINTER ValuePtr, SQLINTEGER StringLength)
 {
-  LOGD_ODBC(file, line, func, "SQLSetStmtAttr(StatementHandle:%p,Attribute:%s,ValuePtr:%p,StringLength:%d) ...",
-      StatementHandle, sql_stmt_attr(Attribute), ValuePtr, StringLength);
+  LOGD_ODBC(file, line, func, "SQLSetStmtAttr(StatementHandle:%p,Attribute:%s[%d/0x%x],ValuePtr:%p,StringLength:%d) ...",
+      StatementHandle, sql_stmt_attr(Attribute), Attribute, Attribute, ValuePtr, StringLength);
   SQLRETURN sr = SQLSetStmtAttr(StatementHandle, Attribute, ValuePtr, StringLength);
   diag(sr, SQL_HANDLE_STMT, StatementHandle);
-  LOGD_ODBC(file, line, func, "SQLSetStmtAttr(StatementHandle:%p,Attribute:%s,ValuePtr:%p,StringLength:%d) => %s",
-      StatementHandle, sql_stmt_attr(Attribute), ValuePtr, StringLength, sql_return_type(sr));
+  LOGD_ODBC(file, line, func, "SQLSetStmtAttr(StatementHandle:%p,Attribute:%s[%d/0x%x],ValuePtr:%p,StringLength:%d) => %s",
+      StatementHandle, sql_stmt_attr(Attribute), Attribute, Attribute, ValuePtr, StringLength, sql_return_type(sr));
+  return sr;
+}
+
+static inline SQLRETURN call_SQLGetStmtAttr(const char *file, int line, const char *func,
+    SQLHSTMT StatementHandle, SQLINTEGER Attribute, SQLPOINTER ValuePtr, SQLINTEGER BufferLength, SQLINTEGER *StringLength)
+{
+  LOGD_ODBC(file, line, func, "SQLGetStmtAttr(StatementHandle:%p,Attribute:%s[%d/0x%x],ValuePtr:%p,BufferLength:%d,StringLength:%p) ...",
+      StatementHandle, sql_stmt_attr(Attribute), Attribute, Attribute, ValuePtr, BufferLength, StringLength);
+  SQLRETURN sr = SQLGetStmtAttr(StatementHandle, Attribute, ValuePtr, BufferLength, StringLength);
+  diag(sr, SQL_HANDLE_STMT, StatementHandle);
+  LOGD_ODBC(file, line, func, "SQLGetStmtAttr(StatementHandle:%p,Attribute:%s[%d/0x%x],ValuePtr:%p,BufferLength:%d,StringLength:%p(%d)) => %s",
+      StatementHandle, sql_stmt_attr(Attribute), Attribute, Attribute, ValuePtr, BufferLength, StringLength, StringLength ? *StringLength : 0, sql_return_type(sr));
   return sr;
 }
 
@@ -654,6 +666,7 @@ static inline SQLRETURN call_SQLRowCount(const char *file, int line, const char 
 #define CALL_SQLDescribeParam(...)                 call_SQLDescribeParam(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_SQLBindParameter(...)                 call_SQLBindParameter(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_SQLSetStmtAttr(...)                   call_SQLSetStmtAttr(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define CALL_SQLGetStmtAttr(...)                   call_SQLGetStmtAttr(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_SQLExecute(...)                       call_SQLExecute(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_SQLEndTran(...)                       call_SQLEndTran(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_SQLFreeStmt(...)                      call_SQLFreeStmt(__FILE__, __LINE__, __func__, ##__VA_ARGS__)

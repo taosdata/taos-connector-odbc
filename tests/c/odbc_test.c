@@ -1738,6 +1738,7 @@ static int select_count_with_col_bind_array(SQLHANDLE hconn, const char *sql, si
   SQLLEN bi_ind[ARRAY_SIZE];
   SQLUSMALLINT status[ARRAY_SIZE];
   SQLULEN nr_rows;
+  SQLULEN cur_array_size = 0;
   do {
     if (array_size > ARRAY_SIZE) {
       E("array_size[%zd] too large [%d]", array_size, ARRAY_SIZE);
@@ -1749,6 +1750,12 @@ static int select_count_with_col_bind_array(SQLHANDLE hconn, const char *sql, si
 
     sr = CALL_SQLBindCol(hstmt, 2, SQL_C_SBIGINT, &bi, 0, bi_ind);
     if (FAILED(sr)) break;
+
+    sr = CALL_SQLSetStmtAttr(hstmt, SQL_ROWSET_SIZE, (SQLPOINTER)array_size, 0);
+    if (FAILED(sr)) break;
+    sr = CALL_SQLGetStmtAttr(hstmt, SQL_ROWSET_SIZE, (SQLPOINTER)&cur_array_size, 0, NULL);
+    if (FAILED(sr)) break;
+    if (array_size != cur_array_size) break;
 
     sr = CALL_SQLSetStmtAttr(hstmt, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER)array_size, 0);
     if (FAILED(sr)) break;
