@@ -224,57 +224,9 @@ input:
 ;
 
 connect_str:
-  dsnx
-| driverx
-;
-
-dsnx:
-  dsn
-| dsn_semi
-| dsn_semi attributes
-;
-
-driverx:
-  driver
-| driver_semi
-| driver_semi attributes
-;
-
-dsn_semi:
-  dsn ';'
-| dsn_semi ';'
-;
-
-driver_semi:
-  driver ';'
-| driver_semi ';'
-;
-
-attributes:
-  odbc
-| url
-| attrs
-;
-
-odbc:
-  odbc_attr
-| odbc ';'
-| odbc ';' odbc_attr
-| odbc ';' attribute
-;
-
-url:
-  url_attr
-| url ';'
-| url ';' url_attr
-| url ';' odbc_attr
-| url ';' attribute
-;
-
-attrs:
   attribute
-| attrs ';'
-| attrs ';' attribute
+| connect_str ';'
+| connect_str ';' attribute
 ;
 
 dsn:
@@ -302,7 +254,11 @@ url_attr:
 ;
 
 attribute:
-  UNSIGNED_PROMOTION '=' DIGITS    { SET_UNSIGNED_PROMOTION($3.text, $3.leng, @$); }
+  driver
+| dsn
+| odbc_attr
+| url_attr
+| UNSIGNED_PROMOTION '=' DIGITS    { SET_UNSIGNED_PROMOTION($3.text, $3.leng, @$); }
 | TIMESTAMP_AS_IS '=' DIGITS       { SET_TIMESTAMP_AS_IS($3.text, $3.leng, @$); }
 | CHARSET_FOR_COL_BIND '=' VALUE               { SET_CHARSET_FOR_COL_BIND($3, @$); }
 | CHARSET_FOR_PARAM_BIND '=' VALUE             { SET_CHARSET_FOR_PARAM_BIND($3, @$); }
