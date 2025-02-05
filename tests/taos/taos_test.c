@@ -1222,18 +1222,30 @@ static int executes_ctx_prepare_stmt(executes_ctx_t *ctx)
     if (e == TSDB_CODE_TSC_STMT_TBNAME_ERROR) {
       // insert into ? ... will result in TSDB_CODE_TSC_STMT_TBNAME_ERROR
       ctx->subtbl_required = 1;
-      W("this is believed an subtbl insert statement");
+      W("this is believed a subtbl insert statement");
       r = 0;
     } else if (e == TSDB_CODE_TSC_STMT_API_ERROR) {
       // insert into t ... and t is normal tablename, will result in TSDB_CODE_TSC_STMT_API_ERROR
       ctx->subtbl_required = 0;
-      W("this is believed an non-subtbl insert statement");
+      W("this is believed a non-subtbl insert statement");
       r = 0;
+    } else if (e == TSDB_CODE_TSC_INVALID_OPERATION) {
+      // [-2147483136/0x80000200]Invalid operation;stmt_errstr:stmt bind param does not support normal value in sql
+      ctx->subtbl_required = 0;
+      W("this is believed a non-bind insert statement");
+      r = 0;
+    } else if (e == TSDB_CODE_PAR_TABLE_NOT_EXIST) {
+      // [-2147473917/0x80002603]Table does not exist;stmt_errstr:Table does not exist
+      ctx->subtbl_required = 1;
+      W("This is believed the table name has not been given");
+      r = 0;
+    } else {
+      W("this is believed a wrong statement,e:%d", e);
     }
   }
   CALL_taos_stmt_reclaim_fields(ctx->stmt, fields);
 
-  return 0;
+  return r;
 }
 
 static int run_execute_params_rs(executes_ctx_t *ctx, ejson_t *params, ejson_t *rs)
@@ -2406,6 +2418,11 @@ static int conformance_prepare_insert_tags_cols(TAOS_STMT *stmt, prepare_checker
     return conformance_prepare_insert_tags_cols_tbname_required(stmt, checker, nr_tags, tags, nr_cols, cols);
   } else if (e == TSDB_CODE_TSC_STMT_API_ERROR) {
     return conformance_prepare_insert_tags_cols_no_tbname_required(stmt, checker, nr_tags, tags, nr_cols, cols);
+  } else if (e == TSDB_CODE_TSC_INVALID_OPERATION) {
+    // [-2147483136/0x80000200]Invalid operation;stmt_errstr:stmt bind param does not support normal value in sql
+    *nr_tags = 0;
+    *nr_cols = 0;
+    return conformance_prepare_check(checker, 0, *nr_tags, *nr_cols, 0);
   } else {
     return -1;
   }
@@ -2481,7 +2498,7 @@ static int conformance_prepare(TAOS *taos)
     // NOTE: taosc specific behavior
     {"insert into suzhou using s tags (3) values (?, ?)", 0, 1, 2, 0},
     // NOTE: taosc specific behavior
-    {"insert into suzhou using s tags (3) values (now(), 4)", 0, 1, 2, 0},
+    {"insert into suzhou using s tags (3) values (now(), 4)", 0, 0, 0, 0},
     // subtable insert
     {"insert into suzhou using s tags (?) (ts) values (?)", 0, 1, 1, 0},
     // normal table insert

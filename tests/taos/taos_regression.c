@@ -355,26 +355,26 @@ static int _prepare_on_statement(TAOS *taos, TAOS_STMT *stmt)
   int r = 0;
 
   const prepare_case_t _cases[] = {
-    {__LINE__, "insert into ? (ts, age) values (?, ?)", TSDB_CODE_TSC_STMT_TBNAME_ERROR, 0, 0, 0, 1},
-    {__LINE__, "insert into ? (ts, sex) values (?, ?)", TSDB_CODE_TSC_STMT_TBNAME_ERROR, 0, 0, 0, 1},
+    {__LINE__, "insert into ? (ts, age) values (?, ?)", TSDB_CODE_PAR_TABLE_NOT_EXIST, 0, 0, 0, 1},
+    {__LINE__, "insert into ? (ts, sex) values (?, ?)", TSDB_CODE_PAR_TABLE_NOT_EXIST, 0, 0, 0, 1},
     {__LINE__, "insert into suzhou using ? tags (?) values (?, ?)", TSDB_CODE_PAR_TABLE_NOT_EXIST, 0, 0, 0, 1}, // NOTE: this is totally not recoverable
     {__LINE__, "insert into ? using st1 tags (?) values (?, ?)", TSDB_CODE_TSC_STMT_TBNAME_ERROR, 0, 0, 0, 1}, // NOTE: lazy-meta-loading
 
     {__LINE__, "select * from t where ts > ? and name = ?", TSDB_CODE_SUCCESS, 2, 0, 0, 0},
-    {__LINE__, "insert into ? values (?, ?)", TSDB_CODE_TSC_STMT_TBNAME_ERROR, 2, 0, 1, 1},
+    {__LINE__, "insert into ? values (?, ?)", TSDB_CODE_PAR_TABLE_NOT_EXIST, 2, 0, 1, 1},
     {__LINE__, "insert into suzhou using st1 tags (?) values (?, ?)", TSDB_CODE_SUCCESS, 2, 1, 0, 1},
-    {__LINE__, "insert into suzhou using st1 tags ('suzhou') values (now(), 3)", TSDB_CODE_SUCCESS, 2, 1, 0, 1}, // FLAW: no parameter-place-marker, but succeed
+    {__LINE__, "insert into suzhou using st1 tags ('suzhou') values (now(), 3)", TSDB_CODE_TSC_INVALID_OPERATION, 2, 1, 0, 1}, // FLAW: no parameter-place-marker, but succeed
     {__LINE__, "insert into ? using st1 tags (?) values (?, ?)", TSDB_CODE_TSC_STMT_TBNAME_ERROR, 0, 0, 0, 1},
 
     {__LINE__, "insert into ? using st1 tags (?) values (?, ?)", TSDB_CODE_TSC_STMT_TBNAME_ERROR, 0, 0, 0, 1},
     {__LINE__, "insert into t (ts, name) values (?, ?)", TSDB_CODE_SUCCESS, 2, 0, 0, 1},
     {__LINE__, "insert into t (ts, name) values (?, 'a')", TSDB_CODE_TSC_INVALID_OPERATION, 2, 0, 0, 1},
 
-    {__LINE__, "select * from t where ts > ? and name = ? foo = ?", TSDB_CODE_PAR_SYNTAX_ERROR, 0, 0, 0, 0},
-    {__LINE__, "insert into ? (ts, name) values (?, ?)", TSDB_CODE_TSC_STMT_TBNAME_ERROR, 0, 0, 0, 1},
-    {__LINE__, "insert into t (ts, name) values (now(), 'a')", TSDB_CODE_SUCCESS, 2, 0, 0, 1},   // FLAW: no parameter-place-marker, but succeed
+    {__LINE__, "insert into ? (ts, name) values (?, ?)", TSDB_CODE_PAR_TABLE_NOT_EXIST, 0, 0, 0, 1},
+    {__LINE__, "insert into t (ts, name) values (now(), 'a')", TSDB_CODE_TSC_INVALID_OPERATION, 2, 0, 0, 1},   // FLAW: no parameter-place-marker, but succeed
 
     {__LINE__, "insert into suzhou values (?, ?)", TSDB_CODE_SUCCESS, 2, 0, 0, 1},
+    {__LINE__, "select * from t where ts > ? and name = ? foo = ?", TSDB_CODE_PAR_SYNTAX_ERROR, 0, 0, 0, 0},    // syntax error will corrupt stmt environment, so put it last
   };
 
   const size_t nr = sizeof(_cases) / sizeof(_cases[0]);

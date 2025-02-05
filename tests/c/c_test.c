@@ -544,8 +544,8 @@ static int _check_with_values_ap(int line, const char *func, handles_t *handles,
           if (memcmp(buf, expected, len)) {
             char hex_expected[1024] = {0};
             char hex_actual[1024] = {0};
-            (void)tod_hexify(hex_expected, sizeof(hex_expected), expected, len);
-            (void)tod_hexify(hex_actual, sizeof(hex_actual), buf, len);
+            (void)tod_hexify(hex_expected, sizeof(hex_expected), (const unsigned char *)expected, len);
+            (void)tod_hexify(hex_actual, sizeof(hex_actual), (const unsigned char *)buf, len);
             DCASE("[%zd,%zd]:expected [%s], but got ==%s==", i_row+1, i_col+1, hex_expected, hex_actual);
             return -1;
           }
@@ -794,8 +794,8 @@ static int _check_col_bind_with_values_ap(int line, const char *func, handles_t 
           if (memcmp(bufs[i_col], expected, lens[i_col])) {
             char hex_expected[1024] = {0};
             char hex_actual[1024] = {0};
-            (void)tod_hexify(hex_expected, sizeof(hex_expected), expected, lens[i_col]);
-            (void)tod_hexify(hex_actual, sizeof(hex_actual), bufs[i_col], lens[i_col]);
+            (void)tod_hexify(hex_expected, sizeof(hex_expected), (const unsigned char *)expected, lens[i_col]);
+            (void)tod_hexify(hex_actual, sizeof(hex_actual), (const unsigned char *)(bufs[i_col]), lens[i_col]);
             DCASE("[%zd,%zd]:expected [%s], but got ==%s==", i_row+1, i_col+1, hex_expected, hex_actual);
             return -1;
           }
