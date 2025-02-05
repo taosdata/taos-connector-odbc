@@ -8266,8 +8266,6 @@ SQLRETURN stmt_set_attr(stmt_t *stmt, SQLINTEGER Attribute, SQLPOINTER ValuePtr,
 {
   (void)StringLength;
 
-  conn_t *conn = stmt->conn;
-
   switch (Attribute) {
     case SQL_ATTR_APP_PARAM_DESC:
       return _stmt_set_param_desc(stmt, ValuePtr);
@@ -8376,8 +8374,6 @@ SQLRETURN stmt_get_attr(stmt_t *stmt,
 {
   (void)BufferLength;
   (void)StringLength;
-  conn_t *conn = stmt->conn;
-
 
   switch (Attribute) {
     case SQL_ATTR_APP_PARAM_DESC:
