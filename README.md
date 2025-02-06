@@ -15,11 +15,39 @@ English | [简体中文](README-CN.md)
 ## 1. Introduction
 `taos-connector-odbc` is the official ODBC connector for TDengine, enabling applications written in various programming languages such as C/C++, C#, Go, Rust, Python, Node.js, and more to interact with the TDengine database. By leveraging the standardized ODBC interface, `taos-connector-odbc` facilitates seamless data writing, querying and parameter binding across different platforms and environments.
 
+The `taos-connector-odbc` supports multiple operating systems, including Windows, Linux, and macOS. 
+
 ## 2. Documentation
 - To use the ODBC connector, please check [Developer Guide](https://docs.tdengine.com/developer-guide/), which includes how an application can introduce the taos-connector-odbc, as well as examples of data writing, querying, and parameter binding across different platforms and environments.
 - For other reference information, please check [Reference Manual](https://docs.tdengine.com/tdengine-reference/client-libraries/odbc/), which includes version history, data types, example programs, API descriptions, and FAQs.
 - This quick guide is mainly for developers who like to contribute/build/test the ODBC connector by themselves. To learn more about TDengine, you can visit the official documentation.
 
+## 3. Prerequisites
+First, ensure that TDengine has been deployed locally. For detailed deployment steps, please refer to [Deploy TDengine](https://docs.tdengine.com/get-started/deploy-from-package/). Ensure that both taosd and taosAdapter services are up and running.
+
+Afterwards, before installing and using the `taos-connector-odbc`, ensure that you have met the following prerequisites for your specific platform.
+
+### Windows Platform, use Windows 11 as an example
+- Install win_flex_bison 2.5.25:
+    - Download from: [win_flex_bison-2.5.25.zip](https://github.com/lexxmark/winflexbison/releases/download/v2.5.25/win_flex_bison-2.5.25.zip),
+    - Extract the files and add the directory to your system's PATH environment variable.
+- Verify Installation:
+    - win_flex --version`
+- Install ODBC Driver Manager:
+    - Ensure that the Microsoft ODBC Driver Manager is installed on your system. It is typically pre-installed on Windows platforms.
+
+### Linux Platform, use Ubuntu 20.04 as an example
+- Install Required Dependencies:
+    - sudo apt update
+    - sudo apt install flex bison
+- Install ODBC Driver Manager:
+    - sudo apt install unixodbc unixodbc-dev
+
+### Linux Platform, use macOS Big Sur as an example
+- Install Required Dependencies:
+    - brew install flex bison
+- Install ODBC Driver Manager:
+    - brew install unixodbc
 
 
 ### Supported platform
