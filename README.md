@@ -56,29 +56,38 @@ Afterwards, before installing and using the `taos-connector-odbc`, ensure that y
   - Download from: [win_flex_bison-2.5.25.zip](https://github.com/lexxmark/winflexbison/releases/download/v2.5.25/win_flex_bison-2.5.25.zip).
   - Extract the files and add the directory to your system's PATH environment variable.
 - Verify Installation:
-  - win_flex --version`
+  ```
+  win_flex --version
+  ```
 - Install ODBC Driver Manager:
   - Ensure that the Microsoft ODBC Driver Manager is installed on your system. It is typically pre-installed on Windows platforms.
 
 ### 3.2 Linux Platform (Ubuntu 20.04 Example)
 - Install Required Dependencies:
-  - sudo apt update
-  - sudo apt install flex bison
+  ```
+  sudo apt install flex bison
+  ```
 - Install ODBC Driver Manager:
-  - sudo apt install unixodbc unixodbc-dev
+  ```
+  sudo apt install unixodbc unixodbc-dev
+  ```
 
 ### 3.3 macOS Platform (macOS Big Sur Example)
 - Install Required Dependencies:
-  - brew install flex bison
+  ```
+  brew install flex bison
+  ```
 - Install ODBC Driver Manager:
-  - brew install unixodbc
+  ```
+  brew install unixodbc
+  ```
 
 ## 4. Building and Installing
 This section provides detailed instructions for building and installing the `taos-connector-odbc` on different platforms.
 
 ### 4.1 Windows Platform (Windows 11 Example)
 - Open Command Prompt as an Administrator:
-  - Follow the instructions provided here to open Command Prompt with administrative privileges.
+  - Follow the instructions provided [here](https://www.makeuseof.com/windows-run-command-prompt-admin/) to open Command Prompt with administrative privileges.
 - Change to the root directory of this project:
   ```
   cd path\to\taos-connector-odbc
@@ -117,10 +126,6 @@ This section provides detailed instructions for building and installing the `tao
   ```
   cd path\to\taos-connector-odbc
   ```
-- Clean previous builds:
-  ```
-  rm -rf debug
-  ```
 - Generate make files:
   ```
   cmake -B debug -DCMAKE_BUILD_TYPE=Debug
@@ -141,10 +146,6 @@ This section provides detailed instructions for building and installing the `tao
 - Change to the root directory of this project:
   ```
   cd path\to\taos-connector-odbc
-  ```
-- Clean previous builds:
-  ```
-  rm -rf debug
   ```
 - Generate make files:
   ```
