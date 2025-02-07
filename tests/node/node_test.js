@@ -660,7 +660,7 @@ async function case9(conn_str, ws) {
       assert.equal(!!await conn_prepare_exec_check(conn, 'select * from t where f < ?', [123.46], expx), 0);
       assert.equal(!!await conn_prepare_exec_check(conn, 'select * from t where f > ? and f < ?', [123.44, 123.46], expx), 0);
       assert.equal(!!await conn_prepare_exec_check(conn, 'select * from t where f > ? and f < ?', [123.45, 123.45], expx), 1);
-      assert.equal(!!await conn_prepare_exec_check(conn, 'select * from t where f = ?', ['123.45'], expx), 1);
+      assert.equal(!!await conn_prepare_exec_check(conn, 'select * from t where f = ?', ['123.45'], expx), 0);
       assert.equal(!!await conn_prepare_exec_check(conn, 'select * from t where f = ?', [123.45], expx), 1);
       assert.equal(!!await conn_prepare_exec_check(conn, 'select * from t where d = ?', [543.21], expx), 0);
       assert.equal(!!await conn_prepare_exec_check(conn, 'select * from t where d = ? and f < ?', [543.21, 123.46], expx), 0);
