@@ -227,6 +227,36 @@ Performance testing is in progress.
 - [Build Workflow] -TODO
 - [Code Coverage] -TODO
 
+## 7. Submitting Issues
+We welcome the submission of [GitHub Issue](https://github.com/taosdata/taos-connector-odbc/issues/new?template=Blank+issue). When submitting an issue, please provide the following information to help us diagnose and resolve the problem more efficiently:
+
+### 7.1 Required Information
+- Problem Description:
+  - Provide a clear and detailed description of the issue you are encountering.
+  - Indicate whether the issue occurs consistently or intermittently.
+  - If possible, include a detailed call stack or error message that can help in diagnosing the problem.
+- ODBC Connector Version or Commit ID:
+  - Specify the version or commit id of the ODBC Connector you are using. 
+- ODBC Connection Parameters:
+  - Provide your ODBC connection string or DSN (Data Source Name) configuration details. Please do not include sensitive information such as usernames and passwords.
+  - Example:
+    ```
+    DSN=TAOS_ODBC_DSN;UID=<your_username>;PWD=<your_password>
+    ```
+    Replace <your_username> and <your_password> with placeholders or omit them for security reasons.
+- TDengine Server Version:
+  - Specify the version of the TDengine server you are connecting to. This can be found by running the following command on your TDengine server:
+    ```
+    taosd -V
+    ```
+### 7.2 Additional Information (Optional but Helpful)
+- Operating System: Specify the operating system and its version (e.g., Windows 11, Ubuntu 20.04, macOS Big Sur).
+- Steps to Reproduce: Provide step-by-step instructions on how to reproduce the issue. This helps us replicate and verify the problem.
+- Environment Configuration: Include any relevant environment configurations, such as specific settings in odbc.ini, odbcinst.ini, or other configuration files.
+- Logs: Attach any relevant logs that might help in diagnosing the issue. Logs can be found in the location specified by your logging configuration (e.g., stderr, temp, or syslog).
+
+
+
 
 
 
