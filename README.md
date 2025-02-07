@@ -67,7 +67,7 @@ Afterwards, before installing and using the `taos-connector-odbc`, ensure that y
 - Install ODBC Driver Manager:
   - sudo apt install unixodbc unixodbc-dev
 
-### 3.3 Linux Platform (macOS Big Sur Example)
+### 3.3 macOS Platform (macOS Big Sur Example)
 - Install Required Dependencies:
   - brew install flex bison
 - Install ODBC Driver Manager:
