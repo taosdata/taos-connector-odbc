@@ -51,7 +51,7 @@ Afterwards, before installing and using the `taos-connector-odbc`, ensure that y
 - R, v4.3 or above, if you wish to enable R-test-cases
   - odbc, please refer to [R odbc](https://cran.r-project.org/web/packages/odbc/index.html).
 
-### 3.1 Windows Platform, use Windows 11 as an example
+### 3.1 Windows Platform (Windows 11 Example)
 - Install win_flex_bison 2.5.25:
   - Download from: [win_flex_bison-2.5.25.zip](https://github.com/lexxmark/winflexbison/releases/download/v2.5.25/win_flex_bison-2.5.25.zip).
   - Extract the files and add the directory to your system's PATH environment variable.
@@ -60,31 +60,107 @@ Afterwards, before installing and using the `taos-connector-odbc`, ensure that y
 - Install ODBC Driver Manager:
   - Ensure that the Microsoft ODBC Driver Manager is installed on your system. It is typically pre-installed on Windows platforms.
 
-### 3.2 Linux Platform, use Ubuntu 20.04 as an example
+### 3.2 Linux Platform (Ubuntu 20.04 Example)
 - Install Required Dependencies:
   - sudo apt update
   - sudo apt install flex bison
 - Install ODBC Driver Manager:
   - sudo apt install unixodbc unixodbc-dev
 
-### 3.3 Linux Platform, use macOS Big Sur as an example
+### 3.3 Linux Platform (macOS Big Sur Example)
 - Install Required Dependencies:
   - brew install flex bison
 - Install ODBC Driver Manager:
   - brew install unixodbc
 
-## 4. Build
+## 4. Building and Installing
+This section provides detailed instructions for building and installing the taos-connector-odbc on different platforms.
 
-Download the repository code and execute the following in root directory to build develop environment:
-``` bash
-pip3 install -e ./ 
-```
+### 4.1 Windows Platform (Windows 11 Example)
+- Open Command Prompt as an Administrator:
+  - Follow the instructions provided here to open Command Prompt with administrative privileges.
+- Change to the root directory of this project:
+  ```powershell
+  cd path\to\taos-connector-odbc
+  ```
+- Optionally, setup building environment:
+  - If you have installed Visual Studio Community 2022 on a 64-bit Windows platform, run the following command to set up the build environment:
+    ```powershell
+    "\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+    ```
+- Generate make files:
+  ```powershell
+  cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -B build -G "Visual Studio 17 2022" -A x64
+  ```
+  - **Troubleshooting**: If compiler errors occur during the following steps, such as <path_to_winbase.h> warning C5105: macro expansion producing 'defined' has undefined behavior, retry with the following command:
+    ```powershell
+    cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -B build -G "Visual Studio 17 2022" -A x64 -DDISABLE_C5105:BOOL=ON
+    ```
+- Building the project:
+  ```powershell
+  cmake --build build --config Debug -j 4
+  ```
+- Installing taos_odbc:
+  - This will install taos_odbc.dll into C:\TDengine\taos_odbc\x64\ by default.
+    ```powershell
+    cmake --install build --config Debug
+    cmake --build build --config Debug --target install_templates
+    ```
+- Verify installation:
+  - Check if a new TAOS_ODBC_DSN registry has been set up in the Windows Registry:
+    ```powershell
+    HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBCINST.INI\TDengine
+    HKEY_CURRENT_USER\Software\ODBC\Odbc.ini\TAOS_ODBC_DSN
+    ```
+### 4.2 Linux Platform (Ubuntu 20.04 Example)
+- Change to the root directory of this project:
+  ```bash
+  cd path\to\taos-connector-odbc
+  ```
+- Clean previous builds:
+  ```bash
+  rm -rf debug
+  ```
+- Generate make files:
+  ```bash
+  cmake -B debug -DCMAKE_BUILD_TYPE=Debug
+  ```
+- Build the project:
+  ```bash
+  cmake --build debug
+  ```
+- Install connector:
+  ```bash
+  sudo cmake --install debug
+  cmake --build debug --target install_templates
+  ```
+- Confirm installation:
+  - Check if the ODBC DSN configuration file (e.g., /etc/odbc.ini or ~/.odbc.ini) contains TAOS_ODBC_DSN entry.
 
-
-## 4. Build
-Execute `mvn clean package` in the project directory to build the project.
-
-
+4.3 macOS Platform (Big Sur Example)
+- Change to the root directory of this project:
+  ```bash
+  cd path\to\taos-connector-odbc
+  ```
+- Clean previous builds:
+  ```bash
+  rm -rf debug
+  ```
+- Generate make files:
+  ```bash
+  cmake -B debug -DCMAKE_BUILD_TYPE=Debug
+  ```
+- Build the project:
+  ```bash
+  cmake --build debug
+  ```
+- Install connector:
+  ```bash
+  sudo cmake --install debug
+  cmake --build debug --target install_templates
+  ```
+- Confirm installation:
+  - Check if the ODBC DSN configuration file (e.g., /etc/odbc.ini or ~/.odbc.ini) contains TAOS_ODBC_DSN entry.
 
 
 
