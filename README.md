@@ -275,13 +275,18 @@ We welcome developers to contribute to this project. When submitting Pull Reques
 5. Create a Pull Request (PR):
    - Create a Pull Request on GitHub by following the instructions provided [here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request).
 6. Check CI Status:
-   - After submitting the PR, you can find it through the Pull Requests page.
+   - After submitting the PR, you can find it through the [Pull Requests](https://github.com/taosdata/taos-connector-odbc/pulls) page.
    - Click on the corresponding link to see if the Continuous Integration (CI) checks for your PR have passed. If they have passed, it will display "All checks have passed". Regardless of whether the CI passes or not, you can click "Show all checks" -> "Details" to view the detailed test case logs.
 7. Review Test Coverage:
-   - After submitting the PR, if the CI checks pass, you can find your PR on the Codecov page to check the test coverage.
+   - After submitting the PR, if the CI checks pass, you can find your PR on the [Codecov](https://app.codecov.io/gh/taosdata/taos-connector-odbc/pulls) page to check the test coverage.
    - Ensure that your changes maintain or improve the overall test coverage.
 
+## 9. References
+- [TDengine Official Website](https://www.tdengine.com/) 
+- [TDengine GitHub](https://github.com/taosdata/TDengine) 
 
+## 10. License
+[MIT License](./LICENSE)
 
 
 
