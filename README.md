@@ -18,7 +18,7 @@ English | [简体中文](README-CN.md)
 The `taos-connector-odbc` supports multiple operating systems, including Windows, Linux, and macOS. 
 
 ## 2. Documentation
-- To use the ODBC connector, please check [Developer Guide](https://docs.tdengine.com/developer-guide/), which includes how an application can introduce the taos-connector-odbc, as well as examples of data writing, querying, and parameter binding across different platforms and environments.
+- To use the ODBC connector, please check [Developer Guide](https://docs.tdengine.com/developer-guide/), which includes how an application can introduce the `taos-connector-odbc`, as well as examples of data writing, querying, and parameter binding across different platforms and environments.
 - For other reference information, please check [Reference Manual](https://docs.tdengine.com/tdengine-reference/client-libraries/odbc/), which includes version history, data types, example programs, API descriptions, and FAQs.
 - This quick guide is mainly for developers who like to contribute/build/test the ODBC connector by themselves. To learn more about TDengine, you can visit the official documentation.
 
@@ -74,7 +74,7 @@ Afterwards, before installing and using the `taos-connector-odbc`, ensure that y
   - brew install unixodbc
 
 ## 4. Building and Installing
-This section provides detailed instructions for building and installing the taos-connector-odbc on different platforms.
+This section provides detailed instructions for building and installing the `taos-connector-odbc` on different platforms.
 
 ### 4.1 Windows Platform (Windows 11 Example)
 - Open Command Prompt as an Administrator:
@@ -406,35 +406,6 @@ We welcome developers to contribute to this project. When submitting Pull Reques
 - **Support TDengine data subscription feature，refer to samples/c/demo_topic.c**
 - **still going on**...
 
-### Requirements
-- cmake, 3.16.3 or above
-- flex, 2.6.4 or above. NOTE: win_flex_bison on windows platform to be installed.
-- bison, 3.5.1 or above. NOTE: win_flex_bison on windows platform to be installed.
-- odbc driver manager, such as unixodbc(2.3.6 or above) in linux. NOTE: odbc driver manager is pre-installed on windows platform
-- iconv, should've been already included in libc. NOTE: win_iconv would be downloaded when building this project
-- valgrind, if you wish to debug and profile executables, such as detecting potential memory leakages
-- node, v12.0 or above if you wish to enable nodejs-test-cases
-  - node odbc, 2.4.4 or above, https://www.npmjs.com/package/odbc
-- rust, v1.63 or above if you wish to enable rust-test-cases
-  - odbc, 0.17.0 or above, https://docs.rs/odbc/latest/odbc/
-  - env_logger, 0.8.2 or above, https://docs.rs/env_logger/latest/env_logger/
-  - json
-- python3, v3.10 or above if you wish to enable python3-test-cases
-  - pyodbc, 4.0.39 or above, https://www.python.org/
-- go, v1.17 or above if you wish to enable go-test-cases
-  - github.com/alexbrainman/odbc, https://go.dev/
-- erlang, v12.2 or above if you wish to enable erlang-test-cases
-  - https://www.erlang.org/doc/apps/odbc/getting_started.html, https://erlang.org/
-- haskell, cabal v3.6 or above, ghc v9.2 or above,  if you wish to enable haskell-test-cases
-  - https://www.haskell.org/ or https://www.haskell.org/ghcup/
-- common lisp, sbcl v2.1.11 or above if you wish to enable common-lisp-test-cases
-  - plain-odbc, https://plain-odbc.common-lisp.dev/, https://lisp-lang.org/ or https://lisp-lang.org/learn/getting-started/
-- R, v4.3 or above, if you wish to enable R-test-cases
-  - https://www.r-project.org/
-
-### Installing TDengine 3.0
-- please visit https://tdengine.com
-- better use TDengine-git-commit "ea249127afb42ac3a31d8d9f63243c3d1b950b5d" or above, otherwise, you might come across memory leakage in windows platform, which is introduced by `taos_stmt_get_tag_fields/taos_stmt_get_col_fields`. please check detail: https://github.com/taosdata/TDengine/issues/18804 and https://github.com/taosdata/TDengine/pull/19245
 
 ### Installing prerequisites, use Ubuntu 20.04 as an example
 ```
