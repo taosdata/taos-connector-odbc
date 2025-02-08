@@ -22,6 +22,156 @@ The `taos-connector-odbc` supports multiple operating systems, including Windows
 - For other reference information, please check [Reference Manual](https://docs.tdengine.com/tdengine-reference/client-libraries/odbc/), which includes version history, data types, example programs, API descriptions, and FAQs.
 - This quick guide is mainly for developers who like to contribute/build/test the ODBC connector by themselves. To learn more about TDengine, you can visit the official documentation.
 
+
+### 2.1 Features
+- **Currently exported ODBC functions are**:
+
+| ODBC/Setup API | linux (ubuntu 22.04) | macosx (ventura 13.2.1) | windows 10/11 | note |
+| :----- | :---- | :---- | :---- | :---- |
+| ConfigDSN | ❌ | ❌ | ✅ | |
+| ConfigDriver | ❌ | ❌ | ✅ | |
+| ConfigTranslator | ❌ | ❌ | ✅ | |
+| SQLAllocHandle | ✅ | ✅ | ✅ | |
+| SQLBindCol  | ✅ | ✅ | ✅ | Column-Wise Binding only |
+| SQLBindParameter | ✅ | ✅ | ✅ | Column-Wise Binding only |
+| SQLBrowseConnect | ❌ | ❌ | ❌ | |
+| SQLBulkOperations | ❌ | ❌ | ❌ | TDengine has no counterpart |
+| SQLCloseCursor | ✅ | ✅ | ✅ | |
+| SQLColAttribute | ✅ | ✅ | ✅ | |
+| SQLColumnPrivileges | ❌ | ❌ | ❌ | TDengine has no strict counterpart |
+| SQLColumns | ✅ | ✅ | ✅ | |
+| SQLCompleteAsync | ❌ | ❌ | ❌ | |
+| SQLConnect | ✅ | ✅ | ✅ | |
+| SQLCopyDesc | ❌ | ❌ | ❌ | |
+| SQLDescribeCol | ✅ | ✅ | ✅ | |
+| SQLDescribeParam | ✅ | ✅ | ✅ | |
+| SQLDisconnect | ✅ | ✅ | ✅ | |
+| SQLDriverConnect | ✅ | ✅ | ✅ | |
+| SQLEndTran | ✅ | ✅ | ✅ | TDengine is non-transactional, thus this is at most simulating |
+| SQLExecDirect | ✅ | ✅ | ✅ | |
+| SQLExecute | ✅ | ✅ | ✅ | |
+| SQLExtendedFetch | ❌ | ❌ | ❌ | |
+| SQLFetch | ✅ | ✅ | ✅ | |
+| SQLFetchScroll | ✅ | ✅ | ✅ | TDengine has no counterpart, just implement SQL_FETCH_NEXT |
+| SQLForeignKeys | ❌ | ❌ | ❌ | TDengine has no counterpart |
+| SQLFreeHandle | ✅ | ✅ | ✅ | |
+| SQLFreeStmt | ✅ | ✅ | ✅ | |
+| SQLGetConnectAttr | ✅ | ✅ | ✅ | |
+| SQLGetCursorName | ❌ | ❌ | ❌ | TDengine has no counterpart |
+| SQLGetData | ✅ | ✅ | ✅ | |
+| SQLGetDescField | ❌ | ❌ | ❌ | |
+| SQLGetDescRec | ❌ | ❌ | ❌ | |
+| SQLGetDiagField | ✅ | ✅ | ✅ | |
+| SQLGetDiagRec | ✅ | ✅ | ✅ | |
+| SQLGetEnvAttr | ✅ | ✅ | ✅ | |
+| SQLGetInfo | ✅ | ✅ | ✅ | |
+| SQLGetStmtAttr | ✅ | ✅ | ✅ | |
+| SQLGetTypeInfo | ✅ | ✅ | ✅ | |
+| SQLMoreResults | ✅ | ✅ | ✅ | |
+| SQLNativeSql | ❌ | ❌ | ❌ | TDengine has no counterpart |
+| SQLNumParams | ✅ | ✅ | ✅ | |
+| SQLNumResultCols | ✅ | ✅ | ✅ | |
+| SQLParamData | ❌ | ❌ | ❌ | TDengine has no counterpart |
+| SQLPrepare | ✅ | ✅ | ✅ | |
+| SQLPrimaryKeys | ✅ | ✅ | ✅ | |
+| SQLProcedureColumns | ❌ | ❌ | ❌ | TDengine has no counterpart |
+| SQLProcedures | ❌ | ❌ | ❌ | TDengine has no counterpart |
+| SQLPutData | ❌ | ❌ | ❌ | TDengine has no counterpart |
+| SQLRowCount | ✅ | ✅ | ✅ | |
+| SQLSetConnectAttr | ✅ | ✅ | ✅ | |
+| SQLSetCursorName | ❌ | ❌ | ❌ | TDengine has no counterpart |
+| SQLSetDescField | ❌ | ❌ | ❌ | |
+| SQLSetDescRec | ❌ | ❌ | ❌ | |
+| SQLSetEnvAttr | ✅ | ✅ | ✅ | |
+| SQLSetPos | ❌ | ❌ | ❌ | TDengine has no counterpart |
+| SQLSetStmtAttr | ✅ | ✅ | ✅ | |
+| SQLSpecialColumns | ❌ | ❌ | ❌ | TDengine has no counterpart |
+| SQLStatistics | ❌ | ❌ | ❌ | TDengine has no counterpart |
+| SQLTablePrivileges | ❌ | ❌ | ❌ | TDengine has no strict counterpart |
+| SQLTables | ✅ | ✅ | ✅ | |
+
+- **Non-supported-statement-attributes (SQLSetStmtAttr)**
+
+| Attribute | Note |
+| :----- | :---- |
+| SQL_ATTR_CONCURRENCY | TDengine has no updatable-CURSOR machanism |
+| SQL_ATTR_FETCH_BOOKMARK_PTR | TDengine has no BOOKMARK machanism |
+| SQL_ATTR_IMP_PARAM_DESC | |
+| SQL_ATTR_IMP_ROW_DESC | |
+| SQL_ATTR_KEYSET_SIZE | |
+| SQL_ATTR_PARAM_BIND_OFFSET_PTR | |
+| SQL_ATTR_PARAM_OPERATION_PTR | |
+| SQL_ATTR_ROW_NUMBER | Readonly attribute |
+| SQL_ATTR_ROW_OPERATION_PTR | |
+| SQL_ATTR_SIMULATE_CURSOR | |
+
+- **Non-supported-connection-attributes (SQLSetConnectAttr)**
+
+| Attribute | Note |
+| :----- | :---- |
+| SQL_ATTR_AUTO_IPD | Readonly attribute |
+| SQL_ATTR_CONNECTION_DEAD | Readonly attribute |
+| SQL_ATTR_ENLIST_IN_DTC | |
+| SQL_ATTR_PACKET_SIZE | |
+| SQL_ATTR_TRACE | |
+| SQL_ATTR_TRACEFILE | |
+| SQL_ATTR_TRANSLATE_LIB | |
+| SQL_ATTR_TRANSLATE_OPTION | |
+
+- **Enable any programming language with ODBC-bindings/ODBC-plugings to communicate with TDengine. programming languages listed as follows are demonstrated in test-cases:**
+
+| programming language | ODBC-API or bindings/plugins |
+| :----- | :---- |
+| C/C++ | ODBC-API |
+| CSharp | System.Data.Odbc |
+| Erlang | odbc module |
+| Go | github.com/alexbrainman/odbc, database/sql |
+| Haskell | HDBC, HDBC-odbc |
+| Common Lisp | plain-odbc |
+| Nodejs | odbc |
+| Python3 | pyodbc |
+| Rust | odbc |
+
+
+### 2.2 Layout of source code, directories only
+```
+<root>
+├── benchmark
+├── cmake
+├── common
+├── inc
+├── samples
+│   └── c
+├── sh
+├── src
+│   ├── core
+│   ├── inc
+│   ├── os_port
+│   ├── parser
+│   ├── tests
+│   └── utils
+├── templates
+├── tests
+│   ├── c
+│   ├── cpp
+│   ├── cs
+│   ├── erl
+│   ├── go
+│   ├── hs
+│   │   └── app
+│   ├── lisp
+│   ├── node
+│   ├── python
+│   ├── R
+│   ├── rust
+│   │   └── main
+│   │       └── src
+│   ├── sh
+│   ├── taos
+│   └── ws
+└── valgrind
+```
+
 ## 3. Prerequisites
 First, ensure that TDengine has been deployed locally. For detailed deployment steps, please refer to [Deploy TDengine](https://docs.tdengine.com/get-started/deploy-from-package/). Ensure that both taosd and taosAdapter services are up and running.
 
@@ -109,7 +259,7 @@ This section provides detailed instructions for building and installing the `tao
   ```
   cmake --build build --config Debug -j 4
   ```
-- Installing taos_odbc:
+- Installing connector:
   - This will install taos_odbc.dll into C:\TDengine\taos_odbc\x64\ by default.
     ```
     cmake --install build --config Debug
@@ -291,137 +441,6 @@ We welcome developers to contribute to this project. When submitting Pull Reques
 
 
 
-### Features
-- **on-going implementation of ODBC driver for TDengine 3.0 (TAOS)**
-- **currently exported ODBC functions are**:
-
-| ODBC/Setup API | linux (ubuntu 22.04) | macosx (ventura 13.2.1) | windows 11 | note |
-| :----- | :---- | :---- | :---- | :---- |
-| ConfigDSN | ❌ | ❌ | ✅ | |
-| ConfigDriver | ❌ | ❌ | ✅ | |
-| ConfigTranslator | ❌ | ❌ | ✅ | |
-| SQLAllocHandle | ✅ | ✅ | ✅ | |
-| SQLBindCol  | ✅ | ✅ | ✅ | Column-Wise Binding only |
-| SQLBindParameter | ✅ | ✅ | ✅ | Column-Wise Binding only |
-| SQLBrowseConnect | ❌ | ❌ | ❌ | |
-| SQLBulkOperations | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLCloseCursor | ✅ | ✅ | ✅ | |
-| SQLColAttribute | ✅ | ✅ | ✅ | |
-| SQLColumnPrivileges | ❌ | ❌ | ❌ | TDengine seems have no strict counterpart |
-| SQLColumns | ✅ | ✅ | ✅ | |
-| SQLCompleteAsync | ❌ | ❌ | ❌ | |
-| SQLConnect | ✅ | ✅ | ✅ | |
-| SQLCopyDesc | ❌ | ❌ | ❌ | |
-| SQLDescribeCol | ✅ | ✅ | ✅ | |
-| SQLDescribeParam | ✅ | ✅ | ✅ | partially and on-going |
-| SQLDisconnect | ✅ | ✅ | ✅ | |
-| SQLDriverConnect | ✅ | ✅ | ✅ | |
-| SQLEndTran | ✅ | ✅ | ✅ | TDengine is non-transactional, thus this is at most simulating |
-| SQLExecDirect | ✅ | ✅ | ✅ | |
-| SQLExecute | ✅ | ✅ | ✅ | |
-| SQLExtendedFetch | ❌ | ❌ | ❌ | |
-| SQLFetch | ✅ | ✅ | ✅ | |
-| SQLFetchScroll | ✅ | ✅ | ✅ | TDengine has no counterpart, just implement SQL_FETCH_NEXT |
-| SQLForeignKeys | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLFreeHandle | ✅ | ✅ | ✅ | |
-| SQLFreeStmt | ✅ | ✅ | ✅ | |
-| SQLGetConnectAttr | ✅ | ✅ | ✅ | partially and on-going |
-| SQLGetCursorName | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLGetData | ✅ | ✅ | ✅ | |
-| SQLGetDescField | ❌ | ❌ | ❌ | |
-| SQLGetDescRec | ❌ | ❌ | ❌ | |
-| SQLGetDiagField | ✅ | ✅ | ✅ | |
-| SQLGetDiagRec | ✅ | ✅ | ✅ | |
-| SQLGetEnvAttr | ✅ | ✅ | ✅ | partially and on-going |
-| SQLGetInfo | ✅ | ✅ | ✅ | partially and on-going |
-| SQLGetStmtAttr | ✅ | ✅ | ✅ | partially and on-going |
-| SQLGetTypeInfo | ✅ | ✅ | ✅ | |
-| SQLMoreResults | ✅ | ✅ | ✅ | |
-| SQLNativeSql | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLNumParams | ✅ | ✅ | ✅ | TDengine has partially support, thus workaround in some cases |
-| SQLNumResultCols | ✅ | ✅ | ✅ | |
-| SQLParamData | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLPrepare | ✅ | ✅ | ✅ | TDengine has partially support, thus workaround in some cases |
-| SQLPrimaryKeys | ✅ | ✅ | ✅ | |
-| SQLProcedureColumns | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLProcedures | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLPutData | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLRowCount | ✅ | ✅ | ✅ | |
-| SQLSetConnectAttr | ✅ | ✅ | ✅ | partially and on-going |
-| SQLSetCursorName | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLSetDescField | ❌ | ❌ | ❌ | |
-| SQLSetDescRec | ❌ | ❌ | ❌ | |
-| SQLSetEnvAttr | ✅ | ✅ | ✅ | partially and on-going |
-| SQLSetPos | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLSetStmtAttr | ✅ | ✅ | ✅ | partially and on-going |
-| SQLSpecialColumns | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLStatistics | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLTablePrivileges | ❌ | ❌ | ❌ | TDengine has no strict counterpart |
-| SQLTables | ✅ | ✅ | ✅ | |
-
-- **non-supported-statement-attributes (SQLSetStmtAttr)**
-
-| Attribute | Note |
-| :----- | :---- |
-| SQL_ATTR_CONCURRENCY | TDengine has no updatable-CURSOR machanism |
-| SQL_ATTR_FETCH_BOOKMARK_PTR | TDengine has no BOOKMARK machanism |
-| SQL_ATTR_IMP_PARAM_DESC | |
-| SQL_ATTR_IMP_ROW_DESC | |
-| SQL_ATTR_KEYSET_SIZE | |
-| SQL_ATTR_PARAM_BIND_OFFSET_PTR | |
-| SQL_ATTR_PARAM_OPERATION_PTR | |
-| SQL_ATTR_ROW_NUMBER | Readonly attribute |
-| SQL_ATTR_ROW_OPERATION_PTR | |
-| SQL_ATTR_SIMULATE_CURSOR | |
-
-- **non-supported-connection-attributes (SQLSetConnectAttr)**
-
-| Attribute | Note |
-| :----- | :---- |
-| SQL_ATTR_AUTO_IPD | Readonly attribute |
-| SQL_ATTR_CONNECTION_DEAD | Readonly attribute |
-| SQL_ATTR_ENLIST_IN_DTC | |
-| SQL_ATTR_PACKET_SIZE | |
-| SQL_ATTR_TRACE | |
-| SQL_ATTR_TRACEFILE | |
-| SQL_ATTR_TRANSLATE_LIB | |
-| SQL_ATTR_TRANSLATE_OPTION | |
-
-- **enable ODBC-aware software to communicate with TDengine**
-- **enable any programming language with ODBC-bindings/ODBC-plugings to communicate with TDengine. programming languages listed as follows are demonstrated in test-cases:**
-
-| programming language | ODBC-API or bindings/plugins |
-| :----- | :---- |
-| C/C++ | ODBC-API |
-| CSharp | System.Data.Odbc |
-| Erlang | odbc module |
-| Go | github.com/alexbrainman/odbc, database/sql |
-| Haskell | HDBC, HDBC-odbc |
-| Common Lisp | plain-odbc |
-| Nodejs | odbc |
-| Python3 | pyodbc |
-| Rust | odbc |
-
-
-- **On Windows, "ODBC Data Sources (64bit)" pre-installed tool can be used to manage DSN**
-- **Support TDengine data subscription feature，refer to samples/c/demo_topic.c**
-- **still going on**...
-
-
-### Installing prerequisites, use Ubuntu 20.04 as an example
-```
-sudo apt install flex bison unixodbc unixodbc-dev && echo -=Done=-
-```
-
-### Building and Installing, use Ubuntu 20.04 as an example
-```
-rm -rf debug &&
-cmake -B debug -DCMAKE_BUILD_TYPE=Debug &&
-cmake --build debug &&
-sudo cmake --install debug &&
-cmake --build debug --target install_templates &&
-echo -=Done=-
-```
 
 ### Test
 ```
@@ -550,49 +569,6 @@ set TAOS_ODBC_LOGGER=stderr
 11. testing
 ```
 ctest --test-dir build --output-on-failure -C Debug
-```
-
-### Tips
-- `cmake --help` or `man cmake`
-- `ctest --help` or `man ctest`
-- `valgrind --help` or `man valgrind`
-
-### Layout of source code, directories only
-```
-<root>
-├── benchmark
-├── cmake
-├── common
-├── inc
-├── samples
-│   └── c
-├── sh
-├── src
-│   ├── core
-│   ├── inc
-│   ├── os_port
-│   ├── parser
-│   ├── tests
-│   └── utils
-├── templates
-├── tests
-│   ├── c
-│   ├── cpp
-│   ├── cs
-│   ├── erl
-│   ├── go
-│   ├── hs
-│   │   └── app
-│   ├── lisp
-│   ├── node
-│   ├── python
-│   ├── R
-│   ├── rust
-│   │   └── main
-│   │       └── src
-│   ├── taos
-│   └── ws
-└── valgrind
 ```
 
 ## TDengine references
