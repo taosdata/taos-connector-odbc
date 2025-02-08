@@ -824,4 +824,427 @@
    fun:stmtGetTagFields
    fun:taos_stmt_get_tag_fields
 }
-
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:rewriteDropTable
+   fun:rewriteQuery
+   fun:translate
+   fun:analyseSemantic
+   fun:qAnalyseSqlSemantic
+   fun:doAsyncQueryFromAnalyse
+   fun:ctgCallUserCb
+   fun:processTaskQueue
+   fun:tQueryAutoQWorkerThreadFp
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:__libc_alloc_buffer_allocate
+   fun:alloc_buffer_allocate
+   fun:__resolv_conf_allocate
+   fun:__resolv_conf_load
+   fun:__resolv_conf_get_current
+   fun:__res_vinit
+   fun:maybe_init
+   fun:context_get
+   fun:__resolv_context_get
+   fun:gaih_inet.constprop.7
+   fun:getaddrinfo
+   fun:taosGetFqdn
+   fun:taosAddClientCfg
+   fun:taosInitCfg
+   fun:taos_init_imp
+   fun:__pthread_once_slow
+   fun:taosThreadOnce
+   fun:taos_init
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.2.5
+   fun:taosThreadCreate
+   fun:taosInitScheduler
+   fun:taosTmrModuleInit
+   fun:taosTmrInitModule
+   fun:taosTmrInit
+   fun:monitorInit
+   fun:taos_init_imp
+   fun:__pthread_once_slow
+   fun:taosThreadOnce
+   fun:taos_init
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.2.5
+   fun:taosThreadCreate
+   fun:taosInitTimer
+   fun:taosTmrModuleInit
+   fun:taosTmrInitModule
+   fun:taosTmrInit
+   fun:monitorInit
+   fun:taos_init_imp
+   fun:__pthread_once_slow
+   fun:taosThreadOnce
+   fun:taos_init
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.2.5
+   fun:taosThreadCreate
+   fun:transInitClient
+   fun:rpcOpen
+   fun:openTransporter
+   fun:taos_connect_internal.part.0
+   fun:taos_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:taosMemCalloc
+   fun:initWQ
+   fun:cliCreateConn
+   fun:cliCreateConn2
+   fun:cliGetOrCreateConn
+   fun:cliHandleBatchReq
+   fun:cliDoReq
+   fun:cliAsyncCb
+   fun:uv__async_io
+   fun:uv__io_poll
+   fun:uv_run
+   fun:cliWorkThread
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:strdup
+   fun:tstrdup
+   fun:cliCreateConn
+   fun:cliCreateConn2
+   fun:cliGetOrCreateConn
+   fun:cliHandleBatchReq
+   fun:cliDoReq
+   fun:cliAsyncCb
+   fun:uv__async_io
+   fun:uv__io_poll
+   fun:uv_run
+   fun:cliWorkThread
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:taosMemMalloc
+   fun:taosArrayInit
+   fun:taosHashInit
+   fun:cliCreateConn
+   fun:cliCreateConn2
+   fun:cliGetOrCreateConn
+   fun:cliHandleBatchReq
+   fun:cliDoReq
+   fun:cliAsyncCb
+   fun:uv__async_io
+   fun:uv__io_poll
+   fun:uv_run
+   fun:cliWorkThread
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:taosMemCalloc
+   fun:taosArrayInit
+   fun:taosHashInit
+   fun:cliCreateConn
+   fun:cliCreateConn2
+   fun:cliGetOrCreateConn
+   fun:cliHandleBatchReq
+   fun:cliDoReq
+   fun:cliAsyncCb
+   fun:uv__async_io
+   fun:uv__io_poll
+   fun:uv_run
+   fun:cliWorkThread
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:taosMemMalloc
+   fun:taosHashInit
+   fun:cliCreateConn
+   fun:cliCreateConn2
+   fun:cliGetOrCreateConn
+   fun:cliHandleBatchReq
+   fun:cliDoReq
+   fun:cliAsyncCb
+   fun:uv__async_io
+   fun:uv__io_poll
+   fun:uv_run
+   fun:cliWorkThread
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:taosMemCalloc
+   fun:cliCreateConn
+   fun:cliCreateConn2
+   fun:cliGetOrCreateConn
+   fun:cliHandleBatchReq
+   fun:cliDoReq
+   fun:cliAsyncCb
+   fun:uv__async_io
+   fun:uv__io_poll
+   fun:uv_run
+   fun:cliWorkThread
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:taosMemMalloc
+   fun:cliCreateConn
+   fun:cliCreateConn2
+   fun:cliGetOrCreateConn
+   fun:cliHandleBatchReq
+   fun:cliDoReq
+   fun:cliAsyncCb
+   fun:uv__async_io
+   fun:uv__io_poll
+   fun:uv_run
+   fun:cliWorkThread
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:taosMemCalloc
+   fun:transInitBuffer
+   fun:cliCreateConn
+   fun:cliCreateConn2
+   fun:cliGetOrCreateConn
+   fun:cliHandleBatchReq
+   fun:cliDoReq
+   fun:cliAsyncCb
+   fun:uv__async_io
+   fun:uv__io_poll
+   fun:uv_run
+   fun:cliWorkThread
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:realloc
+   fun:taosMemRealloc
+   fun:transAllocBuffer
+   fun:cliAllocRecvBufferCb
+   fun:uv__read
+   fun:uv__stream_io
+   fun:uv__io_poll
+   fun:uv_run
+   fun:cliWorkThread
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:strdup
+   fun:tstrdup
+   fun:schUpdateSendTargetInfo
+   fun:schAsyncSendMsg
+   fun:schBuildAndSendMsg
+   fun:schDropTaskOnExecNode
+   fun:schDropTaskInHashList
+   fun:schFreeJobImpl
+   fun:taosDecRefCount
+   fun:schHandleCallback
+   fun:doProcessMsgFromServerImpl
+   fun:doProcessMsgFromServer
+   fun:processTaskQueue
+   fun:tQueryAutoQWorkerThreadFp
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:taosMemCalloc
+   fun:schBuildAndSendMsg
+   fun:schDropTaskOnExecNode
+   fun:schDropTaskInHashList
+   fun:schFreeJobImpl
+   fun:taosDecRefCount
+   fun:schHandleCallback
+   fun:doProcessMsgFromServerImpl
+   fun:doProcessMsgFromServer
+   fun:processTaskQueue
+   fun:tQueryAutoQWorkerThreadFp
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:taosMemCalloc
+   fun:schMakeCallbackParam
+   fun:schGenerateCallBackInfo
+   fun:schAsyncSendMsg
+   fun:schBuildAndSendMsg
+   fun:schDropTaskOnExecNode
+   fun:schDropTaskInHashList
+   fun:schFreeJobImpl
+   fun:taosDecRefCount
+   fun:schHandleCallback
+   fun:doProcessMsgFromServerImpl
+   fun:doProcessMsgFromServer
+   fun:processTaskQueue
+   fun:tQueryAutoQWorkerThreadFp
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:taosMemCalloc
+   fun:rpcMallocCont
+   fun:asyncSendMsgToServerExt
+   fun:schAsyncSendMsg
+   fun:schBuildAndSendMsg
+   fun:schDropTaskOnExecNode
+   fun:schDropTaskInHashList
+   fun:schFreeJobImpl
+   fun:taosDecRefCount
+   fun:schHandleCallback
+   fun:doProcessMsgFromServerImpl
+   fun:doProcessMsgFromServer
+   fun:processTaskQueue
+   fun:tQueryAutoQWorkerThreadFp
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:taosMemCalloc
+   fun:schGenerateCallBackInfo
+   fun:schAsyncSendMsg
+   fun:schBuildAndSendMsg
+   fun:schDropTaskOnExecNode
+   fun:schDropTaskInHashList
+   fun:schFreeJobImpl
+   fun:taosDecRefCount
+   fun:schHandleCallback
+   fun:doProcessMsgFromServerImpl
+   fun:doProcessMsgFromServer
+   fun:processTaskQueue
+   fun:tQueryAutoQWorkerThreadFp
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:taosMemCalloc
+   fun:transCreateReqEpsetFromUserEpset
+   fun:transInitMsg.isra.0.constprop.0
+   fun:transSendRequest
+   fun:asyncSendMsgToServerExt
+   fun:schAsyncSendMsg
+   fun:schBuildAndSendMsg
+   fun:schDropTaskOnExecNode
+   fun:schDropTaskInHashList
+   fun:schFreeJobImpl
+   fun:taosDecRefCount
+   fun:schHandleCallback
+   fun:doProcessMsgFromServerImpl
+   fun:doProcessMsgFromServer
+   fun:processTaskQueue
+   fun:tQueryAutoQWorkerThreadFp
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:taosMemCalloc
+   fun:transInitMsg.isra.0.constprop.0
+   fun:transSendRequest
+   fun:asyncSendMsgToServerExt
+   fun:schAsyncSendMsg
+   fun:schBuildAndSendMsg
+   fun:schDropTaskOnExecNode
+   fun:schDropTaskInHashList
+   fun:schFreeJobImpl
+   fun:taosDecRefCount
+   fun:schHandleCallback
+   fun:doProcessMsgFromServerImpl
+   fun:doProcessMsgFromServer
+   fun:processTaskQueue
+   fun:tQueryAutoQWorkerThreadFp
+   fun:start_thread
+   fun:clone
+}
