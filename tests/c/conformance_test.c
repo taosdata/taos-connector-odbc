@@ -2948,7 +2948,10 @@ static int test_conn(int argc, char *argv[], SQLHANDLE hconn)
 
   if (r == 0) {
     r = test_conn_SQL_catalog_functions(hconn);
-    if (r) return -1;
+    if (r) {
+      CALL_SQLDisconnect(hconn);
+      return -1;
+    }
 
     r = test_connected_conn(hconn, &conn_arg);
   }
