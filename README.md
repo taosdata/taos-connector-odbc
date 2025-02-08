@@ -25,7 +25,7 @@ The `taos-connector-odbc` supports multiple operating systems, including Windows
 ### 2.1 Features
 - **Currently exported ODBC functions are**:
 
-| ODBC/Setup API | linux (ubuntu 22.04) | macosx (ventura 13.2.1) | windows 10/11 | note |
+| ODBC/Setup API | Linux | macOS | Windows | Note |
 | :----- | :---- | :---- | :---- | :---- |
 | ConfigDSN | ❌ | ❌ | ✅ | |
 | ConfigDriver | ❌ | ❌ | ✅ | |
@@ -439,6 +439,6 @@ We welcome developers to contribute to this project. When submitting Pull Reques
 
 ## 10. License
 [MIT License](./LICENSE)
-- 
+
 ## originally initiated by freemine@yeah.net
 
