@@ -3290,4 +3290,766 @@
    fun:_ZN61_$LT$taos_ws..TaosBuilder$u20$as$u20$taos_query..TBuilder$GT$5build17h4a6aecd016639bdfE
    fun:ws_connect_with_dsn
 }
-
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:_ZN4http6header4name7HdrName10from_bytes17h46c8f085ef97cb84E
+   fun:_ZN11tungstenite9handshake6client33extract_subprotocols_from_request17h0f4182fd9f1b28f9E
+   fun:_ZN11tungstenite9handshake6client24ClientHandshake$LT$S$GT$5start17h76f712be2b206b8dE
+   fun:_ZN114_$LT$tokio_tungstenite..handshake..StartedHandshakeFuture$LT$F$C$S$GT$$u20$as$u20$core..future..future..Future$GT$4poll17hbff345419906017cE
+   fun:_ZN17tokio_tungstenite7connect7connect28_$u7b$$u7b$closure$u7d$$u7d$17h6d48c95a83d76d99E
+   fun:_ZN7taos_ws11TaosBuilder16build_stream_opt28_$u7b$$u7b$closure$u7d$$u7d$17h8cd1b0508a6f7eb5E
+   fun:_ZN7taos_ws11TaosBuilder12build_stream28_$u7b$$u7b$closure$u7d$$u7d$17h1185b2221f728b53E
+   fun:_ZN5tokio7runtime4park16CachedParkThread8block_on17ha6745360317ef873E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17h19eaf7734273cc6bE
+   fun:_ZN5tokio7runtime7runtime7Runtime8block_on17h9b553cd490724035E
+   fun:_ZN10taos_query24block_in_place_or_global17h2415567dfc6e400aE
+   fun:_ZN61_$LT$taos_ws..TaosBuilder$u20$as$u20$taos_query..TBuilder$GT$5build17hb3f4d98ccd1e0adbE
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:_ZN4http6header4name7HdrName10from_bytes17h46c8f085ef97cb84E
+   fun:_ZN11tungstenite9handshake6client16generate_request17h8e9a776c2a41871aE
+   fun:_ZN11tungstenite9handshake6client24ClientHandshake$LT$S$GT$5start17h76f712be2b206b8dE
+   fun:_ZN114_$LT$tokio_tungstenite..handshake..StartedHandshakeFuture$LT$F$C$S$GT$$u20$as$u20$core..future..future..Future$GT$4poll17hbff345419906017cE
+   fun:_ZN17tokio_tungstenite7connect7connect28_$u7b$$u7b$closure$u7d$$u7d$17h6d48c95a83d76d99E
+   fun:_ZN7taos_ws11TaosBuilder16build_stream_opt28_$u7b$$u7b$closure$u7d$$u7d$17h8cd1b0508a6f7eb5E
+   fun:_ZN7taos_ws11TaosBuilder12build_stream28_$u7b$$u7b$closure$u7d$$u7d$17h1185b2221f728b53E
+   fun:_ZN5tokio7runtime4park16CachedParkThread8block_on17ha6745360317ef873E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17h19eaf7734273cc6bE
+   fun:_ZN5tokio7runtime7runtime7Runtime8block_on17h9b553cd490724035E
+   fun:_ZN10taos_query24block_in_place_or_global17h2415567dfc6e400aE
+   fun:_ZN61_$LT$taos_ws..TaosBuilder$u20$as$u20$taos_query..TBuilder$GT$5build17hb3f4d98ccd1e0adbE
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:_ZN4http6header4name7HdrName10from_bytes17h46c8f085ef97cb84E
+   fun:_ZN4http6header3map18HeaderMap$LT$T$GT$6remove17h8574f9cf8ce0327fE
+   fun:_ZN11tungstenite9handshake6client16generate_request17h8e9a776c2a41871aE
+   fun:_ZN11tungstenite9handshake6client24ClientHandshake$LT$S$GT$5start17h76f712be2b206b8dE
+   fun:_ZN114_$LT$tokio_tungstenite..handshake..StartedHandshakeFuture$LT$F$C$S$GT$$u20$as$u20$core..future..future..Future$GT$4poll17hbff345419906017cE
+   fun:_ZN17tokio_tungstenite7connect7connect28_$u7b$$u7b$closure$u7d$$u7d$17h6d48c95a83d76d99E
+   fun:_ZN7taos_ws11TaosBuilder16build_stream_opt28_$u7b$$u7b$closure$u7d$$u7d$17h8cd1b0508a6f7eb5E
+   fun:_ZN7taos_ws11TaosBuilder12build_stream28_$u7b$$u7b$closure$u7d$$u7d$17h1185b2221f728b53E
+   fun:_ZN5tokio7runtime4park16CachedParkThread8block_on17ha6745360317ef873E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17h19eaf7734273cc6bE
+   fun:_ZN5tokio7runtime7runtime7Runtime8block_on17h9b553cd490724035E
+   fun:_ZN10taos_query24block_in_place_or_global17h2415567dfc6e400aE
+   fun:_ZN61_$LT$taos_ws..TaosBuilder$u20$as$u20$taos_query..TBuilder$GT$5build17hb3f4d98ccd1e0adbE
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:_ZN4http6header4name7HdrName10from_bytes17h46c8f085ef97cb84E
+   fun:_ZN11tungstenite9handshake6client10VerifyData15verify_response17he2119ea003e05786E
+   fun:_ZN114_$LT$tungstenite..handshake..client..ClientHandshake$LT$S$GT$$u20$as$u20$tungstenite..handshake..HandshakeRole$GT$14stage_finished17h62ca6d0619013ecbE
+   fun:_ZN11tungstenite9handshake24MidHandshake$LT$Role$GT$9handshake17hbbb59ba9edf1c308E
+   fun:_ZN103_$LT$tokio_tungstenite..handshake..MidHandshake$LT$Role$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h3e39688a9eca5d6aE
+   fun:_ZN17tokio_tungstenite7connect7connect28_$u7b$$u7b$closure$u7d$$u7d$17h6d48c95a83d76d99E
+   fun:_ZN7taos_ws11TaosBuilder16build_stream_opt28_$u7b$$u7b$closure$u7d$$u7d$17h8cd1b0508a6f7eb5E
+   fun:_ZN7taos_ws11TaosBuilder12build_stream28_$u7b$$u7b$closure$u7d$$u7d$17h1185b2221f728b53E
+   fun:_ZN5tokio7runtime4park16CachedParkThread8block_on17ha6745360317ef873E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17h19eaf7734273cc6bE
+   fun:_ZN5tokio7runtime7runtime7Runtime8block_on17h9b553cd490724035E
+   fun:_ZN10taos_query24block_in_place_or_global17h2415567dfc6e400aE
+   fun:_ZN61_$LT$taos_ws..TaosBuilder$u20$as$u20$taos_query..TBuilder$GT$5build17hb3f4d98ccd1e0adbE
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:_ZN4http6header4name7HdrName10from_bytes17h46c8f085ef97cb84E
+   fun:_ZN4http6header3map18HeaderMap$LT$T$GT$3get17hf91cd3311683ec5eE
+   fun:_ZN11tungstenite9handshake6client10VerifyData15verify_response17he2119ea003e05786E
+   fun:_ZN114_$LT$tungstenite..handshake..client..ClientHandshake$LT$S$GT$$u20$as$u20$tungstenite..handshake..HandshakeRole$GT$14stage_finished17h62ca6d0619013ecbE
+   fun:_ZN11tungstenite9handshake24MidHandshake$LT$Role$GT$9handshake17hbbb59ba9edf1c308E
+   fun:_ZN103_$LT$tokio_tungstenite..handshake..MidHandshake$LT$Role$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h3e39688a9eca5d6aE
+   fun:_ZN17tokio_tungstenite7connect7connect28_$u7b$$u7b$closure$u7d$$u7d$17h6d48c95a83d76d99E
+   fun:_ZN7taos_ws11TaosBuilder16build_stream_opt28_$u7b$$u7b$closure$u7d$$u7d$17h8cd1b0508a6f7eb5E
+   fun:_ZN7taos_ws11TaosBuilder12build_stream28_$u7b$$u7b$closure$u7d$$u7d$17h1185b2221f728b53E
+   fun:_ZN5tokio7runtime4park16CachedParkThread8block_on17ha6745360317ef873E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17h19eaf7734273cc6bE
+   fun:_ZN5tokio7runtime7runtime7Runtime8block_on17h9b553cd490724035E
+   fun:_ZN10taos_query24block_in_place_or_global17h2415567dfc6e400aE
+   fun:_ZN61_$LT$taos_ws..TaosBuilder$u20$as$u20$taos_query..TBuilder$GT$5build17hb3f4d98ccd1e0adbE
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17h49c22055b017c049E
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$17h10e3d4045ffd98caE
+   fun:_ZN83_$LT$taos_ws..query..Taos$u20$as$u20$taos_query..prelude..async..AsyncQueryable$GT$17query_with_req_id28_$u7b$$u7b$closure$u7d$$u7d$17h8fa8455882a80e19E.llvm.3164188089105766712
+   fun:_ZN5tokio7runtime4park16CachedParkThread8block_on17he141514093cdc20aE
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hc1b19f6cdff16ec2E
+   fun:_ZN10taos_query24block_in_place_or_global17h22a643d588ab5883E
+   fun:ws_query_with_reqid
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:_ZN9hashbrown3raw21RawTable$LT$T$C$A$GT$14reserve_rehash17hc60806d076982d9dE
+   fun:_ZN9hashbrown3map28HashMap$LT$K$C$V$C$S$C$A$GT$6insert17h83e6fc23f24755bcE
+   fun:_ZN14regex_automata6hybrid3dfa4Lazy10init_cache17h60787415f210ae9bE
+   fun:_ZN14regex_automata6hybrid3dfa5Cache3new17he936e56c86d3e85cE
+   fun:_ZN108_$LT$regex_automata..meta..strategy..ReverseAnchored$u20$as$u20$regex_automata..meta..strategy..Strategy$GT$12create_cache17hebb972b4841f6beeE
+   fun:_ZN14regex_automata4meta5regex7Builder19build_many_from_hir28_$u7b$$u7b$closure$u7d$$u7d$17h39491d3137b5358bE
+   fun:_ZN14regex_automata4util4pool5inner17Pool$LT$T$C$F$GT$8get_slow17he7ee26962cc529beE
+   fun:_ZN5regex5regex6string5Regex11is_match_at17hf58b65aa126697d0E
+   fun:_ZN4mdsn3Dsn10from_regex17h5b28d1e3d1a8da4bE
+   fun:_ZN41_$LT$$RF$str$u20$as$u20$mdsn..IntoDsn$GT$8into_dsn17hba689201a00c4af9E
+   fun:_ZN7taos_ws11TaosBuilder8from_dsn17he5164c4cd5fccf22E
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17h49c22055b017c049E.llvm.10086090848175375415
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$17h10e3d4045ffd98caE
+   fun:_ZN91_$LT$tracing..instrument..Instrumented$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h6c9685a328a81f49E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h525b948ba1a70134E
+   fun:_ZN5tokio7runtime4task7harness20Harness$LT$T$C$S$GT$4poll17he7387f5834825083E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context8run_task17h9d48a9880ba265beE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context3run17h058fb9762b8af1cfE
+   fun:_ZN5tokio7runtime7context13set_scheduler17h9ab1eaf897b9fbe1E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hcbb59e793edf8808E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker3run17heecc67d3104f7732E
+   fun:_ZN102_$LT$tokio..runtime..blocking..task..BlockingTask$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h9c20a5cda36c2a04E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h6d43742747d3db23E
+   fun:_ZN5tokio7runtime4task3raw4poll17h6d94b78c98d674b0E
+   fun:_ZN5tokio7runtime8blocking4pool5Inner3run17hc096eb4b805e3e8eE
+   fun:_ZN3std10sys_common9backtrace28__rust_begin_short_backtrace17h8893626c4bd3bcc8E
+   fun:_ZN4core3ops8function6FnOnce40call_once$u7b$$u7b$vtable.shim$u7d$$u7d$17h5bdb8a16fc59c692E
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new12thread_start17h420dad5cf01a9f35E
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:_ZN9hashbrown3raw21RawTable$LT$T$C$A$GT$14reserve_rehash17hc60806d076982d9dE
+   fun:_ZN9hashbrown3map28HashMap$LT$K$C$V$C$S$C$A$GT$6insert17h83e6fc23f24755bcE
+   fun:_ZN14regex_automata6hybrid3dfa4Lazy10init_cache17h60787415f210ae9bE
+   fun:_ZN14regex_automata6hybrid3dfa5Cache3new17he936e56c86d3e85cE
+   fun:_ZN97_$LT$regex_automata..meta..strategy..Core$u20$as$u20$regex_automata..meta..strategy..Strategy$GT$12create_cache17h88f56951200b1ca9E
+   fun:_ZN14regex_automata4meta5regex7Builder19build_many_from_hir28_$u7b$$u7b$closure$u7d$$u7d$17h39491d3137b5358bE
+   fun:_ZN14regex_automata4util4pool5inner17Pool$LT$T$C$F$GT$8get_slow17he7ee26962cc529beE
+   fun:_ZN5regex5regex6string5Regex11captures_at17hac205423d5814668E
+   fun:_ZN4mdsn3Dsn10from_regex17parse_single_addr17hb71439ca4da0ad8fE
+   fun:_ZN4mdsn3Dsn10from_regex10parse_addr17h7262c872647ed6c4E
+   fun:_ZN4mdsn3Dsn10from_regex13try_parse_url17h46a2c5bdd38911b2E
+   fun:_ZN4mdsn3Dsn10from_regex17h5b28d1e3d1a8da4bE
+   fun:_ZN41_$LT$$RF$str$u20$as$u20$mdsn..IntoDsn$GT$8into_dsn17hba689201a00c4af9E
+   fun:_ZN7taos_ws11TaosBuilder8from_dsn17he5164c4cd5fccf22E
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:posix_memalign
+   fun:__rdl_alloc
+   fun:_ZN3sdd9collector15CollectorAnchor5alloc17hdee3353394bc7619E
+   fun:_ZN3sdd5guard5Guard3new17he56a3e67cf0c29d9E
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17he31edee2ab4c9719E.llvm.10351630704282588696
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$17h54e7d312310a7dbcE.llvm.10351630704282588696
+   fun:_ZN7taos_ws5query4asyn6WsTaos19s_query_with_req_id28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17h401558c963355f12E
+   fun:_ZN91_$LT$tracing..instrument..Instrumented$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17hae9c12979808825bE
+   fun:_ZN83_$LT$taos_ws..query..Taos$u20$as$u20$taos_query..prelude..async..AsyncQueryable$GT$5query28_$u7b$$u7b$closure$u7d$$u7d$17h4b9359d1a1c755fbE.llvm.870302479201606134
+   fun:_ZN5tokio7runtime4park16CachedParkThread8block_on17hb44dc5f1ef600298E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17h1a8e89c55d82371cE
+   fun:_ZN5tokio7runtime7runtime7Runtime8block_on17h16cc628b2c54ee51E
+   fun:_ZN10taos_query24block_in_place_or_global17h21501ced2ae8d240E
+   fun:_ZN10taos_query7prelude4sync9Queryable4exec17h1aa367eaeb4f5782E
+   fun:_ZN61_$LT$taos_ws..TaosBuilder$u20$as$u20$taos_query..TBuilder$GT$4ping17hd7175c2c78e9543fE
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17he31edee2ab4c9719E.llvm.10351630704282588696
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$17h54e7d312310a7dbcE.llvm.10351630704282588696
+   fun:_ZN7taos_ws5query4asyn6WsTaos19s_query_with_req_id28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17h401558c963355f12E
+   fun:_ZN91_$LT$tracing..instrument..Instrumented$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17hae9c12979808825bE
+   fun:_ZN83_$LT$taos_ws..query..Taos$u20$as$u20$taos_query..prelude..async..AsyncQueryable$GT$5query28_$u7b$$u7b$closure$u7d$$u7d$17h4b9359d1a1c755fbE.llvm.870302479201606134
+   fun:_ZN5tokio7runtime4park16CachedParkThread8block_on17hb44dc5f1ef600298E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17h1a8e89c55d82371cE
+   fun:_ZN5tokio7runtime7runtime7Runtime8block_on17h16cc628b2c54ee51E
+   fun:_ZN10taos_query24block_in_place_or_global17h21501ced2ae8d240E
+   fun:_ZN10taos_query7prelude4sync9Queryable4exec17h1aa367eaeb4f5782E
+   fun:_ZN61_$LT$taos_ws..TaosBuilder$u20$as$u20$taos_query..TBuilder$GT$4ping17hd7175c2c78e9543fE
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:posix_memalign
+   fun:__rdl_alloc
+   fun:_ZN3sdd9collector15CollectorAnchor5alloc17hdee3353394bc7619E
+   fun:_ZN3sdd5guard5Guard3new17he56a3e67cf0c29d9E
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17he31edee2ab4c9719E.llvm.10351630704282588696
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$17h54e7d312310a7dbcE.llvm.10351630704282588696
+   fun:_ZN91_$LT$tracing..instrument..Instrumented$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17hfbc3addb55abe243E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h865eab74aec22d6fE
+   fun:_ZN5tokio7runtime4task7harness20Harness$LT$T$C$S$GT$4poll17h822847a4b2d12bebE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context8run_task17h9d48a9880ba265beE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context3run17h058fb9762b8af1cfE
+   fun:_ZN5tokio7runtime7context13set_scheduler17h9ab1eaf897b9fbe1E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hcbb59e793edf8808E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker3run17heecc67d3104f7732E
+   fun:_ZN102_$LT$tokio..runtime..blocking..task..BlockingTask$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h9c20a5cda36c2a04E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h6d43742747d3db23E
+   fun:_ZN5tokio7runtime4task3raw4poll17h6d94b78c98d674b0E
+   fun:_ZN5tokio7runtime8blocking4pool5Inner3run17hc096eb4b805e3e8eE
+   fun:_ZN3std10sys_common9backtrace28__rust_begin_short_backtrace17h8893626c4bd3bcc8E
+   fun:_ZN4core3ops8function6FnOnce40call_once$u7b$$u7b$vtable.shim$u7d$$u7d$17h5bdb8a16fc59c692E
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new12thread_start17h420dad5cf01a9f35E
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:posix_memalign
+   fun:__rdl_alloc
+   fun:_ZN3sdd9collector15CollectorAnchor5alloc17hdee3353394bc7619E
+   fun:_ZN3scc8hash_map24HashMap$LT$K$C$V$C$H$GT$9remove_if17he4881aabeca63237E
+   fun:_ZN7taos_ws5query4asyn12read_queries28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17h8572da228f23c583E
+   fun:_ZN7taos_ws5query4asyn12read_queries28_$u7b$$u7b$closure$u7d$$u7d$17h733be98be4e64033E.llvm.12654642672321372731
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h970c488ee398d709E
+   fun:_ZN5tokio7runtime4task7harness20Harness$LT$T$C$S$GT$4poll17hbaf2b06528c640a0E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context8run_task17h9d48a9880ba265beE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context3run17h058fb9762b8af1cfE
+   fun:_ZN5tokio7runtime7context13set_scheduler17h9ab1eaf897b9fbe1E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hcbb59e793edf8808E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker3run17heecc67d3104f7732E
+   fun:_ZN102_$LT$tokio..runtime..blocking..task..BlockingTask$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h9c20a5cda36c2a04E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h6d43742747d3db23E
+   fun:_ZN5tokio7runtime4task3raw4poll17h6d94b78c98d674b0E
+   fun:_ZN5tokio7runtime8blocking4pool5Inner3run17hc096eb4b805e3e8eE
+   fun:_ZN3std10sys_common9backtrace28__rust_begin_short_backtrace17h8893626c4bd3bcc8E
+   fun:_ZN4core3ops8function6FnOnce40call_once$u7b$$u7b$vtable.shim$u7d$$u7d$17h5bdb8a16fc59c692E
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new12thread_start17h420dad5cf01a9f35E
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:posix_memalign
+   fun:__rdl_alloc
+   fun:_ZN3sdd9collector15CollectorAnchor5alloc17hdee3353394bc7619E
+   fun:_ZN3scc8hash_map24HashMap$LT$K$C$V$C$H$GT$9remove_if17he4881aabeca63237E
+   fun:_ZN7taos_ws5query4asyn12read_queries28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17hb374ef8f19b4526eE.llvm.12654642672321372731
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h5d195b03cae9947fE
+   fun:_ZN5tokio7runtime4task7harness20Harness$LT$T$C$S$GT$4poll17h4ecd6ba39d7d3715E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context8run_task17h9d48a9880ba265beE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context3run17h058fb9762b8af1cfE
+   fun:_ZN5tokio7runtime7context13set_scheduler17h9ab1eaf897b9fbe1E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hcbb59e793edf8808E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker3run17heecc67d3104f7732E
+   fun:_ZN102_$LT$tokio..runtime..blocking..task..BlockingTask$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h9c20a5cda36c2a04E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h6d43742747d3db23E
+   fun:_ZN5tokio7runtime4task3raw4poll17h6d94b78c98d674b0E
+   fun:_ZN5tokio7runtime8blocking4pool5Inner3run17hc096eb4b805e3e8eE
+   fun:_ZN3std10sys_common9backtrace28__rust_begin_short_backtrace17h8893626c4bd3bcc8E
+   fun:_ZN4core3ops8function6FnOnce40call_once$u7b$$u7b$vtable.shim$u7d$$u7d$17h5bdb8a16fc59c692E
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new12thread_start17h420dad5cf01a9f35E
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:_ZN3scc10hash_table12bucket_array32BucketArray$LT$K$C$V$C$L$C$_$GT$3new17h4c39a896691afa0bE
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17h49c22055b017c049E.llvm.10086090848175375415
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$17h10e3d4045ffd98caE
+   fun:_ZN91_$LT$tracing..instrument..Instrumented$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h6c9685a328a81f49E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h525b948ba1a70134E
+   fun:_ZN5tokio7runtime4task7harness20Harness$LT$T$C$S$GT$4poll17he7387f5834825083E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context8run_task17h9d48a9880ba265beE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context3run17h058fb9762b8af1cfE
+   fun:_ZN5tokio7runtime7context13set_scheduler17h9ab1eaf897b9fbe1E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hcbb59e793edf8808E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker3run17heecc67d3104f7732E
+   fun:_ZN102_$LT$tokio..runtime..blocking..task..BlockingTask$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h9c20a5cda36c2a04E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h6d43742747d3db23E
+   fun:_ZN5tokio7runtime4task3raw4poll17h6d94b78c98d674b0E
+   fun:_ZN5tokio7runtime8blocking4pool5Inner3run17hc096eb4b805e3e8eE
+   fun:_ZN3std10sys_common9backtrace28__rust_begin_short_backtrace17h8893626c4bd3bcc8E
+   fun:_ZN4core3ops8function6FnOnce40call_once$u7b$$u7b$vtable.shim$u7d$$u7d$17h5bdb8a16fc59c692E
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new12thread_start17h420dad5cf01a9f35E
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:_ZN3scc10hash_table12bucket_array32BucketArray$LT$K$C$V$C$L$C$_$GT$3new17h4c39a896691afa0bE
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17h49c22055b017c049E
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$17h10e3d4045ffd98caE
+   fun:_ZN83_$LT$taos_ws..query..Taos$u20$as$u20$taos_query..prelude..async..AsyncQueryable$GT$17query_with_req_id28_$u7b$$u7b$closure$u7d$$u7d$17h8fa8455882a80e19E.llvm.3164188089105766712
+   fun:_ZN5tokio7runtime4park16CachedParkThread8block_on17he141514093cdc20aE
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hc1b19f6cdff16ec2E
+   fun:_ZN10taos_query24block_in_place_or_global17h22a643d588ab5883E
+   fun:ws_query_with_reqid
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.2.5
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new17ha7dea8a242003201E
+   fun:_ZN3std6thread7Builder15spawn_unchecked17h4f5d13f62b30f67eE
+   fun:_ZN5tokio7runtime8blocking4pool7Spawner10spawn_task17he18ad7882b18de44E
+   fun:_ZN5tokio7runtime8blocking4pool7Spawner14spawn_blocking17h41c94f48ef0d6644E
+   fun:_ZN5tokio7runtime8blocking4pool14spawn_blocking17h0c6c38195453381cE
+   fun:_ZN5tokio3net4addr95_$LT$impl$u20$tokio..net..addr..sealed..ToSocketAddrsPriv$u20$for$u20$alloc..string..String$GT$15to_socket_addrs17hbeba14f155c1d183E
+   fun:_ZN17tokio_tungstenite7connect7connect28_$u7b$$u7b$closure$u7d$$u7d$17h6d48c95a83d76d99E
+   fun:_ZN7taos_ws11TaosBuilder16build_stream_opt28_$u7b$$u7b$closure$u7d$$u7d$17h8cd1b0508a6f7eb5E
+   fun:_ZN7taos_ws11TaosBuilder12build_stream28_$u7b$$u7b$closure$u7d$$u7d$17h1185b2221f728b53E
+   fun:_ZN5tokio7runtime4park16CachedParkThread8block_on17ha6745360317ef873E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17h19eaf7734273cc6bE
+   fun:_ZN5tokio7runtime7runtime7Runtime8block_on17h9b553cd490724035E
+   fun:_ZN10taos_query24block_in_place_or_global17h2415567dfc6e400aE
+   fun:_ZN61_$LT$taos_ws..TaosBuilder$u20$as$u20$taos_query..TBuilder$GT$5build17hb3f4d98ccd1e0adbE
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:posix_memalign
+   fun:__rdl_alloc
+   fun:_ZN3sdd9collector15CollectorAnchor5alloc17hdee3353394bc7619E
+   fun:_ZN3sdd5guard5Guard3new17he56a3e67cf0c29d9E
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17h49c22055b017c049E.llvm.10086090848175375415
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$17h10e3d4045ffd98caE
+   fun:_ZN91_$LT$tracing..instrument..Instrumented$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h6c9685a328a81f49E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h525b948ba1a70134E
+   fun:_ZN5tokio7runtime4task7harness20Harness$LT$T$C$S$GT$4poll17he7387f5834825083E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context8run_task17h9d48a9880ba265beE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context3run17h058fb9762b8af1cfE
+   fun:_ZN5tokio7runtime7context13set_scheduler17h9ab1eaf897b9fbe1E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hcbb59e793edf8808E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker3run17heecc67d3104f7732E
+   fun:_ZN102_$LT$tokio..runtime..blocking..task..BlockingTask$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h9c20a5cda36c2a04E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h6d43742747d3db23E
+   fun:_ZN5tokio7runtime4task3raw4poll17h6d94b78c98d674b0E
+   fun:_ZN5tokio7runtime8blocking4pool5Inner3run17hc096eb4b805e3e8eE
+   fun:_ZN3std10sys_common9backtrace28__rust_begin_short_backtrace17h8893626c4bd3bcc8E
+   fun:_ZN4core3ops8function6FnOnce40call_once$u7b$$u7b$vtable.shim$u7d$$u7d$17h5bdb8a16fc59c692E
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new12thread_start17h420dad5cf01a9f35E
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:_ZN3std3sys12thread_local10fast_local12Key$LT$T$GT$14try_initialize17hef63e7e0be2d48cdE
+   fun:_ZN4rand4rngs6thread10thread_rng17h01f7c7de6dea926bE
+   fun:_ZN11tungstenite8protocol5frame5frame11FrameHeader15set_random_mask17h64f8d8dd2d3d8038E
+   fun:_ZN11tungstenite8protocol16WebSocketContext12buffer_frame17hca1533b396ef522fE
+   fun:_ZN11tungstenite8protocol16WebSocketContext6_write17hbded409b58b3d5feE
+   fun:_ZN11tungstenite8protocol16WebSocketContext5write17h9a03c2fd991ed8f5E
+   fun:_ZN129_$LT$tokio_tungstenite..WebSocketStream$LT$T$GT$$u20$as$u20$futures_sink..Sink$LT$tungstenite..protocol..message..Message$GT$$GT$10start_send17h7ecf5007c59603e9E
+   fun:_ZN113_$LT$futures_util..stream..stream..split..SplitSink$LT$S$C$Item$GT$$u20$as$u20$futures_sink..Sink$LT$Item$GT$$GT$10poll_flush17hcc0a1cb31af08d22E
+   fun:_ZN91_$LT$tracing..instrument..Instrumented$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h75055db0c733ce87E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17hbebde010b6d9a37eE
+   fun:_ZN5tokio7runtime4task7harness20Harness$LT$T$C$S$GT$4poll17h07992ec2f2095a41E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context8run_task17h9d48a9880ba265beE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context3run17h058fb9762b8af1cfE
+   fun:_ZN5tokio7runtime7context13set_scheduler17h9ab1eaf897b9fbe1E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hcbb59e793edf8808E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker3run17heecc67d3104f7732E
+   fun:_ZN102_$LT$tokio..runtime..blocking..task..BlockingTask$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h9c20a5cda36c2a04E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h6d43742747d3db23E
+   fun:_ZN5tokio7runtime4task3raw4poll17h6d94b78c98d674b0E
+   fun:_ZN5tokio7runtime8blocking4pool5Inner3run17hc096eb4b805e3e8eE
+   fun:_ZN3std10sys_common9backtrace28__rust_begin_short_backtrace17h8893626c4bd3bcc8E
+   fun:_ZN4core3ops8function6FnOnce40call_once$u7b$$u7b$vtable.shim$u7d$$u7d$17h5bdb8a16fc59c692E
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new12thread_start17h420dad5cf01a9f35E
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:_ZN3std3sys12thread_local10fast_local12Key$LT$T$GT$14try_initialize17hef63e7e0be2d48cdE
+   fun:_ZN4rand4rngs6thread10thread_rng17h01f7c7de6dea926bE
+   fun:_ZN4uuid3rng4u12817h1c9dc24d4f44fc2cE
+   fun:_ZN4uuid2v428_$LT$impl$u20$uuid..Uuid$GT$6new_v417hf838ccbeb2152728E
+   fun:_ZN4core3ops8function6FnOnce9call_once17he2bf9ea95a770d8dE
+   fun:_ZN9once_cell3imp17OnceCell$LT$T$GT$10initialize28_$u7b$$u7b$closure$u7d$$u7d$17h779c99051e4c6df5E.llvm.4611006054798453129
+   fun:_ZN9once_cell3imp18initialize_or_wait17h0d40527f23041a41E
+   fun:_ZN9once_cell3imp17OnceCell$LT$T$GT$10initialize17hb0774820aa0f6c0eE
+   fun:_ZN91_$LT$tracing..instrument..Instrumented$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17hfbc3addb55abe243E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h865eab74aec22d6fE
+   fun:_ZN5tokio7runtime4task7harness20Harness$LT$T$C$S$GT$4poll17h822847a4b2d12bebE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context8run_task17h9d48a9880ba265beE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context3run17h058fb9762b8af1cfE
+   fun:_ZN5tokio7runtime7context13set_scheduler17h9ab1eaf897b9fbe1E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hcbb59e793edf8808E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker3run17heecc67d3104f7732E
+   fun:_ZN102_$LT$tokio..runtime..blocking..task..BlockingTask$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h9c20a5cda36c2a04E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h6d43742747d3db23E
+   fun:_ZN5tokio7runtime4task3raw4poll17h6d94b78c98d674b0E
+   fun:_ZN5tokio7runtime8blocking4pool5Inner3run17hc096eb4b805e3e8eE
+   fun:_ZN3std10sys_common9backtrace28__rust_begin_short_backtrace17h8893626c4bd3bcc8E
+   fun:_ZN4core3ops8function6FnOnce40call_once$u7b$$u7b$vtable.shim$u7d$$u7d$17h5bdb8a16fc59c692E
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new12thread_start17h420dad5cf01a9f35E
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:_ZN3scc10hash_table12bucket_array32BucketArray$LT$K$C$V$C$L$C$_$GT$3new17h3c6e4c14b40b1a37E
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17he31edee2ab4c9719E.llvm.10351630704282588696
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$17h54e7d312310a7dbcE.llvm.10351630704282588696
+   fun:_ZN7taos_ws5query4asyn6WsTaos19s_query_with_req_id28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17h401558c963355f12E
+   fun:_ZN91_$LT$tracing..instrument..Instrumented$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17hae9c12979808825bE
+   fun:_ZN83_$LT$taos_ws..query..Taos$u20$as$u20$taos_query..prelude..async..AsyncQueryable$GT$5query28_$u7b$$u7b$closure$u7d$$u7d$17h4b9359d1a1c755fbE.llvm.870302479201606134
+   fun:_ZN5tokio7runtime4park16CachedParkThread8block_on17hb44dc5f1ef600298E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17h1a8e89c55d82371cE
+   fun:_ZN5tokio7runtime7runtime7Runtime8block_on17h16cc628b2c54ee51E
+   fun:_ZN10taos_query24block_in_place_or_global17h21501ced2ae8d240E
+   fun:_ZN10taos_query7prelude4sync9Queryable4exec17h1aa367eaeb4f5782E
+   fun:_ZN61_$LT$taos_ws..TaosBuilder$u20$as$u20$taos_query..TBuilder$GT$4ping17hd7175c2c78e9543fE
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:_ZN9hashbrown3raw21RawTable$LT$T$C$A$GT$14reserve_rehash17hc60806d076982d9dE
+   fun:_ZN9hashbrown3map28HashMap$LT$K$C$V$C$S$C$A$GT$6insert17h83e6fc23f24755bcE
+   fun:_ZN14regex_automata6hybrid3dfa4Lazy16cache_next_state17h78880b904c465fd6E
+   fun:_ZN14regex_automata6hybrid6search8find_rev17h19679a0047edf337E
+   fun:_ZN108_$LT$regex_automata..meta..strategy..ReverseAnchored$u20$as$u20$regex_automata..meta..strategy..Strategy$GT$11search_half17h4c27633564ecc810E
+   fun:_ZN5regex5regex6string5Regex11is_match_at17hf58b65aa126697d0E
+   fun:_ZN4mdsn3Dsn10from_regex17h5b28d1e3d1a8da4bE
+   fun:_ZN41_$LT$$RF$str$u20$as$u20$mdsn..IntoDsn$GT$8into_dsn17hba689201a00c4af9E
+   fun:_ZN7taos_ws11TaosBuilder8from_dsn17he5164c4cd5fccf22E
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:_ZN9hashbrown3raw21RawTable$LT$T$C$A$GT$14reserve_rehash17he91ac6b2ad723d08E
+   fun:_ZN9hashbrown3map28HashMap$LT$K$C$V$C$S$C$A$GT$6insert17hef152fe189948cceE
+   fun:_ZN5tokio7runtime8blocking4pool7Spawner10spawn_task17he18ad7882b18de44E
+   fun:_ZN5tokio7runtime8blocking4pool7Spawner14spawn_blocking17ha254863a9c41742aE
+   fun:_ZN5tokio7runtime8blocking4pool14spawn_blocking17hc9a994175e496440E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker6Launch6launch17h306c024c972654afE
+   fun:_ZN5tokio7runtime7builder7Builder5build17h755a556469d5c73eE
+   fun:_ZN3std3sys4sync4once5futex4Once4call17hb8358b81524d26fbE
+   fun:_ZN10taos_query20global_tokio_runtime17h1eae51c35e6e51c8E
+   fun:_ZN10taos_query24block_in_place_or_global17h2415567dfc6e400aE
+   fun:_ZN61_$LT$taos_ws..TaosBuilder$u20$as$u20$taos_query..TBuilder$GT$5build17hb3f4d98ccd1e0adbE
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:_ZN3scc10hash_table12bucket_array32BucketArray$LT$K$C$V$C$L$C$_$GT$3new17h3c6e4c14b40b1a37E
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17he31edee2ab4c9719E.llvm.10351630704282588696
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$17h54e7d312310a7dbcE.llvm.10351630704282588696
+   fun:_ZN7taos_ws5query4asyn6WsTaos19s_query_with_req_id28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17h401558c963355f12E
+   fun:_ZN91_$LT$tracing..instrument..Instrumented$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17hae9c12979808825bE
+   fun:_ZN83_$LT$taos_ws..query..Taos$u20$as$u20$taos_query..prelude..async..AsyncQueryable$GT$5query28_$u7b$$u7b$closure$u7d$$u7d$17h4b9359d1a1c755fbE.llvm.870302479201606134
+   fun:_ZN5tokio7runtime4park16CachedParkThread8block_on17hb44dc5f1ef600298E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17h1a8e89c55d82371cE
+   fun:_ZN5tokio7runtime7runtime7Runtime8block_on17h16cc628b2c54ee51E
+   fun:_ZN10taos_query24block_in_place_or_global17h21501ced2ae8d240E
+   fun:_ZN10taos_query7prelude4sync9Queryable4exec17h1aa367eaeb4f5782E
+   fun:_ZN61_$LT$taos_ws..TaosBuilder$u20$as$u20$taos_query..TBuilder$GT$4ping17hd7175c2c78e9543fE
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:posix_memalign
+   fun:__rdl_alloc
+   fun:_ZN3sdd9collector15CollectorAnchor5alloc17hdee3353394bc7619E
+   fun:_ZN3std10sys_common9backtrace28__rust_begin_short_backtrace17h7094bad21a71bd13E
+   fun:_ZN4core3ops8function6FnOnce40call_once$u7b$$u7b$vtable.shim$u7d$$u7d$17hf73e82cbd0d93a6fE
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new12thread_start17h420dad5cf01a9f35E
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:_ZN3scc10hash_table12bucket_array32BucketArray$LT$K$C$V$C$L$C$_$GT$3new17h4c39a896691afa0bE
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17h49c22055b017c049E
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$17h10e3d4045ffd98caE
+   fun:_ZN83_$LT$taos_ws..query..Taos$u20$as$u20$taos_query..prelude..async..AsyncQueryable$GT$17query_with_req_id28_$u7b$$u7b$closure$u7d$$u7d$17h8fa8455882a80e19E.llvm.3164188089105766712
+   fun:_ZN5tokio7runtime4park16CachedParkThread8block_on17he141514093cdc20aE
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hc1b19f6cdff16ec2E
+   fun:_ZN10taos_query24block_in_place_or_global17h22a643d588ab5883E
+   fun:ws_query_with_reqid
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.2.5
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new17ha7dea8a242003201E
+   fun:_ZN3std6thread7Builder15spawn_unchecked17h4f5d13f62b30f67eE
+   fun:_ZN5tokio7runtime8blocking4pool7Spawner10spawn_task17he18ad7882b18de44E
+   fun:_ZN5tokio7runtime8blocking4pool7Spawner14spawn_blocking17ha254863a9c41742aE
+   fun:_ZN5tokio7runtime8blocking4pool14spawn_blocking17hc9a994175e496440E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker6Launch6launch17h306c024c972654afE
+   fun:_ZN5tokio7runtime7builder7Builder5build17h755a556469d5c73eE
+   fun:_ZN3std3sys4sync4once5futex4Once4call17hb8358b81524d26fbE
+   fun:_ZN10taos_query20global_tokio_runtime17h1eae51c35e6e51c8E
+   fun:_ZN10taos_query24block_in_place_or_global17h2415567dfc6e400aE
+   fun:_ZN61_$LT$taos_ws..TaosBuilder$u20$as$u20$taos_query..TBuilder$GT$5build17hb3f4d98ccd1e0adbE
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:_ZN4http6header4name7HdrName10from_bytes17h46c8f085ef97cb84E
+   fun:_ZN11tungstenite9handshake6client10VerifyData15verify_response17he2119ea003e05786E
+   fun:_ZN114_$LT$tungstenite..handshake..client..ClientHandshake$LT$S$GT$$u20$as$u20$tungstenite..handshake..HandshakeRole$GT$14stage_finished17h62ca6d0619013ecbE
+   fun:_ZN11tungstenite9handshake24MidHandshake$LT$Role$GT$9handshake17hbbb59ba9edf1c308E
+   fun:_ZN114_$LT$tokio_tungstenite..handshake..StartedHandshakeFuture$LT$F$C$S$GT$$u20$as$u20$core..future..future..Future$GT$4poll17hbff345419906017cE
+   fun:_ZN17tokio_tungstenite7connect7connect28_$u7b$$u7b$closure$u7d$$u7d$17h6d48c95a83d76d99E
+   fun:_ZN7taos_ws11TaosBuilder16build_stream_opt28_$u7b$$u7b$closure$u7d$$u7d$17h8cd1b0508a6f7eb5E
+   fun:_ZN7taos_ws11TaosBuilder12build_stream28_$u7b$$u7b$closure$u7d$$u7d$17h1185b2221f728b53E
+   fun:_ZN5tokio7runtime4park16CachedParkThread8block_on17ha6745360317ef873E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17h19eaf7734273cc6bE
+   fun:_ZN5tokio7runtime7runtime7Runtime8block_on17h9b553cd490724035E
+   fun:_ZN10taos_query24block_in_place_or_global17h2415567dfc6e400aE
+   fun:_ZN61_$LT$taos_ws..TaosBuilder$u20$as$u20$taos_query..TBuilder$GT$5build17hb3f4d98ccd1e0adbE
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:_ZN3scc10hash_table12bucket_array32BucketArray$LT$K$C$V$C$L$C$_$GT$3new17h4c39a896691afa0bE
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17h49c22055b017c049E.llvm.10086090848175375415
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$17h10e3d4045ffd98caE
+   fun:_ZN91_$LT$tracing..instrument..Instrumented$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h6c9685a328a81f49E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h525b948ba1a70134E
+   fun:_ZN5tokio7runtime4task7harness20Harness$LT$T$C$S$GT$4poll17he7387f5834825083E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context8run_task17h9d48a9880ba265beE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context3run17h058fb9762b8af1cfE
+   fun:_ZN5tokio7runtime7context13set_scheduler17h9ab1eaf897b9fbe1E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hcbb59e793edf8808E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker3run17heecc67d3104f7732E
+   fun:_ZN102_$LT$tokio..runtime..blocking..task..BlockingTask$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h9c20a5cda36c2a04E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h6d43742747d3db23E
+   fun:_ZN5tokio7runtime4task3raw4poll17h6d94b78c98d674b0E
+   fun:_ZN5tokio7runtime8blocking4pool5Inner3run17hc096eb4b805e3e8eE
+   fun:_ZN3std10sys_common9backtrace28__rust_begin_short_backtrace17h8893626c4bd3bcc8E
+   fun:_ZN4core3ops8function6FnOnce40call_once$u7b$$u7b$vtable.shim$u7d$$u7d$17h5bdb8a16fc59c692E
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new12thread_start17h420dad5cf01a9f35E
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:_ZN4http6header4name7HdrName10from_bytes17h46c8f085ef97cb84E
+   fun:_ZN4http6header3map18HeaderMap$LT$T$GT$3get17hf91cd3311683ec5eE
+   fun:_ZN11tungstenite9handshake6client10VerifyData15verify_response17he2119ea003e05786E
+   fun:_ZN114_$LT$tungstenite..handshake..client..ClientHandshake$LT$S$GT$$u20$as$u20$tungstenite..handshake..HandshakeRole$GT$14stage_finished17h62ca6d0619013ecbE
+   fun:_ZN11tungstenite9handshake24MidHandshake$LT$Role$GT$9handshake17hbbb59ba9edf1c308E
+   fun:_ZN114_$LT$tokio_tungstenite..handshake..StartedHandshakeFuture$LT$F$C$S$GT$$u20$as$u20$core..future..future..Future$GT$4poll17hbff345419906017cE
+   fun:_ZN17tokio_tungstenite7connect7connect28_$u7b$$u7b$closure$u7d$$u7d$17h6d48c95a83d76d99E
+   fun:_ZN7taos_ws11TaosBuilder16build_stream_opt28_$u7b$$u7b$closure$u7d$$u7d$17h8cd1b0508a6f7eb5E
+   fun:_ZN7taos_ws11TaosBuilder12build_stream28_$u7b$$u7b$closure$u7d$$u7d$17h1185b2221f728b53E
+   fun:_ZN5tokio7runtime4park16CachedParkThread8block_on17ha6745360317ef873E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17h19eaf7734273cc6bE
+   fun:_ZN5tokio7runtime7runtime7Runtime8block_on17h9b553cd490724035E
+   fun:_ZN10taos_query24block_in_place_or_global17h2415567dfc6e400aE
+   fun:_ZN61_$LT$taos_ws..TaosBuilder$u20$as$u20$taos_query..TBuilder$GT$5build17hb3f4d98ccd1e0adbE
+   fun:ws_connect
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.2.5
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new17ha7dea8a242003201E
+   fun:_ZN3std6thread5spawn17h634541771ee2a4dfE
+   fun:_ZN73_$LT$taos_ws..query..asyn..ResultSet$u20$as$u20$core..ops..drop..Drop$GT$4drop17hd1db0d85ad69ff55E
+   fun:_ZN4core3ptr52drop_in_place$LT$taos_ws..query..asyn..ResultSet$GT$17h74148eb1465b49f1E
+   fun:_ZN4core3ptr40drop_in_place$LT$taosws..WsResultSet$GT$17hef8641a2cf16eec3E.llvm.6032212255974213183
+   fun:_ZN71_$LT$taosws..WsMaybeError$LT$T$GT$$u20$as$u20$core..ops..drop..Drop$GT$4drop17hacfed2d01b41f711E
+   fun:_ZN4core3ptr68drop_in_place$LT$taosws..WsMaybeError$LT$taosws..WsResultSet$GT$$GT$17hd68bc403b7237caaE
+   fun:ws_free_result
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:posix_memalign
+   fun:__rdl_alloc
+   fun:_ZN3sdd9collector15CollectorAnchor5alloc17hdee3353394bc7619E
+   fun:_ZN3scc8hash_map24HashMap$LT$K$C$V$C$H$GT$3len17h4c20c76a17030da1E
+   fun:_ZN7taos_ws5query4asyn12read_queries28_$u7b$$u7b$closure$u7d$$u7d$17h733be98be4e64033E.llvm.12654642672321372731
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h970c488ee398d709E
+   fun:_ZN5tokio7runtime4task7harness20Harness$LT$T$C$S$GT$4poll17hbaf2b06528c640a0E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context8run_task17h9d48a9880ba265beE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context3run17h058fb9762b8af1cfE
+   fun:_ZN5tokio7runtime7context13set_scheduler17h9ab1eaf897b9fbe1E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hcbb59e793edf8808E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker3run17heecc67d3104f7732E
+   fun:_ZN102_$LT$tokio..runtime..blocking..task..BlockingTask$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h9c20a5cda36c2a04E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h6d43742747d3db23E
+   fun:_ZN5tokio7runtime4task3raw4poll17h6d94b78c98d674b0E
+   fun:_ZN5tokio7runtime8blocking4pool5Inner3run17hc096eb4b805e3e8eE
+   fun:_ZN3std10sys_common9backtrace28__rust_begin_short_backtrace17h8893626c4bd3bcc8E
+   fun:_ZN4core3ops8function6FnOnce40call_once$u7b$$u7b$vtable.shim$u7d$$u7d$17h5bdb8a16fc59c692E
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new12thread_start17h420dad5cf01a9f35E
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17he31edee2ab4c9719E.llvm.10351630704282588696
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$17h54e7d312310a7dbcE.llvm.10351630704282588696
+   fun:_ZN91_$LT$tracing..instrument..Instrumented$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17hfbc3addb55abe243E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h865eab74aec22d6fE
+   fun:_ZN5tokio7runtime4task7harness20Harness$LT$T$C$S$GT$4poll17h822847a4b2d12bebE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context8run_task17h9d48a9880ba265beE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context3run17h058fb9762b8af1cfE
+   fun:_ZN5tokio7runtime7context13set_scheduler17h9ab1eaf897b9fbe1E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hcbb59e793edf8808E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker3run17heecc67d3104f7732E
+   fun:_ZN102_$LT$tokio..runtime..blocking..task..BlockingTask$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h9c20a5cda36c2a04E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h6d43742747d3db23E
+   fun:_ZN5tokio7runtime4task3raw4poll17h6d94b78c98d674b0E
+   fun:_ZN5tokio7runtime8blocking4pool5Inner3run17hc096eb4b805e3e8eE
+   fun:_ZN3std10sys_common9backtrace28__rust_begin_short_backtrace17h8893626c4bd3bcc8E
+   fun:_ZN4core3ops8function6FnOnce40call_once$u7b$$u7b$vtable.shim$u7d$$u7d$17h5bdb8a16fc59c692E
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new12thread_start17h420dad5cf01a9f35E
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:_ZN3scc10hash_table12bucket_array32BucketArray$LT$K$C$V$C$L$C$_$GT$3new17h3c6e4c14b40b1a37E
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17he31edee2ab4c9719E.llvm.10351630704282588696
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$17h54e7d312310a7dbcE.llvm.10351630704282588696
+   fun:_ZN91_$LT$tracing..instrument..Instrumented$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17hfbc3addb55abe243E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h865eab74aec22d6fE
+   fun:_ZN5tokio7runtime4task7harness20Harness$LT$T$C$S$GT$4poll17h822847a4b2d12bebE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context8run_task17h9d48a9880ba265beE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context3run17h058fb9762b8af1cfE
+   fun:_ZN5tokio7runtime7context13set_scheduler17h9ab1eaf897b9fbe1E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hcbb59e793edf8808E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker3run17heecc67d3104f7732E
+   fun:_ZN102_$LT$tokio..runtime..blocking..task..BlockingTask$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h9c20a5cda36c2a04E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h6d43742747d3db23E
+   fun:_ZN5tokio7runtime4task3raw4poll17h6d94b78c98d674b0E
+   fun:_ZN5tokio7runtime8blocking4pool5Inner3run17hc096eb4b805e3e8eE
+   fun:_ZN3std10sys_common9backtrace28__rust_begin_short_backtrace17h8893626c4bd3bcc8E
+   fun:_ZN4core3ops8function6FnOnce40call_once$u7b$$u7b$vtable.shim$u7d$$u7d$17h5bdb8a16fc59c692E
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new12thread_start17h420dad5cf01a9f35E
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:_ZN3scc10hash_table12bucket_array32BucketArray$LT$K$C$V$C$L$C$_$GT$3new17h3c6e4c14b40b1a37E
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$28_$u7b$$u7b$closure$u7d$$u7d$17he31edee2ab4c9719E.llvm.10351630704282588696
+   fun:_ZN7taos_ws5query4asyn13WsQuerySender9send_recv28_$u7b$$u7b$closure$u7d$$u7d$17h54e7d312310a7dbcE.llvm.10351630704282588696
+   fun:_ZN91_$LT$tracing..instrument..Instrumented$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17hfbc3addb55abe243E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h865eab74aec22d6fE
+   fun:_ZN5tokio7runtime4task7harness20Harness$LT$T$C$S$GT$4poll17h822847a4b2d12bebE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context8run_task17h9d48a9880ba265beE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context3run17h058fb9762b8af1cfE
+   fun:_ZN5tokio7runtime7context13set_scheduler17h9ab1eaf897b9fbe1E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hcbb59e793edf8808E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker3run17heecc67d3104f7732E
+   fun:_ZN102_$LT$tokio..runtime..blocking..task..BlockingTask$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h9c20a5cda36c2a04E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h6d43742747d3db23E
+   fun:_ZN5tokio7runtime4task3raw4poll17h6d94b78c98d674b0E
+   fun:_ZN5tokio7runtime8blocking4pool5Inner3run17hc096eb4b805e3e8eE
+   fun:_ZN3std10sys_common9backtrace28__rust_begin_short_backtrace17h8893626c4bd3bcc8E
+   fun:_ZN4core3ops8function6FnOnce40call_once$u7b$$u7b$vtable.shim$u7d$$u7d$17h5bdb8a16fc59c692E
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new12thread_start17h420dad5cf01a9f35E
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.2.5
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new17ha7dea8a242003201E
+   fun:_ZN3std6thread5spawn17h634541771ee2a4dfE
+   fun:_ZN73_$LT$taos_ws..query..asyn..ResultSet$u20$as$u20$core..ops..drop..Drop$GT$4drop17hd1db0d85ad69ff55E
+   fun:_ZN4core3ptr52drop_in_place$LT$taos_ws..query..asyn..ResultSet$GT$17ha4d75a1a29d4c645E.llvm.870302479201606134
+   fun:_ZN10taos_query7prelude4sync9Queryable4exec17h1aa367eaeb4f5782E
+   fun:_ZN61_$LT$taos_ws..TaosBuilder$u20$as$u20$taos_query..TBuilder$GT$4ping17hd7175c2c78e9543fE
+   fun:ws_connect
+}
