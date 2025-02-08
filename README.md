@@ -55,7 +55,7 @@ The `taos-connector-odbc` supports multiple operating systems, including Windows
 | SQLForeignKeys | ❌ | ❌ | ❌ | TDengine has no counterpart |
 | SQLFreeHandle | ✅ | ✅ | ✅ | |
 | SQLFreeStmt | ✅ | ✅ | ✅ | |
-| SQLGetConnectAttr | ✅ | ✅ | ✅ | |
+| SQLGetConnectAttr | ✅ | ✅ | ✅ | Supports partial attributes; unsupported attributes are listed below. |
 | SQLGetCursorName | ❌ | ❌ | ❌ | TDengine has no counterpart |
 | SQLGetData | ✅ | ✅ | ✅ | |
 | SQLGetDescField | ❌ | ❌ | ❌ | |
@@ -64,7 +64,7 @@ The `taos-connector-odbc` supports multiple operating systems, including Windows
 | SQLGetDiagRec | ✅ | ✅ | ✅ | |
 | SQLGetEnvAttr | ✅ | ✅ | ✅ | |
 | SQLGetInfo | ✅ | ✅ | ✅ | |
-| SQLGetStmtAttr | ✅ | ✅ | ✅ | |
+| SQLGetStmtAttr | ✅ | ✅ | ✅ | Supports partial attributes; unsupported attributes are listed below. |
 | SQLGetTypeInfo | ✅ | ✅ | ✅ | |
 | SQLMoreResults | ✅ | ✅ | ✅ | |
 | SQLNativeSql | ❌ | ❌ | ❌ | TDengine has no counterpart |
@@ -77,13 +77,13 @@ The `taos-connector-odbc` supports multiple operating systems, including Windows
 | SQLProcedures | ❌ | ❌ | ❌ | TDengine has no counterpart |
 | SQLPutData | ❌ | ❌ | ❌ | TDengine has no counterpart |
 | SQLRowCount | ✅ | ✅ | ✅ | |
-| SQLSetConnectAttr | ✅ | ✅ | ✅ | |
+| SQLSetConnectAttr | ✅ | ✅ | ✅ | Supports partial attributes; unsupported attributes are listed below. |
 | SQLSetCursorName | ❌ | ❌ | ❌ | TDengine has no counterpart |
 | SQLSetDescField | ❌ | ❌ | ❌ | |
 | SQLSetDescRec | ❌ | ❌ | ❌ | |
 | SQLSetEnvAttr | ✅ | ✅ | ✅ | |
 | SQLSetPos | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLSetStmtAttr | ✅ | ✅ | ✅ | |
+| SQLSetStmtAttr | ✅ | ✅ | ✅ | Supports partial attributes; unsupported attributes are listed below. |
 | SQLSpecialColumns | ❌ | ❌ | ❌ | TDengine has no counterpart |
 | SQLStatistics | ❌ | ❌ | ❌ | TDengine has no counterpart |
 | SQLTablePrivileges | ❌ | ❌ | ❌ | TDengine has no strict counterpart |
@@ -124,7 +124,7 @@ The `taos-connector-odbc` supports multiple operating systems, including Windows
 | C/C++ | ODBC-API |
 | CSharp | System.Data.Odbc |
 | Erlang | odbc module |
-| Go | github.com/alexbrainman/odbc, database/sql |
+| Go | [odbc](https://github.com/alexbrainman/odbc), database/sql |
 | Haskell | HDBC, HDBC-odbc |
 | Common Lisp | plain-odbc |
 | Nodejs | odbc |
