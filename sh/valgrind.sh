@@ -42,6 +42,7 @@ valgrind --leak-check=full                                                \
          --suppressions=${_path_to_valgrind}/sqlite3.supp                 \
          --suppressions=${_path_to_valgrind}/c_test.supp                  \
          --suppressions=${_path_to_valgrind}/test_threads.supp            \
+         --suppressions=${_path_to_valgrind}/odbc_test.supp               \
          --gen-suppressions=all                                           \
          --track-origins=yes                                              \
          --errors-for-leak-kinds=definite,indirect,possible               \
