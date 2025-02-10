@@ -12,15 +12,45 @@
 
 English | [简体中文](README-CN.md)
 
+<!-- omit in toc -->
+## Table of Contents
+- [1. Introduction](#1-introduction)
+- [2. Documentation](#2-documentation)
+  - [2.1 Features](#21-features)
+  - [2.2 Layout of source code, directories only](#22-layout-of-source-code-directories-only)
+- [3. Prerequisites](#3-prerequisites)
+  - [3.1 Windows Platform (Windows 11 Example)](#31-windows-platform-windows-11-example)
+  - [3.2 Linux Platform (Ubuntu 20.04 Example)](#32-linux-platform-ubuntu-2004-example)
+  - [3.3 macOS Platform (macOS Big Sur Example)](#33-macos-platform-macos-big-sur-example)
+- [4. Building and Installing](#4-building-and-installing)
+  - [4.1 Windows Platform (Windows 11 Example)](#41-windows-platform-windows-11-example)
+  - [4.2 Linux Platform (Ubuntu 20.04 Example)](#42-linux-platform-ubuntu-2004-example)
+- [5. Testing](#5-testing)
+  - [5.1 Test Execution](#51-test-execution)
+    - [5.1.1 Windows Platform (Windows 11 Example)](#511-windows-platform-windows-11-example)
+    - [5.1.2 Linux Platform (Ubuntu 20.04 Example)](#512-linux-platform-ubuntu-2004-example)
+    - [5.1.3 macOS Platform (Big Sur Example)](#513-macos-platform-big-sur-example)
+  - [5.2 Test Case Addition](#52-test-case-addition)
+  - [5.3 Performance Testing](#53-performance-testing)
+- [6. CI/CD](#6-cicd)
+- [7. Submitting Issues](#7-submitting-issues)
+  - [7.1 Required Information](#71-required-information)
+  - [7.2 Additional Information (Optional but Helpful)](#72-additional-information-optional-but-helpful)
+- [8. Submitting PRs](#8-submitting-prs)
+- [9. References](#9-references)
+- [10. License](#10-license)
+- [originally initiated by freemine@yeah.net](#originally-initiated-by-freemineyeahnet)
+
+
 ## 1. Introduction
 `taos-connector-odbc` is the official ODBC connector for TDengine, enabling applications written in various programming languages such as C/C++, C#, Go, Rust, Python, Node.js, and more to interact with the TDengine database. By leveraging the standardized ODBC interface, `taos-connector-odbc` facilitates seamless data writing, querying and parameter binding across different platforms and environments.
 
 The `taos-connector-odbc` supports multiple operating systems, including Windows, Linux, and macOS. 
 
 ## 2. Documentation
-- To use the ODBC connector, please check [Developer Guide](https://docs.tdengine.com/developer-guide/), which includes how an application can introduce the `taos-connector-odbc`, as well as examples of data writing, querying, and parameter binding across different platforms and environments.
-- For other reference information, please check [Reference Manual](https://docs.tdengine.com/tdengine-reference/client-libraries/odbc/), which includes version history, data types, example programs, API descriptions, and FAQs.
+- To use the TDengine ODBC connector, please check [Reference Manual](https://docs.tdengine.com/tdengine-reference/client-libraries/odbc/), which includes version history, data types, example programs, API descriptions, and FAQs.
 - This quick guide is mainly for developers who like to contribute/build/test the ODBC connector by themselves. To learn more about TDengine, you can visit the official documentation.
+- The TDengine ODBC connector adheres to the ODBC standard, ensuring compatibility and interoperability across various database systems. For more detailed information about ODBC standards and specifications, please refer to the [Microsoft Open Database Connectivity (ODBC)](https://learn.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc) documentation. This resource provides comprehensive insights into ODBC interfaces, methods, and other relevant details that can help deepen your understanding of how the TDengine ODBC connector operates within the broader context of ODBC applications.
 
 ### 2.1 Features
 - **Currently exported ODBC functions are**:
