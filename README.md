@@ -16,8 +16,6 @@ English | [简体中文](README-CN.md)
 ## Table of Contents
 - [1. Introduction](#1-introduction)
 - [2. Documentation](#2-documentation)
-  - [2.1 Features](#21-features)
-  - [2.2 Layout of source code, directories only](#22-layout-of-source-code-directories-only)
 - [3. Prerequisites](#3-prerequisites)
   - [3.1 Windows Platform (Windows 11 Example)](#31-windows-platform-windows-11-example)
   - [3.2 Linux Platform (Ubuntu 20.04 Example)](#32-linux-platform-ubuntu-2004-example)
@@ -39,6 +37,8 @@ English | [简体中文](README-CN.md)
 - [8. Submitting PRs](#8-submitting-prs)
 - [9. References](#9-references)
 - [10. License](#10-license)
+- [11. Appendix](#11-appendix)
+  - [11.1 Project Directory Structure](#111-project-directory-structure)
 - [originally initiated by freemine@yeah.net](#originally-initiated-by-freemineyeahnet)
 
 
@@ -51,155 +51,6 @@ The `taos-connector-odbc` supports multiple operating systems, including Windows
 - To use the TDengine ODBC connector, please check [Reference Manual](https://docs.tdengine.com/tdengine-reference/client-libraries/odbc/), which includes version history, data types, example programs, API descriptions, and FAQs.
 - This quick guide is mainly for developers who like to contribute/build/test the ODBC connector by themselves. To learn more about TDengine, you can visit the official documentation.
 - The TDengine ODBC connector adheres to the ODBC standard, ensuring compatibility and interoperability across various database systems. For more detailed information about ODBC standards and specifications, please refer to the [Microsoft Open Database Connectivity (ODBC)](https://learn.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc) documentation. This resource provides comprehensive insights into ODBC interfaces, methods, and other relevant details that can help deepen your understanding of how the TDengine ODBC connector operates within the broader context of ODBC applications.
-
-### 2.1 Features
-- **Currently exported ODBC functions are**:
-
-| ODBC/Setup API | Linux | macOS | Windows | Note |
-| :----- | :---- | :---- | :---- | :---- |
-| ConfigDSN | ❌ | ❌ | ✅ | |
-| ConfigDriver | ❌ | ❌ | ✅ | |
-| ConfigTranslator | ❌ | ❌ | ✅ | |
-| SQLAllocHandle | ✅ | ✅ | ✅ | |
-| SQLBindCol  | ✅ | ✅ | ✅ | Column-Wise Binding only |
-| SQLBindParameter | ✅ | ✅ | ✅ | Column-Wise Binding only |
-| SQLBrowseConnect | ❌ | ❌ | ❌ | |
-| SQLBulkOperations | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLCloseCursor | ✅ | ✅ | ✅ | |
-| SQLColAttribute | ✅ | ✅ | ✅ | |
-| SQLColumnPrivileges | ❌ | ❌ | ❌ | TDengine has no strict counterpart |
-| SQLColumns | ✅ | ✅ | ✅ | |
-| SQLCompleteAsync | ❌ | ❌ | ❌ | |
-| SQLConnect | ✅ | ✅ | ✅ | |
-| SQLCopyDesc | ❌ | ❌ | ❌ | |
-| SQLDescribeCol | ✅ | ✅ | ✅ | |
-| SQLDescribeParam | ✅ | ✅ | ✅ | |
-| SQLDisconnect | ✅ | ✅ | ✅ | |
-| SQLDriverConnect | ✅ | ✅ | ✅ | |
-| SQLEndTran | ✅ | ✅ | ✅ | TDengine is non-transactional, thus this is at most simulating |
-| SQLExecDirect | ✅ | ✅ | ✅ | |
-| SQLExecute | ✅ | ✅ | ✅ | |
-| SQLExtendedFetch | ❌ | ❌ | ❌ | |
-| SQLFetch | ✅ | ✅ | ✅ | |
-| SQLFetchScroll | ✅ | ✅ | ✅ | TDengine has no counterpart, just implement SQL_FETCH_NEXT |
-| SQLForeignKeys | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLFreeHandle | ✅ | ✅ | ✅ | |
-| SQLFreeStmt | ✅ | ✅ | ✅ | |
-| SQLGetConnectAttr | ✅ | ✅ | ✅ | Supports partial attributes; unsupported attributes are listed below. |
-| SQLGetCursorName | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLGetData | ✅ | ✅ | ✅ | |
-| SQLGetDescField | ❌ | ❌ | ❌ | |
-| SQLGetDescRec | ❌ | ❌ | ❌ | |
-| SQLGetDiagField | ✅ | ✅ | ✅ | |
-| SQLGetDiagRec | ✅ | ✅ | ✅ | |
-| SQLGetEnvAttr | ✅ | ✅ | ✅ | |
-| SQLGetInfo | ✅ | ✅ | ✅ | |
-| SQLGetStmtAttr | ✅ | ✅ | ✅ | Supports partial attributes; unsupported attributes are listed below. |
-| SQLGetTypeInfo | ✅ | ✅ | ✅ | |
-| SQLMoreResults | ✅ | ✅ | ✅ | |
-| SQLNativeSql | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLNumParams | ✅ | ✅ | ✅ | |
-| SQLNumResultCols | ✅ | ✅ | ✅ | |
-| SQLParamData | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLPrepare | ✅ | ✅ | ✅ | |
-| SQLPrimaryKeys | ✅ | ✅ | ✅ | |
-| SQLProcedureColumns | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLProcedures | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLPutData | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLRowCount | ✅ | ✅ | ✅ | |
-| SQLSetConnectAttr | ✅ | ✅ | ✅ | Supports partial attributes; unsupported attributes are listed below. |
-| SQLSetCursorName | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLSetDescField | ❌ | ❌ | ❌ | |
-| SQLSetDescRec | ❌ | ❌ | ❌ | |
-| SQLSetEnvAttr | ✅ | ✅ | ✅ | |
-| SQLSetPos | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLSetStmtAttr | ✅ | ✅ | ✅ | Supports partial attributes; unsupported attributes are listed below. |
-| SQLSpecialColumns | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLStatistics | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLTablePrivileges | ❌ | ❌ | ❌ | TDengine has no strict counterpart |
-| SQLTables | ✅ | ✅ | ✅ | |
-
-- **Non-supported-statement-attributes (SQLSetStmtAttr)**
-
-| Attribute | Note |
-| :----- | :---- |
-| SQL_ATTR_CONCURRENCY | TDengine has no updatable-CURSOR machanism |
-| SQL_ATTR_FETCH_BOOKMARK_PTR | TDengine has no BOOKMARK machanism |
-| SQL_ATTR_IMP_PARAM_DESC | |
-| SQL_ATTR_IMP_ROW_DESC | |
-| SQL_ATTR_KEYSET_SIZE | |
-| SQL_ATTR_PARAM_BIND_OFFSET_PTR | |
-| SQL_ATTR_PARAM_OPERATION_PTR | |
-| SQL_ATTR_ROW_NUMBER | Readonly attribute |
-| SQL_ATTR_ROW_OPERATION_PTR | |
-| SQL_ATTR_SIMULATE_CURSOR | |
-
-- **Non-supported-connection-attributes (SQLSetConnectAttr)**
-
-| Attribute | Note |
-| :----- | :---- |
-| SQL_ATTR_AUTO_IPD | Readonly attribute |
-| SQL_ATTR_CONNECTION_DEAD | Readonly attribute |
-| SQL_ATTR_ENLIST_IN_DTC | |
-| SQL_ATTR_PACKET_SIZE | |
-| SQL_ATTR_TRACE | |
-| SQL_ATTR_TRACEFILE | |
-| SQL_ATTR_TRANSLATE_LIB | |
-| SQL_ATTR_TRANSLATE_OPTION | |
-
-- **Enable any programming language with ODBC-bindings/ODBC-plugings to communicate with TDengine. programming languages listed as follows are demonstrated in test-cases:**
-
-| programming language | ODBC-API or bindings/plugins |
-| :----- | :---- |
-| C/C++ | ODBC-API |
-| CSharp | System.Data.Odbc |
-| Erlang | odbc module |
-| Go | [odbc](https://github.com/alexbrainman/odbc), database/sql |
-| Haskell | HDBC, HDBC-odbc |
-| Common Lisp | plain-odbc |
-| Nodejs | odbc |
-| Python3 | pyodbc |
-| Rust | odbc |
-
-
-### 2.2 Layout of source code, directories only
-```
-<root>
-├── benchmark
-├── cmake
-├── common
-├── inc
-├── samples
-│   └── c
-├── sh
-├── src
-│   ├── core
-│   ├── inc
-│   ├── os_port
-│   ├── parser
-│   ├── tests
-│   └── utils
-├── templates
-├── tests
-│   ├── c
-│   ├── cpp
-│   ├── cs
-│   ├── erl
-│   ├── go
-│   ├── hs
-│   │   └── app
-│   ├── lisp
-│   ├── node
-│   ├── python
-│   ├── R
-│   ├── rust
-│   │   └── main
-│   │       └── src
-│   ├── sh
-│   ├── taos
-│   └── ws
-└── valgrind
-```
 
 ## 3. Prerequisites
 First, ensure that TDengine has been deployed locally. For detailed deployment steps, please refer to [Deploy TDengine](https://docs.tdengine.com/get-started/deploy-from-package/). Ensure that both taosd and taosAdapter services are up and running.
@@ -469,6 +320,49 @@ We welcome developers to contribute to this project. When submitting Pull Reques
 
 ## 10. License
 [MIT License](./LICENSE)
+
+## 11. Appendix
+
+### 11.1 Project Directory Structure
+Layout of source code, directories only
+```
+<root>
+├── benchmark
+├── cmake
+├── common
+├── inc
+├── samples
+│   └── c
+├── sh
+├── src
+│   ├── core
+│   ├── inc
+│   ├── os_port
+│   ├── parser
+│   ├── tests
+│   └── utils
+├── templates
+├── tests
+│   ├── c
+│   ├── cpp
+│   ├── cs
+│   ├── erl
+│   ├── go
+│   ├── hs
+│   │   └── app
+│   ├── lisp
+│   ├── node
+│   ├── python
+│   ├── R
+│   ├── rust
+│   │   └── main
+│   │       └── src
+│   ├── sh
+│   ├── taos
+│   └── ws
+└── valgrind
+```
+
 
 ## originally initiated by freemine@yeah.net
 
