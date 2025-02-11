@@ -36,9 +36,8 @@ English | [简体中文](./README-CN.md)
   - [7.2 Additional Information (Optional but Helpful)](#72-additional-information-optional-but-helpful)
 - [8. Submitting PRs](#8-submitting-prs)
 - [9. References](#9-references)
-- [10. License](#10-license)
-- [11. Appendix](#11-appendix)
-  - [11.1 Project Directory Structure](#111-project-directory-structure)
+- [10. Appendix](#10-appendix)
+- [11. License](#11-license)
 - [originally initiated by freemine@yeah.net](#originally-initiated-by-freemineyeahnet)
 
 
@@ -61,7 +60,7 @@ Afterwards, before installing and using the `taos-connector-odbc`, ensure that y
 - flex, 2.6.4 or above. NOTE: win_flex_bison on windows platform to be installed.
 - bison, 3.5.1 or above. NOTE: win_flex_bison on windows platform to be installed.
 - odbc driver manager, such as unixodbc(2.3.6 or above) in linux. NOTE: odbc driver manager is pre-installed on windows platform.
-- iconv, should've been already included in libc. NOTE: win_iconv would be downloaded when building this project.
+- iconv, should've been already included in libc. NOTE: win_iconv will be automatically downloaded when building this project.
 
 If you want to enable valgrind memory checks or test cases for programming languages other than C/C++, please refer to the following content.
 
@@ -82,8 +81,8 @@ If you want to enable valgrind memory checks or test cases for programming langu
 In the following content of this guide, we will use the following versions as examples: Windows 11 for the Windows platform, Ubuntu 20.04 for the Linux platform, and macOS Big Sur for the macOS platform.
 
 ### 3.1 Windows Platform
-- Install win_flex_bison 2.5.25:
-  - Download from: [win_flex_bison-2.5.25.zip](https://github.com/lexxmark/winflexbison/releases/download/v2.5.25/win_flex_bison-2.5.25.zip).
+- Install win_flex_bison:
+  - Download from: [win_flex_bison](https://github.com/lexxmark/winflexbison/releases/).
   - Extract the files and add the directory to your system's PATH environment variable.
 - Verify Installation:
   ```
@@ -212,8 +211,8 @@ We welcome the submission of [GitHub Issue](https://github.com/taosdata/taos-con
   Provide a clear and detailed description of the issue you are encountering.
   Indicate whether the issue occurs consistently or intermittently.
   If possible, include a detailed call stack or error message that can help in diagnosing the problem.
-- ODBC Connector Version or Commit ID:
-  Specify the version or commit id of the ODBC Connector you are using. 
+- ODBC Connector Version:
+  Specify the version of the ODBC Connector you are using. 
 - ODBC Connection Parameters:
   Provide your ODBC connection string or DSN (Data Source Name) configuration details. Please do not include sensitive information such as usernames and passwords.
   Example:
@@ -247,13 +246,8 @@ We welcome developers to contribute to this project. When submitting PRs, please
 - [Microsoft Introduction to ODBC](https://learn.microsoft.com/en-us/sql/odbc/reference/introduction-to-odbc)
 - [Microsoft ODBC API Reference](https://learn.microsoft.com/en-us/sql/odbc/reference/syntax/odbc-api-reference)
 
-## 10. License
-[MIT License](./LICENSE)
-
-## 11. Appendix
-
-### 11.1 Project Directory Structure
-Layout of source code, directories only
+## 10. Appendix
+Layout of project source code, directories only
 ```
 <root>
 ├── benchmark
@@ -292,6 +286,8 @@ Layout of source code, directories only
 └── valgrind
 ```
 
+## 11. License
+[MIT License](./LICENSE)
 
 ## originally initiated by freemine@yeah.net
 
