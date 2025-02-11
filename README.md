@@ -22,12 +22,11 @@ English | [简体中文](README-CN.md)
   - [3.3 macOS Platform (macOS Big Sur Example)](#33-macos-platform-macos-big-sur-example)
 - [4. Building and Installing](#4-building-and-installing)
   - [4.1 Windows Platform (Windows 11 Example)](#41-windows-platform-windows-11-example)
-  - [4.2 Linux Platform (Ubuntu 20.04 Example)](#42-linux-platform-ubuntu-2004-example)
+  - [4.2 Linux Platform (Ubuntu 20.04 Example) and macOS Platform (Big Sur Example)](#42-linux-platform-ubuntu-2004-example-and-macos-platform-big-sur-example)
 - [5. Testing](#5-testing)
   - [5.1 Test Execution](#51-test-execution)
     - [5.1.1 Windows Platform (Windows 11 Example)](#511-windows-platform-windows-11-example)
-    - [5.1.2 Linux Platform (Ubuntu 20.04 Example)](#512-linux-platform-ubuntu-2004-example)
-    - [5.1.3 macOS Platform (Big Sur Example)](#513-macos-platform-big-sur-example)
+    - [5.1.2 Linux Platform (Ubuntu 20.04 Example) and macOS Platform (Big Sur Example)](#512-linux-platform-ubuntu-2004-example-and-macos-platform-big-sur-example)
   - [5.2 Test Case Addition](#52-test-case-addition)
   - [5.3 Performance Testing](#53-performance-testing)
 - [6. CI/CD](#6-cicd)
@@ -56,30 +55,34 @@ The `taos-connector-odbc` supports multiple operating systems, including Windows
 First, ensure that TDengine has been deployed locally. For detailed deployment steps, please refer to [Deploy TDengine](https://docs.tdengine.com/get-started/deploy-from-package/). Ensure that both taosd and taosAdapter services are up and running.
 
 Afterwards, before installing and using the `taos-connector-odbc`, ensure that you have met the following prerequisites for your specific platform.
-- cmake, 3.16.3 or above, please refer to [cmake](https://cmake.org/).
-- flex, 2.6.4 or above. NOTE: win_flex_bison on windows platform to be installed.
-- bison, 3.5.1 or above. NOTE: win_flex_bison on windows platform to be installed.
-- odbc driver manager, such as unixodbc(2.3.6 or above) in linux. NOTE: odbc driver manager is pre-installed on windows platform.
-- iconv, should've been already included in libc. NOTE: win_iconv would be downloaded when building this project.
-- valgrind, if you wish to debug and profile executables, such as detecting potential memory leakages.
-- node, v12.0 or above if you wish to enable nodejs-test-cases.
-  - node odbc, 2.4.4 or above, please refer to [node odbc](https://www.npmjs.com/package/odbc/).
-- rust, v1.63 or above if you wish to enable rust-test-cases.
-  - odbc, 0.17.0 or above, please refer to [rust odbc](https://docs.rs/odbc/latest/odbc/).
-  - env_logger, 0.8.2 or above, please refer to [env_logger](https://docs.rs/env_logger/latest/env_logger/).
-  - json, please refer to [json](https://docs.rs/json/latest/json/).
-- python3, v3.10 or above if you wish to enable python3-test-cases
-  - pyodbc, 4.0.39 or above, please refer to [python odbc](https://pypi.org/project/pyodbc/).
-- go, v1.17 or above if you wish to enable go-test-cases
-  - odbc, please refer to [go odbc](https://github.com/alexbrainman/odbc).
-- erlang, v12.2 or above if you wish to enable erlang-test-cases.
-  - odbc, please refer to [erlang odbc](https://www.erlang.org/doc/apps/odbc/getting_started.html).
-- haskell, cabal v3.6 or above, ghc v9.2 or above, if you wish to enable haskell-test-cases.
-  - hsql-odbc, please refer to [haskell odbc](https://hackage.haskell.org/package/hsql-odbc). 
-- common lisp, sbcl v2.1.11 or above if you wish to enable common-lisp-test-cases.
-  - plain-odbc, please refer to [common lisp odbc](https://plain-odbc.common-lisp.dev/).
-- R, v4.3 or above, if you wish to enable R-test-cases.
-  - odbc, please refer to [R odbc](https://cran.r-project.org/web/packages/odbc/index.html).
+
+- Required Dependencies:
+  - cmake, 3.16.3 or above, please refer to [cmake](https://cmake.org/).
+  - flex, 2.6.4 or above. NOTE: win_flex_bison on windows platform to be installed.
+  - bison, 3.5.1 or above. NOTE: win_flex_bison on windows platform to be installed.
+  - odbc driver manager, such as unixodbc(2.3.6 or above) in linux. NOTE: odbc driver manager is pre-installed on windows platform.
+  - iconv, should've been already included in libc. NOTE: win_iconv would be downloaded when building this project.
+
+- Optional Dependencies:
+  - valgrind, if you wish to debug and profile executables, such as detecting potential memory leakages.
+  - node, v12.0 or above if you wish to enable nodejs-test-cases.
+    - node odbc, 2.4.4 or above, please refer to [node odbc](https://www.npmjs.com/package/odbc/).
+  - rust, v1.63 or above if you wish to enable rust-test-cases.
+    - odbc, 0.17.0 or above, please refer to [rust odbc](https://docs.rs/odbc/latest/odbc/).
+    - env_logger, 0.8.2 or above, please refer to [env_logger](https://docs.rs/env_logger/latest/env_logger/).
+    - json, please refer to [json](https://docs.rs/json/latest/json/).
+  - python3, v3.10 or above if you wish to enable python3-test-cases
+    - pyodbc, 4.0.39 or above, please refer to [python odbc](https://pypi.org/project/pyodbc/).
+  - go, v1.17 or above if you wish to enable go-test-cases
+    - odbc, please refer to [go odbc](https://github.com/alexbrainman/odbc).
+  - erlang, v12.2 or above if you wish to enable erlang-test-cases.
+    - odbc, please refer to [erlang odbc](https://www.erlang.org/doc/apps/odbc/getting_started.html).
+  - haskell, cabal v3.6 or above, ghc v9.2 or above, if you wish to enable haskell-test-cases.
+    - hsql-odbc, please refer to [haskell odbc](https://hackage.haskell.org/package/hsql-odbc). 
+  - common lisp, sbcl v2.1.11 or above if you wish to enable common-lisp-test-cases.
+    - plain-odbc, please refer to [common lisp odbc](https://plain-odbc.common-lisp.dev/).
+  - R, v4.3 or above, if you wish to enable R-test-cases.
+    - odbc, please refer to [R odbc](https://cran.r-project.org/web/packages/odbc/index.html).
 
 ### 3.1 Windows Platform (Windows 11 Example)
 - Install win_flex_bison 2.5.25:
@@ -90,48 +93,34 @@ Afterwards, before installing and using the `taos-connector-odbc`, ensure that y
   win_flex --version
   ```
 - Install ODBC Driver Manager:
-  - Ensure that the Microsoft ODBC Driver Manager is installed on your system. It is typically pre-installed on Windows platforms.
+  Ensure that the Microsoft ODBC Driver Manager is installed on your system. It is typically pre-installed on Windows platforms.
 
 ### 3.2 Linux Platform (Ubuntu 20.04 Example)
-- Install Required Dependencies:
+- Install Required Dependencies, including the ODBC Driver Manager:
   ```
-  sudo apt install flex bison
-  ```
-- Install ODBC Driver Manager:
-  ```
-  sudo apt install unixodbc unixodbc-dev
+  sudo apt install flex bison unixodbc unixodbc-dev && echo -=Done=-
   ```
 
 ### 3.3 macOS Platform (macOS Big Sur Example)
-- Install Required Dependencies:
+- Install Required Dependencies, including the ODBC Driver Manager:
   ```
-  brew install flex bison
-  ```
-- Install ODBC Driver Manager:
-  ```
-  brew install unixodbc
+  brew install flex bison unixodbc && echo -=Done=-
   ```
 
 ## 4. Building and Installing
-This section provides detailed instructions for building and installing the `taos-connector-odbc` on different platforms.
+This section provides detailed instructions for building and installing the ODBC connector on different platforms.
+Before proceeding, ensure you are in the root directory of this project.
 
 ### 4.1 Windows Platform (Windows 11 Example)
-- Open Command Prompt as an Administrator:
-  - Follow the instructions provided [here](https://www.makeuseof.com/windows-run-command-prompt-admin/) to open Command Prompt with administrative privileges.
-- Change to the root directory of this project:
+- Optionally, setup building environment: If you have installed Visual Studio Community 2022 on a 64-bit Windows platform, run the following command to set up the build environment:
   ```
-  cd path\to\taos-connector-odbc
+  "\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
   ```
-- Optionally, setup building environment:
-  - If you have installed Visual Studio Community 2022 on a 64-bit Windows platform, run the following command to set up the build environment:
-    ```
-    "\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
-    ```
 - Generate make files:
   ```
   cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -B build -G "Visual Studio 17 2022" -A x64
   ```
-  - **Troubleshooting**: If compiler errors occur during the following steps, such as <path_to_winbase.h> warning C5105: macro expansion producing 'defined' has undefined behavior, retry with the following command:
+  **Troubleshooting**: If compiler errors occur during the following steps, such as <path_to_winbase.h> warning C5105: macro expansion producing 'defined' has undefined behavior, retry with the following command:
     ```
     cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -B build -G "Visual Studio 17 2022" -A x64 -DDISABLE_C5105:BOOL=ON
     ```
@@ -140,22 +129,18 @@ This section provides detailed instructions for building and installing the `tao
   cmake --build build --config Debug -j 4
   ```
 - Installing connector:
-  - This will install taos_odbc.dll into C:\TDengine\taos_odbc\x64\ by default.
-    ```
-    cmake --install build --config Debug
-    cmake --build build --config Debug --target install_templates
-    ```
+  This will install taos_odbc.dll into `C:\TDengine\taos_odbc\x64\` by default.
+  ```
+  cmake --install build --config Debug
+  cmake --build build --config Debug --target install_templates
+  ```
 - Verify installation:
-  - Check if a new TAOS_ODBC_DSN registry has been set up in the Windows Registry:
-    ```
-    HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBCINST.INI\TDengine
-    HKEY_CURRENT_USER\Software\ODBC\Odbc.ini\TAOS_ODBC_DSN
-    ```
-### 4.2 Linux Platform (Ubuntu 20.04 Example)
-- Change to the root directory of this project:
+  Check if a new TAOS_ODBC_DSN registry has been set up in the Windows Registry:
   ```
-  cd path\to\taos-connector-odbc
+  HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBCINST.INI\TDengine
+  HKEY_CURRENT_USER\Software\ODBC\Odbc.ini\TAOS_ODBC_DSN
   ```
+### 4.2 Linux Platform (Ubuntu 20.04 Example) and macOS Platform (Big Sur Example)
 - Generate make files:
   ```
   cmake -B debug -DCMAKE_BUILD_TYPE=Debug
@@ -170,28 +155,7 @@ This section provides detailed instructions for building and installing the `tao
   cmake --build debug --target install_templates
   ```
 - Confirm installation:
-  - Check if the ODBC DSN configuration file (e.g., /etc/odbc.ini or ~/.odbc.ini) contains TAOS_ODBC_DSN entry.
-
-4.3 macOS Platform (Big Sur Example)
-- Change to the root directory of this project:
-  ```
-  cd path\to\taos-connector-odbc
-  ```
-- Generate make files:
-  ```
-  cmake -B debug -DCMAKE_BUILD_TYPE=Debug
-  ```
-- Build the project:
-  ```
-  cmake --build debug
-  ```
-- Install connector:
-  ```
-  sudo cmake --install debug
-  cmake --build debug --target install_templates
-  ```
-- Confirm installation:
-  - Check if the ODBC DSN configuration file (e.g., /etc/odbc.ini or ~/.odbc.ini) contains TAOS_ODBC_DSN entry.
+  Check if the ODBC DSN configuration file (e.g., /etc/odbc.ini or ~/.odbc.ini) contains TAOS_ODBC_DSN entry.
 
 ## 5. Testing
 ### 5.1 Test Execution
@@ -199,47 +163,36 @@ The ODBC Connector testing framework uses ctest for running test cases. The test
 
 #### 5.1.1 Windows Platform (Windows 11 Example)
 - Setup testing environment variables:
-  - Set the following environment variables to configure logging levels and destinations:
-    ```
-    set TAOS_ODBC_LOG_LEVEL=ERROR
-    set TAOS_ODBC_LOGGER=stderr
-    set TAOS_TEST_CASES=%cd%\tests\taos\taos_test.cases
-    set ODBC_TEST_CASES=%cd%\tests\c\odbc_test.cases
-    ```
-  - Available log levels are: VERBOSE, DEBUG, INFO, WARN, ERROR, FATAL. Lower levels provide more detailed logs.
-  - Available loggers are: stderr, temp. stderr logs to standard error, and temp logs to a file in the temporary directory.
+  Set the following environment variables to configure logging levels and destinations:
+  ```
+  set TAOS_ODBC_LOG_LEVEL=ERROR
+  set TAOS_ODBC_LOGGER=stderr
+  set TAOS_TEST_CASES=%cd%\tests\taos\taos_test.cases
+  set ODBC_TEST_CASES=%cd%\tests\c\odbc_test.cases
+  ```
+  Available log levels are: VERBOSE, DEBUG, INFO, WARN, ERROR, FATAL. Lower levels provide more detailed logs.
+  Available loggers are: stderr, temp. stderr logs to standard error, and temp logs to a file in the temporary directory.
 - Run the tests:
   ```
   ctest --test-dir build --output-on-failure -C Debug
   ```
 
-#### 5.1.2 Linux Platform (Ubuntu 20.04 Example)
+#### 5.1.2 Linux Platform (Ubuntu 20.04 Example) and macOS Platform (Big Sur Example)
 - Setup testing environment variables:
-  - Set the following environment variables to configure logging levels and destinations:
-    ```
-    export TAOS_ODBC_LOG_LEVEL=ERROR
-    export TAOS_ODBC_LOGGER=stderr
-    export TAOS_TEST_CASES=$(pwd)/tests/taos/taos_test.cases
-    export ODBC_TEST_CASES=$(pwd)/tests/c/odbc_test.cases
-    ```
-  - Available log levels are: VERBOSE, DEBUG, INFO, WARN, ERROR, FATAL. Lower levels provide more detailed logs.
-  - Available loggers are: stderr, temp, syslog. stderr logs to standard error, temp logs to a file in the temporary directory, and syslog logs to the system log.
-- Run the tests:
+  Set the following environment variables to configure logging levels and destinations:
   ```
-  pushd debug >/dev/null && ctest --output-on-failure && echo -=Done=-; popd >/dev/null
+  export TAOS_ODBC_LOG_LEVEL=ERROR
+  export TAOS_ODBC_LOGGER=stderr
+  export TAOS_TEST_CASES=$(pwd)/tests/taos/taos_test.cases
+  export ODBC_TEST_CASES=$(pwd)/tests/c/odbc_test.cases
   ```
+  Available log levels are: VERBOSE, DEBUG, INFO, WARN, ERROR, FATAL. Lower levels provide more detailed logs.
 
-#### 5.1.3 macOS Platform (Big Sur Example)
-- Setup testing environment variables:
-  - Set the following environment variables to configure logging levels and destinations:
-    ```
-    export TAOS_ODBC_LOG_LEVEL=ERROR
-    export TAOS_ODBC_LOGGER=stderr
-    export TAOS_TEST_CASES=$(pwd)/tests/taos/taos_test.cases
-    export ODBC_TEST_CASES=$(pwd)/tests/c/odbc_test.cases
-    ```
-  - Available log levels are: VERBOSE, DEBUG, INFO, WARN, ERROR, FATAL. Lower levels provide more detailed logs.
-  - Available loggers are: stderr, temp. stderr logs to standard error, and temp logs to a file in the temporary directory.
+  Available loggers are:
+  - stderr: Logs to standard error.
+  - temp: Logs to a file in the temporary directory.
+  - syslog: Logs to the system log (only available on Linux platforms; not supported on macOS).
+  
 - Run the tests:
   ```
   pushd debug >/dev/null && ctest --output-on-failure && echo -=Done=-; popd >/dev/null
