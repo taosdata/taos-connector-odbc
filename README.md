@@ -3,6 +3,7 @@
 
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/taosdata/taos-connector-odbc)
 ![GitHub License](https://img.shields.io/github/license/taosdata/taos-connector-odbc)
+![GitHub Tag](https://img.shields.io/github/v/tag/taosdata/taos-connector-odbc?label=latest)
 <br />
 [![Twitter Follow](https://img.shields.io/twitter/follow/tdenginedb?label=TDengine&style=social)](https://twitter.com/tdenginedb)
 [![YouTube Channel](https://img.shields.io/badge/Subscribe_@tdengine--white?logo=youtube&style=social)](https://www.youtube.com/@tdengine)
