@@ -128,19 +128,6 @@ if(TODBC_DARWIN)
   endif()
 endif()
 
-if(TODBC_WINDOWS)
-  if(NOT DEFINED SERVER_FOR_TEST)
-    message(FATAL_ERROR " you must define SERVER_FOR_TEST on windows platform,\n"
-                        " because taosd is NOT included TDengine OSS since 3.1.x.x\n"
-                        " eg.: -DSERVER_FOR_TEST:STRING=127.0.0.1:6030")
-  endif()
-  if(NOT DEFINED WS_FOR_TEST)
-    message(FATAL_ERROR " you must define WS_FOR_TEST on windows platform,\n"
-                        " because taosd is NOT included TDengine OSS since 3.1.x.x\n"
-                        " eg.: -DWS_FOR_TEST:STRING=127.0.0.1:6041")
-  endif()
-endif()
-
 if(NOT DEFINED SERVER_FOR_TEST)
   set(SERVER_FOR_TEST "localhost:6030")
 endif()
