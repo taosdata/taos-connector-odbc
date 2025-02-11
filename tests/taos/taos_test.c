@@ -1548,21 +1548,29 @@ static int load_and_run(const char *json_test_cases_file)
   return r;
 }
 
+static void set_default_test_cases_file(char *buffer, size_t buffer_size) {
+  char source_dir[PATH_MAX];
+  tod_get_file_dir(__FILE__, source_dir, sizeof(source_dir));
+  snprintf(buffer, buffer_size, "%staos_test.cases", source_dir);
+}
+
 static int process_by_args(int argc, char *argv[])
 {
   (void)argc;
   (void)argv;
 
   int r = 0;
-  const char *json_test_cases_file = getenv("TAOS_TEST_CASES");
-  if (!json_test_cases_file) {
-    W("set environment `TAOS_TEST_CASES` to the test cases file");
-    return -1;
+  char json_test_cases_file[PATH_MAX];
+  const char *env_json_test_cases_file = getenv("TAOS_TEST_CASES");
+  if (!env_json_test_cases_file) {
+    W("Environment variable `TAOS_TEST_CASES` is not set. Using default test cases file.");
+    set_default_test_cases_file(json_test_cases_file, sizeof(json_test_cases_file));
+    env_json_test_cases_file = json_test_cases_file;
   }
 
-  LOG_CALL("load_and_run(%s)", json_test_cases_file);
-  r = load_and_run(json_test_cases_file);
-  LOG_FINI(r, "load_and_run(%s)", json_test_cases_file);
+  LOG_CALL("load_and_run(%s)", env_json_test_cases_file);
+  r = load_and_run(env_json_test_cases_file);
+  LOG_FINI(r, "load_and_run(%s)", env_json_test_cases_file);
   return r;
 }
 

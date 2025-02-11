@@ -1424,6 +1424,12 @@ static int load_and_run(SQLHANDLE hconn, const char *json_test_cases_file, conn_
   return r;
 }
 
+static void set_default_test_cases_file(char *buffer, size_t buffer_size) {
+  char source_dir[PATH_MAX];
+  tod_get_file_dir(__FILE__, source_dir, sizeof(source_dir));
+  snprintf(buffer, buffer_size, "%sodbc_test.cases", source_dir);
+}
+
 static int process_by_args_conn(int argc, char *argv[], SQLHANDLE hconn)
 {
   (void)argc;
@@ -1463,15 +1469,17 @@ static int process_by_args_conn(int argc, char *argv[], SQLHANDLE hconn)
   }
 
   int r = 0;
-  const char *json_test_cases_file = getenv("ODBC_TEST_CASES");
-  if (!json_test_cases_file) {
-    W("set environment `ODBC_TEST_CASES` to the test cases file");
-    return -1;
+  char json_test_cases_file[PATH_MAX];
+  const char *env_json_test_cases_file = getenv("ODBC_TEST_CASES");
+  if (!env_json_test_cases_file) {
+    W("Environment variable `ODBC_TEST_CASES` is not set. Using default test cases file.");
+    set_default_test_cases_file(json_test_cases_file, sizeof(json_test_cases_file));
+    env_json_test_cases_file = json_test_cases_file;
   }
 
-  LOG_CALL("load_and_run(%s)", json_test_cases_file);
-  r = load_and_run(hconn, json_test_cases_file, &conn_arg);
-  LOG_FINI(r, "load_and_run(%s)", json_test_cases_file);
+  LOG_CALL("load_and_run(%s)", env_json_test_cases_file);
+  r = load_and_run(hconn, env_json_test_cases_file, &conn_arg);
+  LOG_FINI(r, "load_and_run(%s)", env_json_test_cases_file);
   return r;
 }
 
