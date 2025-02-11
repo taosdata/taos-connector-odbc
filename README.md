@@ -168,8 +168,6 @@ The ODBC Connector testing framework uses ctest for running test cases. The test
   ```
   set TAOS_ODBC_LOG_LEVEL=ERROR
   set TAOS_ODBC_LOGGER=stderr
-  set TAOS_TEST_CASES=%cd%\tests\taos\taos_test.cases
-  set ODBC_TEST_CASES=%cd%\tests\c\odbc_test.cases
   ```
   Available log levels are: VERBOSE, DEBUG, INFO, WARN, ERROR, FATAL. Lower levels provide more detailed logs.
   Available loggers are: stderr, temp. stderr logs to standard error, and temp logs to a file in the temporary directory.
@@ -184,8 +182,6 @@ The ODBC Connector testing framework uses ctest for running test cases. The test
   ```
   export TAOS_ODBC_LOG_LEVEL=ERROR
   export TAOS_ODBC_LOGGER=stderr
-  export TAOS_TEST_CASES=$(pwd)/tests/taos/taos_test.cases
-  export ODBC_TEST_CASES=$(pwd)/tests/c/odbc_test.cases
   ```
   Available log levels are: VERBOSE, DEBUG, INFO, WARN, ERROR, FATAL. Lower levels provide more detailed logs.
 
