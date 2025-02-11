@@ -241,27 +241,27 @@ We welcome the submission of [GitHub Issue](https://github.com/taosdata/taos-con
 We welcome developers to contribute to this project. When submitting Pull Requests (PRs), please follow these steps:
 
 1. Fork the Project:
-   - Fork this repository by following the instructions provided [here](https://docs.github.com/en/get-started/quickstart/fork-a-repo).
+  Fork this repository by following the instructions provided [here](https://docs.github.com/en/get-started/quickstart/fork-a-repo).
 2. Create a New Branch:
-   - Create a new branch from the main branch with a meaningful name that reflects the changes you are making. Do not modify the main branch directly.
-      ```
-      git checkout -b my_branch
-      ```
+  Create a new branch from the main branch with a meaningful name that reflects the changes you are making. Do not modify the main branch directly.
+    ```
+    git checkout -b my_branch
+    ```
 3. Modify the Code:
-   - Make the necessary code modifications. Ensure that all existing unit tests pass and add new unit tests to verify your changes.
+  Make the necessary code modifications. Ensure that all existing unit tests pass and add new unit tests to verify your changes.
 4. Push Changes to Remote Branch:
-   - Push your changes to the remote branch on your forked repository.
-      ```
-      git push origin my_branch
-      ```
+  Push your changes to the remote branch on your forked repository.
+    ```
+    git push origin my_branch
+    ```
 5. Create a Pull Request (PR):
-   - Create a Pull Request on GitHub by following the instructions provided [here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request).
+  Create a Pull Request on GitHub by following the instructions provided [here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request).
 6. Check CI Status:
-   - After submitting the PR, you can find it through the [Pull Requests](https://github.com/taosdata/taos-connector-odbc/pulls) page.
-   - Click on the corresponding link to see if the Continuous Integration (CI) checks for your PR have passed. If they have passed, it will display "All checks have passed". Regardless of whether the CI passes or not, you can click "Show all checks" -> "Details" to view the detailed test case logs.
+  After submitting the PR, you can find it through the [Pull Requests](https://github.com/taosdata/taos-connector-odbc/pulls) page.
+  Click on the corresponding link to see if the Continuous Integration (CI) checks for your PR have passed. If they have passed, it will display "All checks have passed". Regardless of whether the CI passes or not, you can click "Show all checks" -> "Details" to view the detailed test case logs.
 7. Review Test Coverage:
-   - After submitting the PR, if the CI checks pass, you can find your PR on the [Codecov](https://app.codecov.io/gh/taosdata/taos-connector-odbc/pulls) page to check the test coverage.
-   - Ensure that your changes maintain or improve the overall test coverage.
+  After submitting the PR, if the CI checks pass, you can find your PR on the [Codecov](https://app.codecov.io/gh/taosdata/taos-connector-odbc/pulls) page to check the test coverage.
+  Ensure that your changes maintain or improve the overall test coverage.
 
 ## 9. References
 - [TDengine Official Website](https://www.tdengine.com/) 
