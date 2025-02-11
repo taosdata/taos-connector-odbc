@@ -216,25 +216,23 @@ We welcome the submission of [GitHub Issue](https://github.com/taosdata/taos-con
 
 ### 7.1 Required Information
 - Problem Description:
-  - Provide a clear and detailed description of the issue you are encountering.
-  - Indicate whether the issue occurs consistently or intermittently.
-  - If possible, include a detailed call stack or error message that can help in diagnosing the problem.
+  Provide a clear and detailed description of the issue you are encountering.
+  Indicate whether the issue occurs consistently or intermittently.
+  If possible, include a detailed call stack or error message that can help in diagnosing the problem.
 - ODBC Connector Version or Commit ID:
-  - Specify the version or commit id of the ODBC Connector you are using. 
+  Specify the version or commit id of the ODBC Connector you are using. 
 - ODBC Connection Parameters:
-  - Provide your ODBC connection string or DSN (Data Source Name) configuration details. Please do not include sensitive information such as usernames and passwords.
-  - Example:
-    ```
-    DSN=TAOS_ODBC_DSN;UID=<your_username>;PWD=<your_password>
-    ```
-    Replace <your_username> and <your_password> with placeholders or omit them for security reasons.
+  Provide your ODBC connection string or DSN (Data Source Name) configuration details. Please do not include sensitive information such as usernames and passwords.
+  Example:
+  ```
+  DSN=TAOS_ODBC_DSN;UID=<your_username>;PWD=<your_password>
+  ```
+  Replace <your_username> and <your_password> with placeholders or omit them for security reasons.
 - TDengine Server Version:
-  - Specify the version of the TDengine server you are connecting to. This can be found by running the following command on your TDengine server:
-    ```
-    taosd -V
-    ```
+  Specify the version of the TDengine server you are connecting to. 
+
 ### 7.2 Additional Information (Optional but Helpful)
-- Operating System: Specify the operating system and its version (e.g., Windows 11, Ubuntu 20.04, macOS Big Sur).
+- Operating System: Specify the operating system and its version.
 - Steps to Reproduce: Provide step-by-step instructions on how to reproduce the issue. This helps us replicate and verify the problem.
 - Environment Configuration: Include any relevant environment configurations, such as specific settings in odbc.ini, odbcinst.ini, or other configuration files.
 - Logs: Attach any relevant logs that might help in diagnosing the issue. Logs can be found in the location specified by your logging configuration (e.g., stderr, temp, or syslog).
