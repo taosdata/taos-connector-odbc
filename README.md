@@ -150,7 +150,7 @@ Before proceeding, ensure you are in the root directory of this project.
   sudo cmake --install debug
   cmake --build debug --target install_templates
   ```
-- Confirm installation:
+- Verify installation:
   Check if the ODBC DSN configuration file (e.g., /etc/odbc.ini or ~/.odbc.ini) contains TAOS_ODBC_DSN entry.
 
 ## 5. Testing
@@ -165,7 +165,7 @@ The ODBC Connector testing framework uses ctest for running test cases. The test
   set TAOS_ODBC_LOGGER=stderr
   ```
   Available log levels are: VERBOSE, DEBUG, INFO, WARN, ERROR, FATAL. Lower levels provide more detailed logs.
-  Available loggers are: stderr, temp. stderr logs to standard error, and temp logs to a file in the temporary directory.
+  Available loggers are: stderr, temp. stderr logs to standard error, and temp logs to a file( `taos_odbc.log`) in the temporary directory.
 - Run the tests:
   ```
   ctest --test-dir build --output-on-failure -C Debug
@@ -182,7 +182,7 @@ The ODBC Connector testing framework uses ctest for running test cases. The test
 
   Available loggers are:
   - stderr: Logs to standard error.
-  - temp: Logs to a file in the temporary directory.
+  - temp: Logs to a file( `taos_odbc.log`) in the temporary directory.
   - syslog: Logs to the system log (only available on Linux platforms; not supported on macOS).
   
 - Run the tests:
