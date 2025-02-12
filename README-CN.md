@@ -46,7 +46,7 @@
 `taos-connector-odbc` 支持多个操作系统，包括 Windows、Linux 和 macOS。
 
 ## 2. 文档
-- 使用 TDengine ODBC 连接器，请查阅[参考手册](https://docs.tdengine.com/tdengine-reference/client-libraries/odbc/)，其中包含版本历史、数据类型、示例程序、API描述和常见问题解答。
+- 使用 TDengine ODBC 连接器，请查阅[参考手册](https://docs.tdengine.com/tdengine-reference/client-libraries/odbc/)，其中包含版本历史、数据类型、示例程序、API 描述和常见问题解答。
 - 本快速指南主要面向那些喜欢自己贡献、构建和测试 ODBC 连接器的开发者。要了解更多关于 TDengine 的信息，您可以访问[官方文档](https://docs.taosdata.com/)。
 - TDengine ODBC 连接器遵循 ODBC 标准，确保在各种数据库系统之间的兼容性和互操作性。有关 ODBC 标准和规范的更详细信息，请参阅[Microsoft Open Database Connectivity (ODBC)](https://learn.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc)文档。此资源提供了对 ODBC 接口、方法及其他相关内容的全面见解，有助于加深您对 TDengine ODBC 连接器如何在更广泛的 ODBC 应用程序中运作的理解。
 
@@ -55,9 +55,9 @@
 
 之后，在安装和使用 `taos-connector-odbc` 之前，请确保您已满足特定平台的以下前置条件。
 
-- cmake ，3.16.3 或以上版本，请参阅 [cmake](https://cmake.org/)。
-- flex ，2.6.4 或以上版本。注意：在 Windows 平台上需要安装 win_flex_bison。
-- bison ，3.5.1 或以上版本。注意：在 Windows 平台上需要安装 win_flex_bison。
+- cmake，3.16.3 或以上版本，请参阅 [cmake](https://cmake.org/)。
+- flex，2.6.4 或以上版本。注意：在 Windows 平台上需要安装 win_flex_bison。
+- bison，3.5.1 或以上版本。注意：在 Windows 平台上需要安装 win_flex_bison。
 - odbc 驱动管理器，例如 Linux 中的 unixodbc（2.3.6 或以上版本）。注意：ODBC 驱动管理器在 Windows 平台上预装。
 - iconv，通常已包含在 libc 中。注意：构建此项目时会自动下载 win_iconv。
 
@@ -148,7 +148,7 @@
   cmake --build debug --target install_templates
   ```
 - 验证安装:
-  检查 ODBC DSN 配置文件（例如， `/etc/odbc.ini` 或 `~/.odbc.ini` ）是否包含 TAOS_ODBC_DSN 条目：
+  检查 ODBC DSN 配置文件（例如， `/etc/odbc.ini` 或 `~/.odbc.ini` ）是否包含 TAOS_ODBC_DSN 条目。
 
 ## 5. 测试
 ### 5.1 运行测试
