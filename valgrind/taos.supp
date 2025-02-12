@@ -1248,3 +1248,20 @@
    fun:start_thread
    fun:clone
 }
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:taosMemCalloc
+   fun:transDumpFromBuffer
+   fun:cliHandleResp
+   fun:cliRecvCb
+   fun:uv__read
+   fun:uv__stream_io
+   fun:uv__io_poll
+   fun:uv_run
+   fun:cliWorkThread
+   fun:start_thread
+   fun:clone
+}
