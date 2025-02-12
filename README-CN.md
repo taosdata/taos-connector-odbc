@@ -55,7 +55,7 @@
 
 之后，在安装和使用 `taos-connector-odbc` 之前，请确保您已满足特定平台的以下前置条件。
 
-- cmake，3.16.3 或以上版本，请参阅 [cmake](https://cmake.org/)。
+- cmake，3.0 或以上版本，请参阅 [cmake](https://cmake.org/)。
 - flex，2.6.4 或以上版本。注意：在 Windows 平台上需要安装 win_flex_bison。
 - bison，3.5.1 或以上版本。注意：在 Windows 平台上需要安装 win_flex_bison。
 - odbc 驱动管理器，例如 Linux 中的 unixodbc（2.3.6 或以上版本）。注意：ODBC 驱动管理器在 Windows 平台上预装。

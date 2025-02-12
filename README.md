@@ -55,7 +55,7 @@ First, ensure that TDengine has been deployed locally. For detailed deployment s
 
 Afterwards, before installing and using the `taos-connector-odbc`, ensure that you have met the following prerequisites for your specific platform.
 
-- cmake, 3.16.3 or above, please refer to [cmake](https://cmake.org/).
+- cmake, 3.0 or above, please refer to [cmake](https://cmake.org/).
 - flex, 2.6.4 or above. NOTE: win_flex_bison on windows platform to be installed.
 - bison, 3.5.1 or above. NOTE: win_flex_bison on windows platform to be installed.
 - odbc driver manager, such as unixodbc(2.3.6 or above) in linux. NOTE: odbc driver manager is pre-installed on windows platform.
@@ -249,7 +249,7 @@ We welcome developers to contribute to this project. When submitting PRs, please
 - [Microsoft ODBC API Reference](https://learn.microsoft.com/en-us/sql/odbc/reference/syntax/odbc-api-reference)
 
 ## 10. Appendix
-Layout of project source code, directories only
+Layout of project source code, directories only:
 ```
 <root>
 ├── benchmark
