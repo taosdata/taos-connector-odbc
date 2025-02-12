@@ -4115,3 +4115,33 @@
    fun:start_thread
    fun:clone
 }
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:__libc_alloc_buffer_allocate
+   fun:alloc_buffer_allocate
+   fun:__resolv_conf_allocate
+   fun:__resolv_conf_load
+   fun:__resolv_conf_get_current
+   fun:__res_vinit
+   fun:maybe_init
+   fun:context_get
+   fun:__resolv_context_get
+   fun:gaih_inet.constprop.7
+   fun:getaddrinfo
+   fun:_ZN104_$LT$std..sys_common..net..LookupHost$u20$as$u20$core..convert..TryFrom$LT$$LP$$RF$str$C$u16$RP$$GT$$GT$8try_from28_$u7b$$u7b$closure$u7d$$u7d$17h31ae8f29b0ed096aE
+   fun:_ZN90_$LT$std..sys_common..net..LookupHost$u20$as$u20$core..convert..TryFrom$LT$$RF$str$GT$$GT$8try_from17h9bc13948cb949249E
+   fun:_ZN60_$LT$str$u20$as$u20$std..net..socket_addr..ToSocketAddrs$GT$15to_socket_addrs17hb29f7c0fc642ba2eE
+   fun:_ZN78_$LT$alloc..string..String$u20$as$u20$std..net..socket_addr..ToSocketAddrs$GT$15to_socket_addrs17h233fc7f35707fe61E
+   fun:_ZN102_$LT$tokio..runtime..blocking..task..BlockingTask$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h511918415a4046f9E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17he576601d623000e7E
+   fun:_ZN5tokio7runtime4task3raw4poll17h3972720cee45659eE
+   fun:_ZN5tokio7runtime8blocking4pool5Inner3run17hc096eb4b805e3e8eE
+   fun:_ZN3std10sys_common9backtrace28__rust_begin_short_backtrace17h8893626c4bd3bcc8E
+   fun:_ZN4core3ops8function6FnOnce40call_once$u7b$$u7b$vtable.shim$u7d$$u7d$17h5bdb8a16fc59c692E
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new12thread_start17h420dad5cf01a9f35E
+   fun:start_thread
+   fun:clone
+}
