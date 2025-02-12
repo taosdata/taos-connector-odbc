@@ -283,8 +283,7 @@ Layout of project source code, directories only:
 │   │   └── main
 │   │       └── src
 │   ├── sh
-│   ├── taos
-│   └── ws
+│   └── taos
 └── valgrind
 ```
 
