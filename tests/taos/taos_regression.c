@@ -1649,23 +1649,24 @@ static int _prepare_get_tag_col_fields(const arg_t *arg, const stage_t stage, TA
   struct {
     int                line;
     const char        *sql;
+    int                err_code;
     int                nr_tags;
     int                nr_cols;
   } _inserts[] = {
-    RECORD("insert into t (ts, v, name, mark) values (?, ?, ?, ?)", 0, 4),
-    RECORD("insert into t values (?, ?, ?, ?)", 0, 4),
-    RECORD("insert into t (ts, v, mark) values (?, ?, ?)", 0, 3),
-    RECORD("insert into t (ts) values (?)", 0, 1),
-    RECORD("insert into t (ts) values (1665025866843)", 0, 1), // NOTE: weird!!!, literal col value, but get_col_fields still reports!!!
-    RECORD("insert into t (ts, v) values (now(), 3)", 0, 2), // NOTE: weird!!!, literal col value, but get_col_fields still reports!!!
-    RECORD("insert into t (ts, v) values (1665025866843, 3)", 0, 2), // NOTE: weird!!!, mixing literal and parameter-markers!!!
-    RECORD("insert into t (ts, v) values (now(), ?)", 0, 2), // NOTE: weird!!!, mixing function and parameter-markers!!!
-    RECORD("insert into t (ts, v) values (1665025866843, ?)", 0, 2), // NOTE: weird!!!, mixing literal and parameter-markers!!!
-    RECORD("insert into t (ts, v, mark) values (1665025866843, ?, ?)", 0, 3), // NOTE: weird!!!, mixing literal and parameter-markers!!!
-    RECORD("insert into t values (1665025866843, ?, ?, ?)", 0, 4), // NOTE: weird!!!, mixing literal and parameter-markers!!!
-    RECORD("insert into t using st (val, feat) tags (?, ?) (ts, v, mark) values (?, ?, ?)", 2, 3),
-    RECORD("insert into t using st (val) tags (?) (ts, v, mark) values (?, ?, ?)", 1, 3),
-    RECORD("insert into t using st (val) tags (4) (ts, v, mark) values (?, ?, ?)", 1, 3),  // NOTE: weird!!!, literal tag value, but get_tag_fields still reports!!!
+    RECORD("insert into t (ts, v, name, mark) values (?, ?, ?, ?)", TSDB_CODE_SUCCESS, 0, 4),
+    RECORD("insert into t values (?, ?, ?, ?)", TSDB_CODE_SUCCESS, 0, 4),
+    RECORD("insert into t (ts, v, mark) values (?, ?, ?)", TSDB_CODE_SUCCESS, 0, 3),
+    RECORD("insert into t (ts) values (?)", TSDB_CODE_SUCCESS, 0, 1),
+    RECORD("insert into t (ts) values (1665025866843)", TSDB_CODE_TSC_INVALID_OPERATION, 0, 0),
+    RECORD("insert into t (ts, v) values (now(), 3)", TSDB_CODE_TSC_INVALID_OPERATION, 0, 0),
+    RECORD("insert into t (ts, v) values (1665025866843, 3)", TSDB_CODE_TSC_INVALID_OPERATION, 0, 0),
+    RECORD("insert into t (ts, v) values (now(), ?)", TSDB_CODE_TSC_INVALID_OPERATION, 0, 0),
+    RECORD("insert into t (ts, v) values (1665025866843, ?)", TSDB_CODE_TSC_INVALID_OPERATION, 0, 0),
+    RECORD("insert into t (ts, v, mark) values (1665025866843, ?, ?)", TSDB_CODE_TSC_INVALID_OPERATION, 0, 0),
+    RECORD("insert into t values (1665025866843, ?, ?, ?)", TSDB_CODE_TSC_INVALID_OPERATION, 0, 0),
+    RECORD("insert into t using st (val, feat) tags (?, ?) (ts, v, mark) values (?, ?, ?)", TSDB_CODE_SUCCESS, 2, 3),
+    RECORD("insert into t using st (val) tags (?) (ts, v, mark) values (?, ?, ?)", TSDB_CODE_SUCCESS, 1, 3),
+    RECORD("insert into t using st (val) tags (4) (ts, v, mark) values (?, ?, ?)", TSDB_CODE_SUCCESS, 1, 3),  // NOTE: weird!!!, literal tag value, but get_tag_fields still reports!!!
   };
   size_t _nr_inserts = sizeof(_inserts)/sizeof(_inserts[0]);
 #undef RECORD
@@ -1673,6 +1674,7 @@ static int _prepare_get_tag_col_fields(const arg_t *arg, const stage_t stage, TA
   for (size_t i=0; i<_nr_inserts; ++i) {
     int          line             = _inserts[i].line;
     const char  *sql              = _inserts[i].sql;
+    int          err_code         = _inserts[i].err_code;
     int          nr_tags          = _inserts[i].nr_tags;
     int          nr_cols          = _inserts[i].nr_cols;
 
@@ -1690,7 +1692,9 @@ static int _prepare_get_tag_col_fields(const arg_t *arg, const stage_t stage, TA
     if (tags) {
       CALL_taos_stmt_reclaim_fields(stmt, tags); tags = NULL;
     }
-    if (r) return -1;
+    if (r) {
+      if (err_code != taos_errno(NULL)) return -1;
+    }
     if (tagNum != nr_tags) {
       E("@%dL:tags expected %d, but got ==%d==", line, nr_tags, tagNum);
       return -1;
@@ -1702,7 +1706,9 @@ static int _prepare_get_tag_col_fields(const arg_t *arg, const stage_t stage, TA
     if (cols) {
       CALL_taos_stmt_reclaim_fields(stmt, cols); cols = NULL;
     }
-    if (r) return -1;
+    if (r) {
+      if (err_code != taos_errno(NULL)) return -1;
+    }
     if (colNum != nr_cols) {
       E("@%dL:cols expected %d, but got ==%d==", line, nr_cols, colNum);
       return -1;
