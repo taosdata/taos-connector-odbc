@@ -4084,3 +4084,34 @@
    fun:start_thread
    fun:clone
 }
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:_ZN3std3sys12thread_local10fast_local12Key$LT$T$GT$14try_initialize17hef63e7e0be2d48cdE
+   fun:_ZN4rand4rngs6thread10thread_rng17h01f7c7de6dea926bE
+   fun:_ZN11tungstenite8protocol5frame5frame11FrameHeader15set_random_mask17h64f8d8dd2d3d8038E
+   fun:_ZN11tungstenite8protocol16WebSocketContext12buffer_frame17hca1533b396ef522fE
+   fun:_ZN11tungstenite8protocol16WebSocketContext6_write17hbded409b58b3d5feE
+   fun:_ZN11tungstenite8protocol16WebSocketContext5close17h418ea17d3d0baf92E
+   fun:_ZN129_$LT$tokio_tungstenite..WebSocketStream$LT$T$GT$$u20$as$u20$futures_sink..Sink$LT$tungstenite..protocol..message..Message$GT$$GT$10poll_close17he10bda8d3c333b4bE
+   fun:_ZN113_$LT$futures_util..stream..stream..split..SplitSink$LT$S$C$Item$GT$$u20$as$u20$futures_sink..Sink$LT$Item$GT$$GT$10poll_close17heab1bdd7a0afbd2bE
+   fun:_ZN91_$LT$tracing..instrument..Instrumented$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h75055db0c733ce87E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17hbebde010b6d9a37eE
+   fun:_ZN5tokio7runtime4task7harness20Harness$LT$T$C$S$GT$4poll17h07992ec2f2095a41E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context8run_task17h9d48a9880ba265beE
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker7Context3run17h058fb9762b8af1cfE
+   fun:_ZN5tokio7runtime7context13set_scheduler17h9ab1eaf897b9fbe1E
+   fun:_ZN5tokio7runtime7context7runtime13enter_runtime17hcbb59e793edf8808E
+   fun:_ZN5tokio7runtime9scheduler12multi_thread6worker3run17heecc67d3104f7732E
+   fun:_ZN102_$LT$tokio..runtime..blocking..task..BlockingTask$LT$T$GT$$u20$as$u20$core..future..future..Future$GT$4poll17h9c20a5cda36c2a04E
+   fun:_ZN5tokio7runtime4task4core17Core$LT$T$C$S$GT$4poll17h6d43742747d3db23E
+   fun:_ZN5tokio7runtime4task3raw4poll17h6d94b78c98d674b0E
+   fun:_ZN5tokio7runtime8blocking4pool5Inner3run17hc096eb4b805e3e8eE
+   fun:_ZN3std10sys_common9backtrace28__rust_begin_short_backtrace17h8893626c4bd3bcc8E
+   fun:_ZN4core3ops8function6FnOnce40call_once$u7b$$u7b$vtable.shim$u7d$$u7d$17h5bdb8a16fc59c692E
+   fun:_ZN3std3sys3pal4unix6thread6Thread3new12thread_start17h420dad5cf01a9f35E
+   fun:start_thread
+   fun:clone
+}
