@@ -38,7 +38,6 @@ English | [简体中文](./README-CN.md)
 - [9. References](#9-references)
 - [10. Appendix](#10-appendix)
 - [11. License](#11-license)
-- [originally initiated by freemine@yeah.net](#originally-initiated-by-freemineyeahnet)
 
 
 ## 1. Introduction
@@ -289,5 +288,6 @@ Layout of project source code, directories only
 ## 11. License
 [MIT License](./LICENSE)
 
+<!-- omit in toc -->
 ## originally initiated by freemine@yeah.net
 
