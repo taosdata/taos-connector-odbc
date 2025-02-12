@@ -1,316 +1,255 @@
-# ODBC Driver for TDengine 3.0 (TAOS) #
-English | [简体中文](README.cn.md)
+<!-- omit in toc -->
+# TDengine ODBC Connector
 
-### Supported platform
-* Linux
-* macOS
-  ```
-  Note:
-  Since TDengine 3.1.x.x, it seems TDengine OSS macOS port is not fully tested by TDengine, please be kindly noted
-  ```
-* Windows
-  ```
-  Note:
-  `taosd`, TDengine server-side program, has been eliminated from TDengine OSS since TDengine 3.1.x.x.
-  test cases are adjusted to use remote `taosd` you specified when building the project
-  ```
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/taosdata/taos-connector-odbc)
+![GitHub License](https://img.shields.io/github/license/taosdata/taos-connector-odbc)
+![GitHub Tag](https://img.shields.io/github/v/tag/taosdata/taos-connector-odbc?label=latest)
+<br />
+[![Twitter Follow](https://img.shields.io/twitter/follow/tdenginedb?label=TDengine&style=social)](https://twitter.com/tdenginedb)
+[![YouTube Channel](https://img.shields.io/badge/Subscribe_@tdengine--white?logo=youtube&style=social)](https://www.youtube.com/@tdengine)
+[![Discord Community](https://img.shields.io/badge/Join_Discord--white?logo=discord&style=social)](https://discord.com/invite/VZdSuUg4pS)
+[![LinkedIn](https://img.shields.io/badge/Follow_LinkedIn--white?logo=linkedin&style=social)](https://www.linkedin.com/company/tdengine)
+[![StackOverflow](https://img.shields.io/badge/Ask_StackOverflow--white?logo=stackoverflow&style=social&logoColor=orange)](https://stackoverflow.com/questions/tagged/tdengine)
 
-### Features
-- **on-going implementation of ODBC driver for TDengine 3.0 (TAOS)**
-- **currently exported ODBC functions are**:
+English | [简体中文](./README-CN.md)
 
-| ODBC/Setup API | linux (ubuntu 22.04) | macosx (ventura 13.2.1) | windows 11 | note |
-| :----- | :---- | :---- | :---- | :---- |
-| ConfigDSN | ❌ | ❌ | ✅ | |
-| ConfigDriver | ❌ | ❌ | ✅ | |
-| ConfigTranslator | ❌ | ❌ | ✅ | |
-| SQLAllocHandle | ✅ | ✅ | ✅ | |
-| SQLBindCol  | ✅ | ✅ | ✅ | Column-Wise Binding only |
-| SQLBindParameter | ✅ | ✅ | ✅ | Column-Wise Binding only |
-| SQLBrowseConnect | ❌ | ❌ | ❌ | |
-| SQLBulkOperations | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLCloseCursor | ✅ | ✅ | ✅ | |
-| SQLColAttribute | ✅ | ✅ | ✅ | |
-| SQLColumnPrivileges | ❌ | ❌ | ❌ | TDengine seems have no strict counterpart |
-| SQLColumns | ✅ | ✅ | ✅ | |
-| SQLCompleteAsync | ❌ | ❌ | ❌ | |
-| SQLConnect | ✅ | ✅ | ✅ | |
-| SQLCopyDesc | ❌ | ❌ | ❌ | |
-| SQLDescribeCol | ✅ | ✅ | ✅ | |
-| SQLDescribeParam | ✅ | ✅ | ✅ | partially and on-going |
-| SQLDisconnect | ✅ | ✅ | ✅ | |
-| SQLDriverConnect | ✅ | ✅ | ✅ | |
-| SQLEndTran | ✅ | ✅ | ✅ | TDengine is non-transactional, thus this is at most simulating |
-| SQLExecDirect | ✅ | ✅ | ✅ | |
-| SQLExecute | ✅ | ✅ | ✅ | |
-| SQLExtendedFetch | ❌ | ❌ | ❌ | |
-| SQLFetch | ✅ | ✅ | ✅ | |
-| SQLFetchScroll | ✅ | ✅ | ✅ | TDengine has no counterpart, just implement SQL_FETCH_NEXT |
-| SQLForeignKeys | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLFreeHandle | ✅ | ✅ | ✅ | |
-| SQLFreeStmt | ✅ | ✅ | ✅ | |
-| SQLGetConnectAttr | ✅ | ✅ | ✅ | partially and on-going |
-| SQLGetCursorName | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLGetData | ✅ | ✅ | ✅ | |
-| SQLGetDescField | ❌ | ❌ | ❌ | |
-| SQLGetDescRec | ❌ | ❌ | ❌ | |
-| SQLGetDiagField | ✅ | ✅ | ✅ | |
-| SQLGetDiagRec | ✅ | ✅ | ✅ | |
-| SQLGetEnvAttr | ✅ | ✅ | ✅ | partially and on-going |
-| SQLGetInfo | ✅ | ✅ | ✅ | partially and on-going |
-| SQLGetStmtAttr | ✅ | ✅ | ✅ | partially and on-going |
-| SQLGetTypeInfo | ✅ | ✅ | ✅ | |
-| SQLMoreResults | ✅ | ✅ | ✅ | |
-| SQLNativeSql | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLNumParams | ✅ | ✅ | ✅ | TDengine has partially support, thus workaround in some cases |
-| SQLNumResultCols | ✅ | ✅ | ✅ | |
-| SQLParamData | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLPrepare | ✅ | ✅ | ✅ | TDengine has partially support, thus workaround in some cases |
-| SQLPrimaryKeys | ✅ | ✅ | ✅ | |
-| SQLProcedureColumns | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLProcedures | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLPutData | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLRowCount | ✅ | ✅ | ✅ | |
-| SQLSetConnectAttr | ✅ | ✅ | ✅ | partially and on-going |
-| SQLSetCursorName | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLSetDescField | ❌ | ❌ | ❌ | |
-| SQLSetDescRec | ❌ | ❌ | ❌ | |
-| SQLSetEnvAttr | ✅ | ✅ | ✅ | partially and on-going |
-| SQLSetPos | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLSetStmtAttr | ✅ | ✅ | ✅ | partially and on-going |
-| SQLSpecialColumns | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLStatistics | ❌ | ❌ | ❌ | TDengine has no counterpart |
-| SQLTablePrivileges | ❌ | ❌ | ❌ | TDengine has no strict counterpart |
-| SQLTables | ✅ | ✅ | ✅ | |
-
-- **non-supported-statement-attributes (SQLSetStmtAttr)**
-
-| Attribute | Note |
-| :----- | :---- |
-| SQL_ATTR_CONCURRENCY | TDengine has no updatable-CURSOR machanism |
-| SQL_ATTR_FETCH_BOOKMARK_PTR | TDengine has no BOOKMARK machanism |
-| SQL_ATTR_IMP_PARAM_DESC | |
-| SQL_ATTR_IMP_ROW_DESC | |
-| SQL_ATTR_KEYSET_SIZE | |
-| SQL_ATTR_PARAM_BIND_OFFSET_PTR | |
-| SQL_ATTR_PARAM_OPERATION_PTR | |
-| SQL_ATTR_ROW_NUMBER | Readonly attribute |
-| SQL_ATTR_ROW_OPERATION_PTR | |
-| SQL_ATTR_SIMULATE_CURSOR | |
-
-- **non-supported-connection-attributes (SQLSetConnectAttr)**
-
-| Attribute | Note |
-| :----- | :---- |
-| SQL_ATTR_AUTO_IPD | Readonly attribute |
-| SQL_ATTR_CONNECTION_DEAD | Readonly attribute |
-| SQL_ATTR_ENLIST_IN_DTC | |
-| SQL_ATTR_PACKET_SIZE | |
-| SQL_ATTR_TRACE | |
-| SQL_ATTR_TRACEFILE | |
-| SQL_ATTR_TRANSLATE_LIB | |
-| SQL_ATTR_TRANSLATE_OPTION | |
-
-- **enable ODBC-aware software to communicate with TDengine**
-- **enable any programming language with ODBC-bindings/ODBC-plugings to communicate with TDengine. programming languages listed as follows are demonstrated in test-cases:**
-
-| programming language | ODBC-API or bindings/plugins |
-| :----- | :---- |
-| C/C++ | ODBC-API |
-| CSharp | System.Data.Odbc |
-| Erlang | odbc module |
-| Go | github.com/alexbrainman/odbc, database/sql |
-| Haskell | HDBC, HDBC-odbc |
-| Common Lisp | plain-odbc |
-| Nodejs | odbc |
-| Python3 | pyodbc |
-| Rust | odbc |
+<!-- omit in toc -->
+## Table of Contents
+- [1. Introduction](#1-introduction)
+- [2. Documentation](#2-documentation)
+- [3. Prerequisites](#3-prerequisites)
+  - [3.1 Windows](#31-windows)
+  - [3.2 Linux](#32-linux)
+  - [3.3 macOS](#33-macos)
+- [4. Building and Installing](#4-building-and-installing)
+  - [4.1 Windows](#41-windows)
+  - [4.2 Linux/macOS](#42-linuxmacos)
+- [5. Testing](#5-testing)
+  - [5.1 Test Execution](#51-test-execution)
+    - [5.1.1 Windows](#511-windows)
+    - [5.1.2 Linux/macOS](#512-linuxmacos)
+  - [5.2 Test Case Addition](#52-test-case-addition)
+  - [5.3 Performance Testing](#53-performance-testing)
+- [6. CI/CD](#6-cicd)
+- [7. Submitting Issues](#7-submitting-issues)
+  - [7.1 Required Information](#71-required-information)
+  - [7.2 Additional Information (Optional but Helpful)](#72-additional-information-optional-but-helpful)
+- [8. Submitting PRs](#8-submitting-prs)
+- [9. References](#9-references)
+- [10. Appendix](#10-appendix)
+- [11. License](#11-license)
 
 
-- **On Windows, "ODBC Data Sources (64bit)" pre-installed tool can be used to manage DSN**
-- **Support TDengine data subscription feature，refer to samples/c/demo_topic.c**
-- **still going on**...
+## 1. Introduction
+`taos-connector-odbc` is the official ODBC connector for TDengine, enabling applications written in various programming languages such as C/C++, C#, Go, Rust, Python, Node.js, and more to interact with the TDengine database. By leveraging the standardized ODBC interface, `taos-connector-odbc` facilitates seamless data writing, querying and parameter binding across different platforms and environments.
 
-### Requirements
-- cmake, 3.16.3 or above
+The `taos-connector-odbc` supports multiple operating systems, including Windows, Linux, and macOS. 
+
+## 2. Documentation
+- To use the TDengine ODBC connector, please check [Reference Manual](https://docs.tdengine.com/tdengine-reference/client-libraries/odbc/), which includes version history, data types, example programs, API descriptions, and FAQs.
+- This quick guide is mainly for developers who like to contribute/build/test the ODBC connector by themselves. To learn more about TDengine, you can visit the [official documentation](https://docs.tdengine.com).
+- The TDengine ODBC connector adheres to the ODBC standard, ensuring compatibility and interoperability across various database systems. For more detailed information about ODBC standards and specifications, please refer to the [Microsoft Open Database Connectivity (ODBC)](https://learn.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc) documentation. This resource provides comprehensive insights into ODBC interfaces, methods, and other relevant details that can help deepen your understanding of how the TDengine ODBC connector operates within the broader context of ODBC applications.
+
+## 3. Prerequisites
+First, ensure that TDengine has been deployed locally. For detailed deployment steps, please refer to [Deploy TDengine](https://docs.tdengine.com/get-started/deploy-from-package/). Ensure that both taosd and taosAdapter services are up and running.
+
+Afterwards, before installing and using the `taos-connector-odbc`, ensure that you have met the following prerequisites for your specific platform.
+
+- cmake, 3.0 or above, please refer to [cmake](https://cmake.org/).
 - flex, 2.6.4 or above. NOTE: win_flex_bison on windows platform to be installed.
 - bison, 3.5.1 or above. NOTE: win_flex_bison on windows platform to be installed.
-- odbc driver manager, such as unixodbc(2.3.6 or above) in linux. NOTE: odbc driver manager is pre-installed on windows platform
-- iconv, should've been already included in libc. NOTE: win_iconv would be downloaded when building this project
-- valgrind, if you wish to debug and profile executables, such as detecting potential memory leakages
-- node, v12.0 or above if you wish to enable nodejs-test-cases
-  - node odbc, 2.4.4 or above, https://www.npmjs.com/package/odbc
-- rust, v1.63 or above if you wish to enable rust-test-cases
-  - odbc, 0.17.0 or above, https://docs.rs/odbc/latest/odbc/
-  - env_logger, 0.8.2 or above, https://docs.rs/env_logger/latest/env_logger/
-  - json
-- python3, v3.10 or above if you wish to enable python3-test-cases
-  - pyodbc, 4.0.39 or above, https://www.python.org/
-- go, v1.17 or above if you wish to enable go-test-cases
-  - github.com/alexbrainman/odbc, https://go.dev/
-- erlang, v12.2 or above if you wish to enable erlang-test-cases
-  - https://www.erlang.org/doc/apps/odbc/getting_started.html, https://erlang.org/
-- haskell, cabal v3.6 or above, ghc v9.2 or above,  if you wish to enable haskell-test-cases
-  - https://www.haskell.org/ or https://www.haskell.org/ghcup/
-- common lisp, sbcl v2.1.11 or above if you wish to enable common-lisp-test-cases
-  - plain-odbc, https://plain-odbc.common-lisp.dev/, https://lisp-lang.org/ or https://lisp-lang.org/learn/getting-started/
-- R, v4.3 or above, if you wish to enable R-test-cases
-  - https://www.r-project.org/
+- odbc driver manager, such as unixodbc(2.3.6 or above) in linux. NOTE: odbc driver manager is pre-installed on windows platform.
+- iconv, should've been already included in libc. NOTE: win_iconv will be automatically downloaded when building this project.
 
-### Installing TDengine 3.0
-- please visit https://tdengine.com
-- better use TDengine-git-commit "ea249127afb42ac3a31d8d9f63243c3d1b950b5d" or above, otherwise, you might come across memory leakage in windows platform, which is introduced by `taos_stmt_get_tag_fields/taos_stmt_get_col_fields`. please check detail: https://github.com/taosdata/TDengine/issues/18804 and https://github.com/taosdata/TDengine/pull/19245
+If you want to enable valgrind memory checks or test cases for programming languages other than C/C++, please refer to the following content.
 
-### Installing prerequisites, use Ubuntu 20.04 as an example
-```
-sudo apt install flex bison unixodbc unixodbc-dev && echo -=Done=-
-```
+| Tool or Language  | Version Requirement                       | Related Libraries and Versions                                                                          | Reference Links                                                                 |
+|-------------------|-------------------------------------------|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| valgrind          | v3.20 or above                            |                                                                                                         | [valgrind](https://valgrind.org/)                                               |
+| node.js           | v12.0 or above                            | node-odbc, 2.4.4 or above                                                                               | [node-odbc](https://www.npmjs.com/package/odbc/)                                |
+| rust              | v1.63 or above                            | odbc, 0.17.0 or above<br>env_logger, 0.8.2 or above<br>json                                             | [rust-odbc](https://docs.rs/odbc/latest/odbc/)<br>[env_logger](https://docs.rs/env_logger/latest/env_logger/)<br>[json](https://docs.rs/json/latest/json/) |
+| python            | v3.10 or above                            | pyodbc, 4.0.39 or above                                                                                 | [python-odbc](https://pypi.org/project/pyodbc/)                                 |
+| go                | v1.17 or above                            | odbc                                                                                                    | [go-odbc](https://github.com/alexbrainman/odbc)                                 |
+| erlang            | v12.2 or above                            | odbc                                                                                                    | [erlang-odbc](https://www.erlang.org/doc/apps/odbc/getting_started.html)        |
+| haskell           | cabal v3.6 or above, ghc v9.2 or above    | hsql-odbc                                                                                               | [haskell-odbc](https://hackage.haskell.org/package/hsql-odbc)                   |
+| common lisp       | sbcl v2.1.11 or above                     | plain-odbc                                                                                              | [common-lisp-odbc](https://plain-odbc.common-lisp.dev/)                         |
+| R                 | v4.3 or above                             | odbc                                                                                                    | [R-odbc](https://cran.r-project.org/web/packages/odbc/index.html)               |
 
-### Building and Installing, use Ubuntu 20.04 as an example
-```
-rm -rf debug &&
-cmake -B debug -DCMAKE_BUILD_TYPE=Debug &&
-cmake --build debug &&
-sudo cmake --install debug &&
-cmake --build debug --target install_templates &&
-echo -=Done=-
-```
 
-### Test
-```
-pushd debug >/dev/null && TAOS_TEST_CASES=$(pwd)/../tests/taos/taos_test.cases ODBC_TEST_CASES=$(pwd)/../tests/c/odbc_test.cases ctest --output-on-failure && echo -=Done=-; popd >/dev/null
-```
 
-### Test with environment variable `TAOS_ODBC_LOG_LEVEL` and `TAOS_ODBC_LOGGER`
-- TAOS_ODBC_LOG_LEVEL: VERBOSE/DEBUG/INFO/WARN/ERROR/FATAL, from low to high. the lower the level is, the more info to log
-- TAOS_ODBC_LOGGER: stderr/temp/syslog
-    - stderr: log to `stderr`
-    - temp: log to `env('TEMP')/taos_odbc.log` or `/tmp/taos_odbc.log` if env('TEMP') not exists
-    - syslog: log to `syslog`
+In the following content of this guide, we will use the following versions as examples: Windows 11 for the Windows platform, Ubuntu 20.04 for the Linux platform, and macOS Big Sur for the macOS platform.
 
-in case when some test cases fail and you wish to have more debug info, such as when and how taos_xxx API is called under the hood, you can
-```
-pushd debug >/dev/null && TAOS_TEST_CASES=$(pwd)/../tests/taos/taos_test.cases ODBC_TEST_CASES=$(pwd)/../tests/c/odbc_test.cases TAOS_ODBC_LOG_LEVEL=ERROR TAOS_ODBC_LOGGER=stderr ctest --output-on-failure && echo -=Done=-; popd >/dev/null
-```
+### 3.1 Windows
+- Install win_flex_bison:
+  - Download from: [win_flex_bison](https://github.com/lexxmark/winflexbison/releases/).
+  - Extract the files and add the directory to your system's PATH environment variable.
+- Verify Installation:
+  ```
+  win_flex --version
+  ```
+- Install ODBC Driver Manager:
+  Ensure that the Microsoft ODBC Driver Manager is installed on your system. It is typically pre-installed on Windows platform.
 
-### To make your daily life better
-```
-export TAOS_TEST_CASES=$(pwd)/tests/taos/taos_test.cases
-export ODBC_TEST_CASES=$(pwd)/tests/c/odbc_test.cases
-export TAOS_ODBC_LOG_LEVEL=ERROR
-export TAOS_ODBC_LOGGER=stderr
-```
-and then, you can
-```
-pushd debug >/dev/null && ctest --output-on-failure && echo -=Done=-; popd >/dev/null
-```
+### 3.2 Linux
+- Install Required Dependencies, including the ODBC Driver Manager:
+  ```
+  sudo apt install flex bison unixodbc unixodbc-dev && echo -=Done=-
+  ```
 
-### Installing prerequisites, use MacOS Big Sur as an example
-```
-brew install flex bison unixodbc && echo -=Done=-
-```
+### 3.3 macOS
+- Install Required Dependencies, including the ODBC Driver Manager:
+  ```
+  brew install flex bison unixodbc && echo -=Done=-
+  ```
 
-### Building and Installing, use MacOS Big Sur as an example
-```
-rm -rf debug &&
-cmake -B debug -DCMAKE_BUILD_TYPE=Debug &&
-cmake --build debug &&
-sudo cmake --install debug &&
-cmake --build debug --target install_templates &&
-echo -=Done=-
-```
+## 4. Building and Installing
+This section provides detailed instructions for building and installing the ODBC connector on different platforms.
+Before proceeding, ensure you are in the root directory of this project.
 
-### Test
-```
-pushd debug >/dev/null && TAOS_TEST_CASES=$(pwd)/../tests/taos/taos_test.cases ODBC_TEST_CASES=$(pwd)/../tests/c/odbc_test.cases ctest --output-on-failure && echo -=Done=-; popd >/dev/null
-```
+### 4.1 Windows
+- Optionally, setup building environment: If you have installed Visual Studio Community 2022 on a 64-bit Windows platform, run the following command to set up the build environment:
+  ```
+  "\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+  ```
+- Generate make files:
+  ```
+  cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -B build -G "Visual Studio 17 2022" -A x64
+  ```
+  **Troubleshooting**: If compiler errors occur during the following steps, such as <path_to_winbase.h> warning C5105: macro expansion producing 'defined' has undefined behavior, retry with the following command:
+    ```
+    cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -B build -G "Visual Studio 17 2022" -A x64 -DDISABLE_C5105:BOOL=ON
+    ```
+- Building the project:
+  ```
+  cmake --build build --config Debug -j 4
+  ```
+- Installing connector:
+  This will install taos_odbc.dll into `C:\TDengine\taos_odbc\x64\` by default.
+  ```
+  cmake --install build --config Debug
+  cmake --build build --config Debug --target install_templates
+  ```
+- Verify installation:
+  Check if a new TAOS_ODBC_DSN registry has been set up in the Windows Registry:
+  ```
+  HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBCINST.INI\TDengine
+  HKEY_CURRENT_USER\Software\ODBC\Odbc.ini\TAOS_ODBC_DSN
+  ```
+### 4.2 Linux/macOS
+- Generate make files:
+  ```
+  cmake -B debug -DCMAKE_BUILD_TYPE=Debug
+  ```
+- Build the project:
+  ```
+  cmake --build debug
+  ```
+- Install connector:
+  ```
+  sudo cmake --install debug
+  cmake --build debug --target install_templates
+  ```
+- Verify installation:
+  Check if the ODBC DSN configuration file (e.g., /etc/odbc.ini or ~/.odbc.ini) contains TAOS_ODBC_DSN entry.
 
-### Test with environment variable `TAOS_ODBC_LOG_LEVEL` and `TAOS_ODBC_LOGGER`
-- TAOS_ODBC_LOG_LEVEL: VERBOSE/DEBUG/INFO/WARN/ERROR/FATAL, from low to high. the lower the level is, the more info to log
-- TAOS_ODBC_LOGGER: stderr/temp
-    - stderr: log to `stderr`
-    - temp: log to `env('TEMP')/taos_odbc.log` or `/tmp/taos_odbc.log` if env('TEMP') not exists
+## 5. Testing
+### 5.1 Test Execution
+The ODBC Connector testing framework uses ctest for running test cases. The test cases are located in the tests directory of the project root.
 
-in case when some test cases fail and you wish to have more debug info, such as when and how taos_xxx API is called under the hood, you can
-```
-pushd debug >/dev/null && TAOS_TEST_CASES=$(pwd)/../tests/taos/taos_test.cases ODBC_TEST_CASES=$(pwd)/../tests/c/odbc_test.cases TAOS_ODBC_LOG_LEVEL=ERROR TAOS_ODBC_LOGGER=stderr ctest --output-on-failure && echo -=Done=-; popd >/dev/null
-```
+#### 5.1.1 Windows
+- Setup testing environment variables:
+  Set the following environment variables to configure logging levels and destinations:
+  ```
+  set TAOS_ODBC_LOG_LEVEL=ERROR
+  set TAOS_ODBC_LOGGER=stderr
+  ```
+  Available log levels are: VERBOSE, DEBUG, INFO, WARN, ERROR, FATAL. Lower levels provide more detailed logs.
+  Available loggers are:
+  - stderr: logs to standard error.
+  - temp: logs to a file( `taos_odbc.log`) in the temporary directory.
 
-### To make your daily life better
-```
-export TAOS_TEST_CASES=$(pwd)/tests/taos/taos_test.cases
-export ODBC_TEST_CASES=$(pwd)/tests/c/odbc_test.cases
-export TAOS_ODBC_LOG_LEVEL=ERROR
-export TAOS_ODBC_LOGGER=stderr
-```
-and then, you can
-```
-pushd debug >/dev/null && ctest --output-on-failure && echo -=Done=-; popd >/dev/null
-```
+- Run the tests:
+  ```
+  ctest --test-dir build --output-on-failure -C Debug
+  ```
 
-### Installing prerequisites, use Windows 11 as an example
-1. download and install win_flex_bison 2.5.25.
-```
-https://github.com/lexxmark/winflexbison/releases/download/v2.5.25/win_flex_bison-2.5.25.zip
-```
-2. check to see if it's installed: 
-```
-win_flex --version
-```
+#### 5.1.2 Linux/macOS
+- Setup testing environment variables:
+  Set the following environment variables to configure logging levels and destinations:
+  ```
+  export TAOS_ODBC_LOG_LEVEL=ERROR
+  export TAOS_ODBC_LOGGER=stderr
+  ```
+  Available log levels are: VERBOSE, DEBUG, INFO, WARN, ERROR, FATAL. Lower levels provide more detailed logs.
 
-### Building and Installing, use Windows 11 as an example
-3. Open Command Prompt as an Administrator. https://www.makeuseof.com/windows-run-command-prompt-admin/
-4. change to the root directory of this project
-5. optionally, setup building environment, if you install visual studio community 2022 on a 64-windows-platform, then:
-```
-"\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
-```
-6. generate make files
-```
-cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -B build -G "Visual Studio 17 2022" -A x64
-```
-**TroubleShooting**: if compiler error occurs during the following steps, such as: <path_to_winbase.h>: warning C5105: macro expansion producing 'defined' has undefined behavior, you can retry as below:
-```
-cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -B build -G "Visual Studio 17 2022" -A x64 -DDISABLE_C5105:BOOL=ON
-```
-7. building project
-```
-cmake --build build --config Debug -j 4
-```
-8. installing taos_odbc, this would install taos_odbc.dll into C:\Program Files\taos_odbc\bin\
-```
-cmake --install build --config Debug
-cmake --build build --config Debug --target install_templates
-```
-9. check and see if a new TAOS_ODBC_DSN registry has been setup in win_registry
-```
-HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBCINST.INI\TDengine
-HKEY_CURRENT_USER\Software\ODBC\Odbc.ini\TAOS_ODBC_DSN
-```
+  Available loggers are:
+  - stderr: Logs to standard error.
+  - temp: Logs to a file( `taos_odbc.log`) in the temporary directory.
+  - syslog: Logs to the system log (only available on Linux platform; not supported on macOS).
+  
+- Run the tests:
+  ```
+  pushd debug >/dev/null && ctest --output-on-failure && echo -=Done=-; popd >/dev/null
+  ```
 
-### Test
-10. setup testing environment variable `TAOS_ODBC_LOG_LEVEL` and `TAOS_ODBC_LOGGER`
-- TAOS_ODBC_LOG_LEVEL: VERBOSE/DEBUG/INFO/WARN/ERROR/FATAL, from low to high. the lower the level is, the more info to log
-- TAOS_ODBC_LOGGER: stderr/temp
-    - stderr: log to `stderr`
-    - temp: log to `env('TEMP')\taos_odbc.log` or `C:\Windows\Temp\taos_odbc.log` if env('TEMP') not exists
-```
-set TAOS_TEST_CASES=%cd%\tests\taos\taos_test.cases
-set ODBC_TEST_CASES=%cd%\tests\c\odbc_test.cases
-set TAOS_ODBC_LOG_LEVEL=ERROR
-set TAOS_ODBC_LOGGER=stderr
-```
-11. testing
-```
-ctest --test-dir build --output-on-failure -C Debug
-```
+### 5.2 Test Case Addition
+All tests are located in the `./tests/` directory of the project. This directory contains subdirectories for various languages and types of tests. The basic functionality verification test cases are written in C and are located in the `c` and `taos` folders.
+You can add new test files or add test cases in existing test files that comply with the testing framework standards.
+For C/C++ tests, ensure they follow the CTest framework conventions.
+Place new test files in the appropriate directories within the tests directory.
 
-### Tips
-- `cmake --help` or `man cmake`
-- `ctest --help` or `man ctest`
-- `valgrind --help` or `man valgrind`
+### 5.3 Performance Testing
+Performance testing is in progress.
 
-### Layout of source code, directories only
+## 6. CI/CD
+- [Build Workflow] -TODO
+- [Code Coverage] -TODO
+
+## 7. Submitting Issues
+We welcome the submission of [GitHub Issue](https://github.com/taosdata/taos-connector-odbc/issues/new?template=Blank+issue). When submitting an issue, please provide the following information to help us diagnose and resolve the problem more efficiently:
+
+### 7.1 Required Information
+- Problem Description:
+  Provide a clear and detailed description of the issue you are encountering.
+  Indicate whether the issue occurs consistently or intermittently.
+  If possible, include a detailed call stack or error message that can help in diagnosing the problem.
+- ODBC Connector Version:
+  Specify the version of the ODBC Connector you are using. 
+- ODBC Connection Parameters:
+  Provide your ODBC connection string or DSN (Data Source Name) configuration details. Please do not include sensitive information such as usernames and passwords.
+  Example:
+  ```
+  DSN=TAOS_ODBC_DSN;UID=<your_username>;PWD=<your_password>
+  ```
+  Replace <your_username> and <your_password> with placeholders or omit them for security reasons.
+- TDengine Server Version:
+  Specify the version of the TDengine server you are connecting to. 
+
+### 7.2 Additional Information (Optional but Helpful)
+- Operating System: Specify the operating system and its version.
+- Steps to Reproduce: Provide step-by-step instructions on how to reproduce the issue. This helps us replicate and verify the problem.
+- Environment Configuration: Include any relevant environment configurations, such as specific settings in odbc.ini, odbcinst.ini, or other configuration files.
+- Logs: Attach any relevant logs that might help in diagnosing the issue. Logs can be found in the location specified by your logging configuration (e.g., stderr, temp, or syslog).
+
+## 8. Submitting PRs
+We welcome developers to contribute to this project. When submitting PRs, please follow these steps:
+
+1. Fork this project, refer to ([how to fork a repo](https://docs.github.com/en/get-started/quickstart/fork-a-repo)).
+2. Create a new branch from the main branch with a meaningful branch name (`git checkout -b my_branch`). Do not modify the main branch directly.
+3. Modify the code, ensure all unit tests pass, and add new unit tests to verify the changes.
+4. Push the changes to the remote branch (`git push origin my_branch`).
+5. Create a Pull Request on GitHub ([how to create a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)).
+6. After submitting the PR, you can find your PR through the [Pull Request](https://github.com/taosdata/taos-connector-odbc/pulls). Click on the corresponding link to see if the CI for your PR has passed. If it has passed, it will display "All checks have passed". Regardless of whether the CI passes or not, you can click "Show all checks" -> "Details" to view the detailed test case logs.
+7. After submitting the PR, if CI passes, you can find your PR on the [codecov](https://app.codecov.io/gh/taosdata/taos-connector-odbc/pulls) page to check the test coverage.
+
+## 9. References
+- [TDengine Official Website](https://www.tdengine.com/) 
+- [TDengine GitHub](https://github.com/taosdata/TDengine) 
+- [Microsoft Introduction to ODBC](https://learn.microsoft.com/en-us/sql/odbc/reference/introduction-to-odbc)
+- [Microsoft ODBC API Reference](https://learn.microsoft.com/en-us/sql/odbc/reference/syntax/odbc-api-reference)
+
+## 10. Appendix
+Layout of project source code, directories only:
 ```
 <root>
 ├── benchmark
@@ -343,19 +282,14 @@ ctest --test-dir build --output-on-failure -C Debug
 │   ├── rust
 │   │   └── main
 │   │       └── src
-│   ├── taos
-│   └── ws
+│   ├── sh
+│   └── taos
 └── valgrind
 ```
 
-## TDengine references
-- https://tdengine.com
-- https://github.com/taosdata/TDengine
-- https://github.com/taosdata/TDengine/blob/main/docs/en/07-develop/07-tmq.mdx#create-a-consumer
+## 11. License
+[MIT License](./LICENSE)
 
-## ODBC references
-- https://learn.microsoft.com/en-us/sql/odbc/reference/introduction-to-odbc?view=sql-server-ver16
-- https://learn.microsoft.com/en-us/sql/odbc/reference/syntax/odbc-api-reference?view=sql-server-ver16
-
+<!-- omit in toc -->
 ## originally initiated by freemine@yeah.net
 

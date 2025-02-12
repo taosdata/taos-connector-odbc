@@ -49,6 +49,8 @@ int gettimeofday(struct timeval *tp, void *tzp);
 char* tod_dirname(const char *path, char *buf, size_t sz) FA_HIDDEN;
 char* tod_basename(const char *path, char *buf, size_t sz) FA_HIDDEN;
 char* tod_strncpy(char *dest, const char *src, size_t n) FA_HIDDEN;
+void tod_get_exe_dir(char *buffer, size_t buffer_size) FA_HIDDEN;
+void tod_get_file_dir(const char *file_path, char *buffer, size_t buffer_size) FA_HIDDEN;
 
 #ifdef _WIN32            /* { */
 #define strdup _strdup
