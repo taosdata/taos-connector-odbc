@@ -162,7 +162,10 @@ ODBC 连接器测试框架使用 ctest 来运行测试用例。测试用例位�
   set TAOS_ODBC_LOGGER=stderr
   ```
   可用的日志级别有：VERBOSE、DEBUG、INFO、WARN、ERROR、FATAL。较低的级别提供更详细的日志。
-  可用的日志记录器有：stderr、temp。stderr 记录到标准错误，temp 记录到临时目录中的文件 `taos_odbc.log`。
+  可用的日志记录器有：
+  - stderr：记录到标准错误。
+  - temp：记录到临时目录中的文件（`taos_odbc.log`）。
+
 - 运行测试:
   ```
   ctest --test-dir build --output-on-failure -C Debug
@@ -179,7 +182,7 @@ ODBC 连接器测试框架使用 ctest 来运行测试用例。测试用例位�
 
   可用的日志记录器有：
   - stderr：记录到标准错误。
-  - temp：记录到临时目录中的文件（ `taos_odbc.log` ）。
+  - temp：记录到临时目录中的文件（`taos_odbc.log`）。
   - syslog：记录到系统日志（仅在 Linux 平台上可用；在 macOS 上不支持）。
 
 - 运行测试:
