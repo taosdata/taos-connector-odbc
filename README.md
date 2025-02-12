@@ -18,16 +18,16 @@ English | [简体中文](./README-CN.md)
 - [1. Introduction](#1-introduction)
 - [2. Documentation](#2-documentation)
 - [3. Prerequisites](#3-prerequisites)
-  - [3.1 Windows Platform](#31-windows-platform)
-  - [3.2 Linux Platform](#32-linux-platform)
-  - [3.3 macOS Platform](#33-macos-platform)
+  - [3.1 Windows](#31-windows)
+  - [3.2 Linux](#32-linux)
+  - [3.3 macOS](#33-macos)
 - [4. Building and Installing](#4-building-and-installing)
-  - [4.1 Windows Platform](#41-windows-platform)
-  - [4.2 Linux Platform and macOS Platform](#42-linux-platform-and-macos-platform)
+  - [4.1 Windows](#41-windows)
+  - [4.2 Linux/macOS](#42-linuxmacos)
 - [5. Testing](#5-testing)
   - [5.1 Test Execution](#51-test-execution)
-    - [5.1.1 Windows Platform](#511-windows-platform)
-    - [5.1.2 Linux Platform and macOS Platform](#512-linux-platform-and-macos-platform)
+    - [5.1.1 Windows](#511-windows)
+    - [5.1.2 Linux/macOS](#512-linuxmacos)
   - [5.2 Test Case Addition](#52-test-case-addition)
   - [5.3 Performance Testing](#53-performance-testing)
 - [6. CI/CD](#6-cicd)
@@ -79,7 +79,7 @@ If you want to enable valgrind memory checks or test cases for programming langu
 
 In the following content of this guide, we will use the following versions as examples: Windows 11 for the Windows platform, Ubuntu 20.04 for the Linux platform, and macOS Big Sur for the macOS platform.
 
-### 3.1 Windows Platform
+### 3.1 Windows
 - Install win_flex_bison:
   - Download from: [win_flex_bison](https://github.com/lexxmark/winflexbison/releases/).
   - Extract the files and add the directory to your system's PATH environment variable.
@@ -88,15 +88,15 @@ In the following content of this guide, we will use the following versions as ex
   win_flex --version
   ```
 - Install ODBC Driver Manager:
-  Ensure that the Microsoft ODBC Driver Manager is installed on your system. It is typically pre-installed on Windows platforms.
+  Ensure that the Microsoft ODBC Driver Manager is installed on your system. It is typically pre-installed on Windows platform.
 
-### 3.2 Linux Platform
+### 3.2 Linux
 - Install Required Dependencies, including the ODBC Driver Manager:
   ```
   sudo apt install flex bison unixodbc unixodbc-dev && echo -=Done=-
   ```
 
-### 3.3 macOS Platform
+### 3.3 macOS
 - Install Required Dependencies, including the ODBC Driver Manager:
   ```
   brew install flex bison unixodbc && echo -=Done=-
@@ -106,7 +106,7 @@ In the following content of this guide, we will use the following versions as ex
 This section provides detailed instructions for building and installing the ODBC connector on different platforms.
 Before proceeding, ensure you are in the root directory of this project.
 
-### 4.1 Windows Platform
+### 4.1 Windows
 - Optionally, setup building environment: If you have installed Visual Studio Community 2022 on a 64-bit Windows platform, run the following command to set up the build environment:
   ```
   "\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
@@ -135,7 +135,7 @@ Before proceeding, ensure you are in the root directory of this project.
   HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBCINST.INI\TDengine
   HKEY_CURRENT_USER\Software\ODBC\Odbc.ini\TAOS_ODBC_DSN
   ```
-### 4.2 Linux Platform and macOS Platform
+### 4.2 Linux/macOS
 - Generate make files:
   ```
   cmake -B debug -DCMAKE_BUILD_TYPE=Debug
@@ -156,7 +156,7 @@ Before proceeding, ensure you are in the root directory of this project.
 ### 5.1 Test Execution
 The ODBC Connector testing framework uses ctest for running test cases. The test cases are located in the tests directory of the project root.
 
-#### 5.1.1 Windows Platform
+#### 5.1.1 Windows
 - Setup testing environment variables:
   Set the following environment variables to configure logging levels and destinations:
   ```
@@ -173,7 +173,7 @@ The ODBC Connector testing framework uses ctest for running test cases. The test
   ctest --test-dir build --output-on-failure -C Debug
   ```
 
-#### 5.1.2 Linux Platform and macOS Platform
+#### 5.1.2 Linux/macOS
 - Setup testing environment variables:
   Set the following environment variables to configure logging levels and destinations:
   ```
@@ -185,7 +185,7 @@ The ODBC Connector testing framework uses ctest for running test cases. The test
   Available loggers are:
   - stderr: Logs to standard error.
   - temp: Logs to a file( `taos_odbc.log`) in the temporary directory.
-  - syslog: Logs to the system log (only available on Linux platforms; not supported on macOS).
+  - syslog: Logs to the system log (only available on Linux platform; not supported on macOS).
   
 - Run the tests:
   ```

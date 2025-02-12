@@ -18,16 +18,16 @@
 - [1. 简介](#1-简介)
 - [2. 文档](#2-文档)
 - [3. 前置条件](#3-前置条件)
-  - [3.1 Windows 平台](#31-windows-平台)
-  - [3.2 Linux 平台](#32-linux-平台)
-  - [3.3 macOS 平台](#33-macos-平台)
+  - [3.1 Windows](#31-windows)
+  - [3.2 Linux](#32-linux)
+  - [3.3 macOS](#33-macos)
 - [4. 构建和安装](#4-构建和安装)
-  - [4.1 Windows Platform](#41-windows-platform)
-  - [4.2 Linux 平台和 macOS 平台](#42-linux-平台和-macos-平台)
+  - [4.1 Windows](#41-windows)
+  - [4.2 Linux/macOS](#42-linuxmacos)
 - [5. 测试](#5-测试)
   - [5.1 运行测试](#51-运行测试)
-    - [5.1.1 Windows 平台](#511-windows-平台)
-    - [5.1.2 Linux 平台和 macOS 平台](#512-linux-平台和-macos-平台)
+    - [5.1.1 Windows](#511-windows)
+    - [5.1.2 Linux/macOS](#512-linuxmacos)
   - [5.2 添加用例](#52-添加用例)
   - [5.3 性能测试](#53-性能测试)
 - [6. CI/CD](#6-cicd)
@@ -77,7 +77,7 @@
 
 在本指南的以下部分中，我们将使用以下版本作为示例：Windows 11（用于 Windows 平台），Ubuntu 20.04（用于 Linux 平台），以及 macOS Big Sur（用于 macOS 平台）。
 
-### 3.1 Windows 平台
+### 3.1 Windows
 - 安装 win_flex_bison ：
   - 下载地址： [win_flex_bison](https://github.com/lexxmark/winflexbison/releases/) 。
   - 解压文件并将目录添加到系统的 PATH 环境变量中。
@@ -88,13 +88,13 @@
 - 安装 ODBC Driver Manager：
 确保系统上已安装 Microsoft ODBC Driver Manager 。它通常在 Windows 平台上预装。
 
-### 3.2 Linux 平台
+### 3.2 Linux
 - 安装所需的依赖项，包括 ODBC 驱动管理器：
   ```
   sudo apt install flex bison unixodbc unixodbc-dev && echo -=Done=-
   ```
 
-### 3.3 macOS 平台
+### 3.3 macOS
 - 安装所需的依赖项，包括 ODBC 驱动管理器：
   ```
   brew install flex bison unixodbc && echo -=Done=-
@@ -104,7 +104,7 @@
 本节提供了在不同平台上构建和安装 ODBC 连接器的详细说明。
 在继续之前，请确保您位于该项目的根目录中。
 
-### 4.1 Windows Platform
+### 4.1 Windows
 - 可选地，设置构建环境：如果您在 64 位 Windows 平台上安装了 Visual Studio Community 2022 ，请运行以下命令来设置构建环境：
   ```
   "\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
@@ -133,7 +133,7 @@
   HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBCINST.INI\TDengine
   HKEY_CURRENT_USER\Software\ODBC\Odbc.ini\TAOS_ODBC_DSN
   ```
-### 4.2 Linux 平台和 macOS 平台
+### 4.2 Linux/macOS
 - 生成 make 文件：
   ```
   cmake -B debug -DCMAKE_BUILD_TYPE=Debug
@@ -154,7 +154,7 @@
 ### 5.1 运行测试
 ODBC 连接器测试框架使用 ctest 来运行测试用例。测试用例位于项目根目录的 tests 目录中。
 
-#### 5.1.1 Windows 平台
+#### 5.1.1 Windows
 - 设置测试环境变量：
   设置以下环境变量以配置日志级别和目标：
   ```
@@ -171,7 +171,7 @@ ODBC 连接器测试框架使用 ctest 来运行测试用例。测试用例位�
   ctest --test-dir build --output-on-failure -C Debug
   ```
 
-#### 5.1.2 Linux 平台和 macOS 平台
+#### 5.1.2 Linux/macOS
 - 设置测试环境变量：
   设置以下环境变量来配置日志级别和目标：
   ```
