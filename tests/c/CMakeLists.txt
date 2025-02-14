@@ -171,25 +171,35 @@ else()
 endif()
 
 if(NOT FAKE_TAOS)
-    add_test(NAME odbc_test
-        COMMAND odbc_test)
+  add_test(NAME odbc_test
+        COMMAND "${CMAKE_COMMAND}" -E env
+            ODBC_TEST_CASES=${CMAKE_CURRENT_SOURCE_DIR}/odbc_test.cases
+            $<TARGET_FILE:odbc_test>)
 else()
-    add_test(NAME odbc_test
-        COMMAND odbc_test --dsn TAOS_ODBC_WS_DSN --non-taos)
+  add_test(NAME odbc_test
+        COMMAND "${CMAKE_COMMAND}" -E env
+            ODBC_TEST_CASES=${CMAKE_CURRENT_SOURCE_DIR}/odbc_test.cases
+            $<TARGET_FILE:odbc_test> --dsn TAOS_ODBC_WS_DSN --non-taos)
 endif()
 
 if(HAVE_VALGRIND)
   add_test(NAME Vodbc_test
-      COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/odbc_test)
+        COMMAND "${CMAKE_COMMAND}" -E env
+            ODBC_TEST_CASES=${CMAKE_CURRENT_SOURCE_DIR}/odbc_test.cases
+            ${CMAKE_SOURCE_DIR}/sh/valgrind.sh $<TARGET_FILE:odbc_test>)
 endif()
 
 if(ENABLE_MYSQL_TEST)
   add_test(NAME mysql_odbc_test
-      COMMAND odbc_test --dsn MYSQL_ODBC_DSN --mysql)
+        COMMAND "${CMAKE_COMMAND}" -E env
+            ODBC_TEST_CASES=${CMAKE_CURRENT_SOURCE_DIR}/odbc_test.cases
+            $<TARGET_FILE:odbc_test> --dsn MYSQL_ODBC_DSN --mysql)
 
   if(HAVE_VALGRIND)
     add_test(NAME Vmysql_odbc_test
-        COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/odbc_test --dsn MYSQL_ODBC_DSN --mysql)
+        COMMAND "${CMAKE_COMMAND}" -E env
+            ODBC_TEST_CASES=${CMAKE_CURRENT_SOURCE_DIR}/odbc_test.cases
+            ${CMAKE_SOURCE_DIR}/sh/valgrind.sh $<TARGET_FILE:odbc_test> --dsn MYSQL_ODBC_DSN --mysql)
   endif()
 endif()
 
