@@ -37,6 +37,7 @@ size_t tls_size(void)
 void tls_release(tls_t *tls)
 {
   mem_release(&tls->intermediate);
+  mem_release(&tls->for_SQL);
   if (tls->mgr) {
     charset_conv_mgr_release(tls->mgr);
     free(tls->mgr);
@@ -68,6 +69,17 @@ static int _charset_conv_mgr_init(charset_conv_mgr_t *mgr)
   mgr->convs = hash_table_new(_release_hash_table_node, NULL);
   if (!mgr->convs) return -1;
   return 0;
+}
+
+const unsigned char* tls_iconv(const char *fromcode, const char *tocode, const char *src, size_t len, size_t *dlen)
+{
+  tls_t *tls = tls_get();
+  if (!tls) return NULL;
+  mem_t *mem = &tls->for_SQL;
+  int r = mem_iconv(mem, fromcode, tocode, src, len);
+  if (r) return NULL;
+  if (dlen) *dlen = mem->nr;
+  return mem->base;
 }
 
 charset_conv_t* tls_get_charset_conv(const char *fromcode, const char *tocode)

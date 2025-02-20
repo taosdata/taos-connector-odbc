@@ -39,8 +39,11 @@ void stmt_clr_errs(stmt_t *stmt) FA_HIDDEN;
 descriptor_t* stmt_APD(stmt_t *stmt) FA_HIDDEN;
 descriptor_t* stmt_IPD(stmt_t *stmt) FA_HIDDEN;
 
+SQLRETURN stmt_preconv_SQLWCHAR_to_SQLCHAR_experimental(
+    stmt_t *stmt, SQLWCHAR *src, SQLINTEGER slen,
+    SQLCHAR **dst, SQLINTEGER *dlen) FA_HIDDEN;
+
 SQLRETURN stmt_exec_direct(stmt_t *stmt, SQLCHAR *StatementText, SQLINTEGER TextLength) FA_HIDDEN;
-SQLRETURN stmt_exec_directw(stmt_t *stmt, SQLWCHAR *StatementText, SQLINTEGER TextLength) FA_HIDDEN;
 SQLRETURN stmt_get_row_count(stmt_t *stmt, SQLLEN *row_count_ptr) FA_HIDDEN;
 SQLRETURN stmt_get_col_count(stmt_t *stmt, SQLSMALLINT *col_count_ptr) FA_HIDDEN;
 

@@ -574,7 +574,7 @@ SQLRETURN SQL_API SQLExecDirect(
   return sr;
 }
 
-SQLRETURN SQL_API xxxSQLExecDirectW(
+SQLRETURN SQL_API SQLExecDirectW(
     SQLHSTMT     StatementHandle,
     SQLWCHAR    *StatementText,
     SQLINTEGER   TextLength)
@@ -585,10 +585,16 @@ SQLRETURN SQL_API xxxSQLExecDirectW(
   if (StatementHandle == SQL_NULL_HANDLE) return SQL_INVALID_HANDLE;
 
   stmt_t *stmt = (stmt_t*)StatementHandle;
+  SQLCHAR     *s = NULL;
+  SQLINTEGER   n = 0;
 
   stmt_ref(stmt);
   stmt_clr_errs(stmt);
-  sr = stmt_exec_directw(stmt, StatementText, TextLength);
+  sr = stmt_preconv_SQLWCHAR_to_SQLCHAR_experimental(stmt,
+      StatementText, TextLength, &s, &n);
+  if (sr == SQL_SUCCESS) {
+    sr = stmt_exec_direct(stmt, s, n);
+  }
   stmt_unref(stmt);
   return sr;
 }
@@ -1005,6 +1011,31 @@ SQLRETURN SQL_API SQLPrepare(
   sr = stmt_prepare(stmt, StatementText, TextLength);
   stmt_unref(stmt);
 
+  return sr;
+}
+
+SQLRETURN SQL_API SQLPrepareW(
+    SQLHSTMT      StatementHandle,
+    SQLWCHAR     *StatementText,
+    SQLINTEGER    TextLength)
+{
+  SQLRETURN sr = SQL_SUCCESS;
+
+  OOW("===");
+  if (StatementHandle == SQL_NULL_HANDLE) return SQL_INVALID_HANDLE;
+
+  stmt_t *stmt = (stmt_t*)StatementHandle;
+  SQLCHAR     *s = NULL;
+  SQLINTEGER   n = 0;
+
+  stmt_ref(stmt);
+  stmt_clr_errs(stmt);
+  sr = stmt_preconv_SQLWCHAR_to_SQLCHAR_experimental(stmt,
+      StatementText, TextLength, &s, &n);
+  if (sr == SQL_SUCCESS) {
+    sr = stmt_prepare(stmt, s, n);
+  }
+  stmt_unref(stmt);
   return sr;
 }
 

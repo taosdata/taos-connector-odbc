@@ -1121,6 +1121,7 @@ struct stmt_s {
 
 struct tls_s {
   mem_t                      intermediate;
+  mem_t                      for_SQL;
   charset_conv_mgr_t        *mgr;
   // debug leakage only
   char                      *leakage;

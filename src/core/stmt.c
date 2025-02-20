@@ -8199,22 +8199,6 @@ SQLRETURN stmt_exec_direct(stmt_t *stmt, SQLCHAR *StatementText, SQLINTEGER Text
 {
   SQLRETURN sr = SQL_SUCCESS;
 
-  fprintf(stderr, "============================\n");
-  fprintf(stderr, "============================\n");
-  fprintf(stderr, "============================\n");
-  fprintf(stderr, "============================\n");
-  fprintf(stderr, "============================\n");
-  fprintf(stderr, "============================\n");
-  fprintf(stderr, "0x");
-  for (SQLINTEGER i = 0; i<TextLength; ++i) {
-    SQLCHAR x = (SQLCHAR)StatementText[i];
-    unsigned char *p = (unsigned char*)&x;
-    for (size_t j=0; j<sizeof(x); ++j) {
-      fprintf(stderr, "%02x", p[j]);
-    }
-  }
-  fprintf(stderr, "\n");
-
   // column-binds remain valid among executes
   _stmt_close_result(stmt);
 
@@ -8238,26 +8222,28 @@ SQLRETURN stmt_exec_direct(stmt_t *stmt, SQLCHAR *StatementText, SQLINTEGER Text
   return _stmt_exec_direct_with_simple_sql(stmt);
 }
 
-SQLRETURN stmt_exec_directw(stmt_t *stmt, SQLWCHAR *StatementText, SQLINTEGER TextLength)
+SQLRETURN stmt_preconv_SQLWCHAR_to_SQLCHAR_experimental(
+    stmt_t *stmt, SQLWCHAR *src, SQLINTEGER slen,
+    SQLCHAR **dst, SQLINTEGER *dlen)
 {
-  fprintf(stderr, "============================\n");
-  fprintf(stderr, "============================\n");
-  fprintf(stderr, "============================\n");
-  fprintf(stderr, "============================\n");
-  fprintf(stderr, "============================\n");
-  fprintf(stderr, "============================\n");
-  fprintf(stderr, "0x");
-  for (SQLINTEGER i = 0; i<TextLength; ++i) {
-    SQLWCHAR x = (SQLWCHAR)StatementText[i];
-    unsigned char *p = (unsigned char*)&x;
-    for (size_t j=0; j<sizeof(x); ++j) {
-      fprintf(stderr, "%02x", p[j]);
-    }
+  const char *fromcode = "UTF-16LE";
+  // freemine: take consideration CHARSET_FOR_xxx!
+  const char *tocode   = conn_get_tsdb_charset(stmt->conn);
+  // freemine: seems go trigger unixodbc(2.3.9) fault implementation
+  if (slen == SQL_NTS) {
+    const int16_t *p = (const int16_t*)src;
+    while (*p++);
+    slen = p - (const int16_t*)src;
   }
-  fprintf(stderr, "\n");
-
-  stmt_append_err_format(stmt, "HY000", 0, "General error:not supported yet");
-  return SQL_ERROR;
+  size_t n;
+  const char *sql = (const char*)tls_iconv(fromcode, tocode, (const char*)src, (size_t)slen * 2, &n);
+  if (!sql) {
+    stmt_append_err_format(stmt, "HY000", 0, "General error:conversion for `%s` to `%s` not found or out of memory", fromcode, tocode);
+    return SQL_ERROR;
+  }
+  if (dst)  *dst  = (SQLCHAR*)sql;
+  if (dlen) *dlen = (SQLINTEGER)n;
+  return SQL_SUCCESS;
 }
 
 static SQLRETURN _stmt_set_row_array_size(stmt_t *stmt, SQLULEN row_array_size)
