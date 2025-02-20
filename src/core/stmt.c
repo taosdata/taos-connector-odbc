@@ -8199,6 +8199,22 @@ SQLRETURN stmt_exec_direct(stmt_t *stmt, SQLCHAR *StatementText, SQLINTEGER Text
 {
   SQLRETURN sr = SQL_SUCCESS;
 
+  fprintf(stderr, "============================\n");
+  fprintf(stderr, "============================\n");
+  fprintf(stderr, "============================\n");
+  fprintf(stderr, "============================\n");
+  fprintf(stderr, "============================\n");
+  fprintf(stderr, "============================\n");
+  fprintf(stderr, "0x");
+  for (SQLINTEGER i = 0; i<TextLength; ++i) {
+    SQLCHAR x = (SQLCHAR)StatementText[i];
+    unsigned char *p = (unsigned char*)&x;
+    for (size_t j=0; j<sizeof(x); ++j) {
+      fprintf(stderr, "%02x", p[j]);
+    }
+  }
+  fprintf(stderr, "\n");
+
   // column-binds remain valid among executes
   _stmt_close_result(stmt);
 
@@ -8232,7 +8248,7 @@ SQLRETURN stmt_exec_directw(stmt_t *stmt, SQLWCHAR *StatementText, SQLINTEGER Te
   fprintf(stderr, "============================\n");
   fprintf(stderr, "0x");
   for (SQLINTEGER i = 0; i<TextLength; ++i) {
-    SQLWCHAR x = StatementText[i];
+    SQLWCHAR x = (SQLWCHAR)StatementText[i];
     unsigned char *p = (unsigned char*)&x;
     for (size_t j=0; j<sizeof(x); ++j) {
       fprintf(stderr, "%02x", p[j]);

@@ -574,7 +574,7 @@ SQLRETURN SQL_API SQLExecDirect(
   return sr;
 }
 
-SQLRETURN SQL_API SQLExecDirectW(
+SQLRETURN SQL_API xxxSQLExecDirectW(
     SQLHSTMT     StatementHandle,
     SQLWCHAR    *StatementText,
     SQLINTEGER   TextLength)
