@@ -8222,6 +8222,28 @@ SQLRETURN stmt_exec_direct(stmt_t *stmt, SQLCHAR *StatementText, SQLINTEGER Text
   return _stmt_exec_direct_with_simple_sql(stmt);
 }
 
+SQLRETURN stmt_exec_directw(stmt_t *stmt, SQLWCHAR *StatementText, SQLINTEGER TextLength)
+{
+  fprintf(stderr, "============================\n");
+  fprintf(stderr, "============================\n");
+  fprintf(stderr, "============================\n");
+  fprintf(stderr, "============================\n");
+  fprintf(stderr, "============================\n");
+  fprintf(stderr, "============================\n");
+  fprintf(stderr, "0x");
+  for (SQLINTEGER i = 0; i<TextLength; ++i) {
+    SQLWCHAR x = StatementText[i];
+    unsigned char *p = (unsigned char*)&x;
+    for (size_t j=0; j<sizeof(x); ++j) {
+      fprintf(stderr, "%02x", p[j]);
+    }
+  }
+  fprintf(stderr, "\n");
+
+  stmt_append_err_format(stmt, "HY000", 0, "General error:not supported yet");
+  return SQL_ERROR;
+}
+
 static SQLRETURN _stmt_set_row_array_size(stmt_t *stmt, SQLULEN row_array_size)
 {
   if (row_array_size == 0) {

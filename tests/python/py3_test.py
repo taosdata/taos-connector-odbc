@@ -62,6 +62,7 @@ def test_case0():
   # Create a cursor from the connection
   cursor = cnxn.cursor()
 
+  cursor.execute("人")
   cursor.execute("drop database if exists foo")
   cursor.execute("create database if not exists foo")
   cursor.execute("use foo")

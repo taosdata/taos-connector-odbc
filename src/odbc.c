@@ -574,6 +574,25 @@ SQLRETURN SQL_API SQLExecDirect(
   return sr;
 }
 
+SQLRETURN SQL_API SQLExecDirectW(
+    SQLHSTMT     StatementHandle,
+    SQLWCHAR    *StatementText,
+    SQLINTEGER   TextLength)
+{
+  SQLRETURN sr = SQL_SUCCESS;
+
+  OOW("===");
+  if (StatementHandle == SQL_NULL_HANDLE) return SQL_INVALID_HANDLE;
+
+  stmt_t *stmt = (stmt_t*)StatementHandle;
+
+  stmt_ref(stmt);
+  stmt_clr_errs(stmt);
+  sr = stmt_exec_directw(stmt, StatementText, TextLength);
+  stmt_unref(stmt);
+  return sr;
+}
+
 SQLRETURN SQL_API SQLSetEnvAttr(
     SQLHENV      EnvironmentHandle,
     SQLINTEGER   Attribute,
