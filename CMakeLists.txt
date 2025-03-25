@@ -22,7 +22,7 @@
 # SOFTWARE.
 ###############################################################################
 
-cmake_minimum_required(VERSION 3.0...3.21)
+cmake_minimum_required(VERSION 3.0...3.31)
 project(taos_odbc)
 
 set(TODBC_VERSION 0.1)
@@ -125,19 +125,6 @@ if(TODBC_DARWIN)
   if(USE_SAN)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize=undefined -fsanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=shift-base -fno-sanitize=alignment")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fsanitize=undefined -fsanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=shift-base -fno-sanitize=alignment")
-  endif()
-endif()
-
-if(TODBC_WINDOWS)
-  if(NOT DEFINED SERVER_FOR_TEST)
-    message(FATAL_ERROR " you must define SERVER_FOR_TEST on windows platform,\n"
-                        " because taosd is NOT included TDengine OSS since 3.1.x.x\n"
-                        " eg.: -DSERVER_FOR_TEST:STRING=127.0.0.1:6030")
-  endif()
-  if(NOT DEFINED WS_FOR_TEST)
-    message(FATAL_ERROR " you must define WS_FOR_TEST on windows platform,\n"
-                        " because taosd is NOT included TDengine OSS since 3.1.x.x\n"
-                        " eg.: -DWS_FOR_TEST:STRING=127.0.0.1:6041")
   endif()
 endif()
 
