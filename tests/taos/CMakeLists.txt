@@ -52,7 +52,7 @@ if(NOT FAKE_TAOS)
             $<TARGET_FILE:taos_test>)
 endif()
 
-if(HAVE_VALGRIND)
+if(ENABLE_VALGRIND)
   add_test(NAME Vtaos_test
         COMMAND "${CMAKE_COMMAND}" -E env
             TAOS_TEST_CASES=${CMAKE_CURRENT_SOURCE_DIR}/taos_test.cases
@@ -91,7 +91,7 @@ if(NOT FAKE_TAOS)
   endif()
 endif()
 
-if(HAVE_VALGRIND)
+if(ENABLE_VALGRIND)
   add_test(NAME Vtaos_regression
       COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/taos_regression)
 endif()
@@ -122,7 +122,7 @@ if(HAVE_TAOSWS)
   add_test(NAME taosws_regression
       COMMAND taosws_regression)
 
-  if(HAVE_VALGRIND)
+  if(ENABLE_VALGRIND)
     add_test(NAME Vtaosws_regression
         COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/taosws_regression)
   endif()
