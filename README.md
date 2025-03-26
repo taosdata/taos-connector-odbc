@@ -73,7 +73,7 @@ If you want to enable valgrind memory checks or test cases for programming langu
 | erlang            | v12.2 or above                            | odbc                                                                                                    | [erlang-odbc](https://www.erlang.org/doc/apps/odbc/getting_started.html)        |
 | haskell           | cabal v3.6 or above, ghc v9.2 or above    | hsql-odbc                                                                                               | [haskell-odbc](https://hackage.haskell.org/package/hsql-odbc)                   |
 | common lisp       | sbcl v2.1.11 or above                     | plain-odbc                                                                                              | [common-lisp-odbc](https://plain-odbc.common-lisp.dev/)                         |
-| R                 | v4.3 or above                             | odbc                                                                                                    | [R-odbc](https://cran.r-project.org/web/packages/odbc/index.html)               |
+| R                 | v4.3 or above                             | odbc, DBI, assert                                                                                       | [R-odbc](https://cran.r-project.org/web/packages/odbc/index.html)               |
 
 
 
@@ -93,7 +93,7 @@ In the following content of this guide, we will use the following versions as ex
 ### 3.2 Linux
 - Install Required Dependencies, including the ODBC Driver Manager:
   ```
-  sudo apt install flex bison unixodbc unixodbc-dev && echo -=Done=-
+  sudo apt install flex bison unixodbc unixodbc-dev odbcinst && echo -=Done=-
   ```
 
 ### 3.3 macOS
