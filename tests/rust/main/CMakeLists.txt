@@ -52,7 +52,7 @@ if(HAVE_CARGO)
         COMMAND env RUST_BACKTRACE=1 ${CARGO_NAME} test --manifest-path ${CMAKE_CURRENT_SOURCE_DIR}/Cargo.toml --target-dir ${CMAKE_CURRENT_BINARY_DIR})
   endif()
 
-  if(HAVE_VALGRIND)
+  if(ENABLE_VALGRIND)
     add_test(NAME Vrust_test
         COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/debug/main)
   endif()

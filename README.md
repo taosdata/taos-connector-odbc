@@ -47,7 +47,7 @@ The `taos-connector-odbc` supports multiple operating systems, including Windows
 
 ## 2. Documentation
 - To use the TDengine ODBC connector, please check [Reference Manual](https://docs.tdengine.com/tdengine-reference/client-libraries/odbc/), which includes version history, data types, example programs, API descriptions, and FAQs.
-- This quick guide is mainly for developers who like to contribute/build/test the ODBC connector by themselves. To learn more about TDengine, you can visit the [official documentation](https://docs.tdengine.com).
+- This quick guide is mainly for developers who like to contribute/build/test the ODBC connector by themselves. To learn more about TDengine, you can visit the [Official Documentation](https://docs.tdengine.com).
 - The TDengine ODBC connector adheres to the ODBC standard, ensuring compatibility and interoperability across various database systems. For more detailed information about ODBC standards and specifications, please refer to the [Microsoft Open Database Connectivity (ODBC)](https://learn.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc) documentation. This resource provides comprehensive insights into ODBC interfaces, methods, and other relevant details that can help deepen your understanding of how the TDengine ODBC connector operates within the broader context of ODBC applications.
 
 ## 3. Prerequisites
@@ -61,7 +61,7 @@ Afterwards, before installing and using the `taos-connector-odbc`, ensure that y
 - odbc driver manager, such as unixodbc(2.3.6 or above) in linux. NOTE: odbc driver manager is pre-installed on windows platform.
 - iconv, should've been already included in libc. NOTE: win_iconv will be automatically downloaded when building this project.
 
-If you want to enable valgrind memory checks or test cases for programming languages other than C/C++, please refer to the following content.
+If you want to enable valgrind memory checks (enable the `ENABLE_VALGRIND_TEST` option during cmake configuration) or test cases for programming languages other than C/C++, please refer to the following content.
 
 | Tool or Language  | Version Requirement                       | Related Libraries and Versions                                                                          | Reference Links                                                                 |
 |-------------------|-------------------------------------------|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
@@ -73,7 +73,7 @@ If you want to enable valgrind memory checks or test cases for programming langu
 | erlang            | v12.2 or above                            | odbc                                                                                                    | [erlang-odbc](https://www.erlang.org/doc/apps/odbc/getting_started.html)        |
 | haskell           | cabal v3.6 or above, ghc v9.2 or above    | hsql-odbc                                                                                               | [haskell-odbc](https://hackage.haskell.org/package/hsql-odbc)                   |
 | common lisp       | sbcl v2.1.11 or above                     | plain-odbc                                                                                              | [common-lisp-odbc](https://plain-odbc.common-lisp.dev/)                         |
-| R                 | v4.3 or above                             | odbc                                                                                                    | [R-odbc](https://cran.r-project.org/web/packages/odbc/index.html)               |
+| R                 | v4.3 or above                             | odbc, DBI, assert                                                                                       | [R-odbc](https://cran.r-project.org/web/packages/odbc/index.html)               |
 
 
 
@@ -93,7 +93,7 @@ In the following content of this guide, we will use the following versions as ex
 ### 3.2 Linux
 - Install Required Dependencies, including the ODBC Driver Manager:
   ```
-  sudo apt install flex bison unixodbc unixodbc-dev && echo -=Done=-
+  sudo apt install flex bison unixodbc unixodbc-dev odbcinst && echo -=Done=-
   ```
 
 ### 3.3 macOS

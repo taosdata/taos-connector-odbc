@@ -31,7 +31,7 @@ if(HAVE_NODEJS)
   add_test(NAME node_test
       COMMAND ${NODEJS_NAME} ${CMAKE_CURRENT_BINARY_DIR}/node_test.js)
 
-  if(HAVE_VALGRIND)
+  if(ENABLE_VALGRIND)
     add_test(NAME Vnode_test
         COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh node ${CMAKE_CURRENT_BINARY_DIR}/node_test.js)
   endif()

@@ -33,11 +33,14 @@ macro(tod_find_prog name version prog ver_arg ver_regex var_type)
     endif ()
     if(NOT "${${name}_VERSION}" STREQUAL "")
       string(REGEX REPLACE ${ver_regex} "\\1" ${name}_VERSION_ONLY ${${name}_VERSION})
+
+      if(NOT "${${name}_VERSION_ONLY}" STREQUAL "")
+        if (${${name}_VERSION_ONLY} VERSION_GREATER_EQUAL ${version})
+          set(HAVE_${name} ON)
+          message(STATUS "${Green}${${name}_VERSION} found: `${${name}}`, please be noted, ${prog} v${version} and above are expected compatible${ColorReset}")
+        endif()
+      endif()
     endif()
-    if (${${name}_VERSION_ONLY} VERSION_GREATER_EQUAL ${version})
-      set(HAVE_${name} ON)
-      message(STATUS "${Green}${${name}_VERSION} found:`${${name}}`, please be noted, ${prog} v${version} and above are expected compatible${ColorReset}")
-    endif ()
   endif ()
 endmacro()
 
@@ -276,11 +279,16 @@ macro(check_requirements)
   ## check `valgrind`
   tod_find_prog(VALGRIND 3.18 valgrind "--version" "valgrind-(.*)" OUTPUT_VARIABLE)
   if (NOT HAVE_VALGRIND)
-    message(STATUS "${Yellow}"
-                   "`valgrind 3.18 or above` not found, "
-                   "thus valgrind-related-test-cases would be eliminated, you may refer to https://valgrind.org/"
-                   "${ColorReset}")
+    if (ENABLE_VALGRIND_TEST)
+      message(FATAL_ERROR
+        "${Red}"
+        "`valgrind 3.18 or above` not found, "
+        "thus valgrind-related-test-cases would be eliminated, you may refer to https://valgrind.org/"
+        "${ColorReset}")
+    endif()
   endif ()
+  set(ENABLE_VALGRIND ${ENABLE_VALGRIND_TEST})
+  message(STATUS "Enable valgrind: ${ENABLE_VALGRIND}")
 
   ## check `node`
   tod_find_prog(NODEJS 12 node "--version" "v(.*)" OUTPUT_VARIABLE)

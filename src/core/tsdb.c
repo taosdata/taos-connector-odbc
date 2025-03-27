@@ -1245,6 +1245,7 @@ void tsdb_stmt_reset(tsdb_stmt_t *stmt)
 void tsdb_stmt_release(tsdb_stmt_t *stmt)
 {
   if (!stmt) return;
+
   tsdb_stmt_reset(stmt);
 
   tsdb_res_release(&stmt->res);

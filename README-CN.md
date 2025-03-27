@@ -61,7 +61,7 @@
 - odbc 驱动管理器，例如 Linux 中的 unixodbc（2.3.6 或以上版本）。注意：ODBC 驱动管理器在 Windows 平台上预装。
 - iconv，通常已包含在 libc 中。注意：构建此项目时会自动下载 win_iconv。
 
-如果您希望启用 valgrind 内存检查或其他编程语言的测试用例，请参考以下内容。
+如果您希望启用 valgrind 内存检查（在 cmake 配置期间启用 `ENABLE_VALGRIND_TEST` 选项），或者其他编程语言的测试用例，请参考以下内容。
 
 | 工具或语言         | 版本要求                                   | 相关库和版本                                                                                             | 参考链接                                                                       |
 |-------------------|-------------------------------------------|---------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
@@ -73,7 +73,7 @@
 | erlang            | v12.2 或以上                              | odbc                                                                                                     | [erlang-odbc](https://www.erlang.org/doc/apps/odbc/getting_started.html)      |
 | haskell           | cabal v3.6 或以上，ghc v9.2 或以上         | hsql-odbc                                                                                                | [haskell-odbc](https://hackage.haskell.org/package/hsql-odbc)                 |
 | common lisp       | sbcl v2.1.11 或以上                       | plain-odbc                                                                                               | [common-lisp-odbc](https://plain-odbc.common-lisp.dev/)                       |
-| R                 | v4.3 或以上                               | odbc                                                                                                     | [R-odbc](https://cran.r-project.org/web/packages/odbc/index.html)             |
+| R                 | v4.3 或以上                               | odbc, DBI, assert                                                                                        | [R-odbc](https://cran.r-project.org/web/packages/odbc/index.html)             |
 
 在本指南的以下部分中，我们将使用以下版本作为示例：Windows 11（用于 Windows 平台），Ubuntu 20.04（用于 Linux 平台），以及 macOS Big Sur（用于 macOS 平台）。
 
@@ -91,7 +91,7 @@
 ### 3.2 Linux
 - 安装所需的依赖项，包括 ODBC 驱动管理器：
   ```
-  sudo apt install flex bison unixodbc unixodbc-dev && echo -=Done=-
+  sudo apt install flex bison unixodbc unixodbc-dev odbcinst && echo -=Done=-
   ```
 
 ### 3.3 macOS

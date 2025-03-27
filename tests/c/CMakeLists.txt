@@ -42,7 +42,7 @@ if(NOT FAKE_TAOS)
         COMMAND conformance_test)
 endif()
 
-if(HAVE_VALGRIND)
+if(ENABLE_VALGRIND)
   add_test(NAME Vconformance_test
       COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/conformance_test)
 endif()
@@ -51,7 +51,7 @@ if(HAVE_TAOSWS)
   add_test(NAME ws_conformance_test
       COMMAND conformance_test --dsn TAOS_ODBC_WS_DSN)
 
-  if(HAVE_VALGRIND)
+  if(ENABLE_VALGRIND)
     add_test(NAME Vws_conformance_test
         COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/conformance_test --dsn TAOS_ODBC_WS_DSN --ws)
   endif()
@@ -61,7 +61,7 @@ endif()
 if(ENABLE_MYSQL_TEST)
   add_test(NAME mysql_conformance_test
       COMMAND conformance_test --dsn MYSQL_ODBC_DSN --mysql)
-  if(HAVE_VALGRIND)
+  if(ENABLE_VALGRIND)
     add_test(NAME Vmysql_conformance_test
         COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/conformance_test --dsn MYSQL_ODBC_DSN --mysql)
   endif()
@@ -70,7 +70,7 @@ endif()
 if(ENABLE_SQLITE3_TEST)
   add_test(NAME sqlite3_conformance_test
       COMMAND conformance_test --dsn SQLITE3_DSN --sqlite3)
-  if(HAVE_VALGRIND)
+  if(ENABLE_VALGRIND)
     add_test(NAME Vsqlite3_conformance_test
         COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/conformance_test --dsn SQLITE3_DSN --sqlite3)
   endif()
@@ -99,9 +99,9 @@ endif()
 add_test(NAME api_test
     COMMAND api_test)
 
-if(HAVE_VALGRIND)
-add_test(NAME Vapi_test
-    COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/api_test)
+if(ENABLE_VALGRIND)
+    add_test(NAME Vapi_test
+        COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/api_test)
 endif()
 
 add_executable(edge_cases_test
@@ -119,9 +119,9 @@ endif()
 add_test(NAME edge_cases_test
     COMMAND edge_cases_test)
 
-if(HAVE_VALGRIND)
-add_test(NAME Vedge_cases_test
-    COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/edge_cases_test)
+if(ENABLE_VALGRIND)
+    add_test(NAME Vedge_cases_test
+        COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/edge_cases_test)
 endif()
 
 add_executable(c_test
@@ -145,7 +145,7 @@ endif()
 add_test(NAME c_test
     COMMAND c_test)
 
-if(HAVE_VALGRIND)
+if(ENABLE_VALGRIND)
   add_test(NAME Vc_test
       COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/c_test)
 endif()
@@ -182,7 +182,7 @@ else()
             $<TARGET_FILE:odbc_test> --dsn TAOS_ODBC_WS_DSN --non-taos)
 endif()
 
-if(HAVE_VALGRIND)
+if(ENABLE_VALGRIND)
   add_test(NAME Vodbc_test
         COMMAND "${CMAKE_COMMAND}" -E env
             ODBC_TEST_CASES=${CMAKE_CURRENT_SOURCE_DIR}/odbc_test.cases
@@ -195,7 +195,7 @@ if(ENABLE_MYSQL_TEST)
             ODBC_TEST_CASES=${CMAKE_CURRENT_SOURCE_DIR}/odbc_test.cases
             $<TARGET_FILE:odbc_test> --dsn MYSQL_ODBC_DSN --mysql)
 
-  if(HAVE_VALGRIND)
+  if(ENABLE_VALGRIND)
     add_test(NAME Vmysql_odbc_test
         COMMAND "${CMAKE_COMMAND}" -E env
             ODBC_TEST_CASES=${CMAKE_CURRENT_SOURCE_DIR}/odbc_test.cases
@@ -214,7 +214,7 @@ if(ENABLE_SQLITE3_TEST)
   add_test(NAME sqlite3_test
       COMMAND sqlite3_test)
 
-  if(HAVE_VALGRIND)
+  if(ENABLE_VALGRIND)
     add_test(NAME Vsqlite3_test
         COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/sqlite3_test)
   endif()
@@ -238,7 +238,7 @@ endif()
 add_test(NAME test_threads
     COMMAND test_threads)
 
-if(HAVE_VALGRIND)
+if(ENABLE_VALGRIND)
   add_test(NAME Vtest_threads
       COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/test_threads)
 endif()
