@@ -1426,50 +1426,6 @@
 {
    <insert_a_suppression_name_here>
    Memcheck:Leak
-   match-leak-kinds: indirect
-   fun:calloc
-   fun:taosMemCalloc
-   fun:insInitBoundColsInfo
-   fun:parseBoundTagsClause
-   fun:parseUsingClauseBottom
-   fun:parseSchemaClauseBottom
-   fun:parseInsertTableClauseBottom
-   fun:parseInsertTableClause
-   fun:parseInsertBody
-   fun:parseInsertSqlFromStart
-   fun:parseInsertSqlImpl
-   fun:parseInsertSql
-   fun:qParseSql
-   fun:parseSql
-   fun:stmtParseSql
-   fun:stmtGetTagFields
-   fun:taos_stmt_get_tag_fields
-   fun:taos_stmt_get_tag_fields
-   fun:call_taos_stmt_get_tag_fields
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   match-leak-kinds: definite
-   fun:malloc
-   fun:taosMemMalloc
-   fun:setStmtInfo
-   fun:parseInsertBodyBottom
-   fun:parseInsertBody
-   fun:parseInsertSqlFromStart
-   fun:parseInsertSqlImpl
-   fun:parseInsertSql
-   fun:qParseSql
-   fun:parseSql
-   fun:stmtParseSql
-   fun:stmtGetTagFields
-   fun:taos_stmt_get_tag_fields
-   fun:taos_stmt_get_tag_fields
-   fun:call_taos_stmt_get_tag_fields
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
    match-leak-kinds: definite
    fun:malloc
    fun:taosMemMalloc
