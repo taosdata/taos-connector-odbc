@@ -1265,3 +1265,85 @@
    fun:start_thread
    fun:clone
 }
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   fun:taosMemCalloc
+   fun:insInitBoundColsInfo
+   fun:parseBoundTagsClause
+   fun:parseUsingClauseBottom
+   fun:parseSchemaClauseBottom
+   fun:parseInsertTableClauseBottom.part.0
+   fun:parseInsertTableClauseBottom
+   fun:parseInsertTableClause
+   fun:parseInsertBody
+   fun:parseInsertSqlFromTable
+   fun:parseInsertSqlImpl
+   fun:parseInsertSql
+   fun:qParseSql
+   fun:parseSql
+   fun:stmtParseSql
+   fun:stmtGetTagFields
+   fun:call_taos_stmt_get_tag_fields
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:taosMemMalloc
+   fun:setStmtInfo
+   fun:parseInsertBodyBottom
+   fun:parseInsertBody
+   fun:parseInsertSqlFromTable
+   fun:parseInsertSqlImpl
+   fun:parseInsertSql
+   fun:qParseSql
+   fun:parseSql
+   fun:stmtParseSql
+   fun:stmtGetTagFields
+   fun:call_taos_stmt_get_tag_fields
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:taosMemMalloc
+   fun:setStmtInfo
+   fun:parseInsertBodyBottom
+   fun:parseInsertBody
+   fun:parseInsertSqlFromTable
+   fun:parseInsertSqlImpl
+   fun:parseInsertSql
+   fun:qParseSql
+   fun:parseSql
+   fun:stmtParseSql
+   fun:stmtSetTbName
+   fun:call_taos_stmt_set_tbname
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   fun:taosMemCalloc
+   fun:insInitBoundColsInfo
+   fun:parseBoundTagsClause
+   fun:parseUsingClauseBottom
+   fun:parseSchemaClauseBottom
+   fun:parseInsertTableClauseBottom.part.0
+   fun:parseInsertTableClauseBottom
+   fun:parseInsertTableClause
+   fun:parseInsertBody
+   fun:parseInsertSqlFromTable
+   fun:parseInsertSqlImpl
+   fun:parseInsertSql
+   fun:qParseSql
+   fun:parseSql
+   fun:stmtParseSql
+   fun:stmtSetTbName
+   fun:call_taos_stmt_set_tbname
+}
