@@ -1347,3 +1347,189 @@
    fun:stmtSetTbName
    fun:call_taos_stmt_set_tbname
 }
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Param
+   write(buf)
+   fun:__libc_write
+   fun:write
+   fun:uv__writev
+   fun:uv__try_write
+   fun:uv__write
+   fun:uv_write2
+   fun:uv_write
+   fun:cliBatchSend
+   fun:cliDoReq
+   fun:cliAsyncCb
+   fun:uv__async_io
+   fun:uv__io_poll
+   fun:uv_run
+   fun:cliWorkThread
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:malloc
+   fun:allocate_dtv_entry
+   fun:allocate_and_init
+   fun:tls_get_addr_tail
+   fun:__tls_get_addr
+   fun:taosGetSelfPthreadId
+   fun:initCrashLogWriter
+   fun:tscCrashReportThreadFp
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:malloc
+   fun:allocate_dtv_entry
+   fun:allocate_and_init
+   fun:tls_get_addr_tail
+   fun:__tls_get_addr
+   fun:taosGetSelfPthreadId
+   fun:taosProcessSchedQueue
+   fun:start_thread
+   fun:clone
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   fun:taosMemCalloc
+   fun:insInitBoundColsInfo
+   fun:parseBoundTagsClause
+   fun:parseUsingClauseBottom
+   fun:parseSchemaClauseBottom
+   fun:parseInsertTableClauseBottom
+   fun:parseInsertTableClause
+   fun:parseInsertBody
+   fun:parseInsertSqlFromStart
+   fun:parseInsertSqlImpl
+   fun:parseInsertSql
+   fun:qParseSql
+   fun:parseSql
+   fun:stmtParseSql
+   fun:stmtGetTagFields
+   fun:taos_stmt_get_tag_fields
+   fun:taos_stmt_get_tag_fields
+   fun:call_taos_stmt_get_tag_fields
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   fun:taosMemCalloc
+   fun:insInitBoundColsInfo
+   fun:parseBoundTagsClause
+   fun:parseUsingClauseBottom
+   fun:parseSchemaClauseBottom
+   fun:parseInsertTableClauseBottom
+   fun:parseInsertTableClause
+   fun:parseInsertBody
+   fun:parseInsertSqlFromStart
+   fun:parseInsertSqlImpl
+   fun:parseInsertSql
+   fun:qParseSql
+   fun:parseSql
+   fun:stmtParseSql
+   fun:stmtGetTagFields
+   fun:taos_stmt_get_tag_fields
+   fun:taos_stmt_get_tag_fields
+   fun:call_taos_stmt_get_tag_fields
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:taosMemMalloc
+   fun:setStmtInfo
+   fun:parseInsertBodyBottom
+   fun:parseInsertBody
+   fun:parseInsertSqlFromStart
+   fun:parseInsertSqlImpl
+   fun:parseInsertSql
+   fun:qParseSql
+   fun:parseSql
+   fun:stmtParseSql
+   fun:stmtGetTagFields
+   fun:taos_stmt_get_tag_fields
+   fun:taos_stmt_get_tag_fields
+   fun:call_taos_stmt_get_tag_fields
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:taosMemMalloc
+   fun:setStmtInfo
+   fun:parseInsertBodyBottom
+   fun:parseInsertBody
+   fun:parseInsertSqlFromStart
+   fun:parseInsertSqlImpl
+   fun:parseInsertSql
+   fun:qParseSql
+   fun:parseSql
+   fun:stmtParseSql
+   fun:stmtGetTagFields
+   fun:taos_stmt_get_tag_fields
+   fun:taos_stmt_get_tag_fields
+   fun:call_taos_stmt_get_tag_fields
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   fun:taosMemCalloc
+   fun:insInitBoundColsInfo
+   fun:parseBoundTagsClause
+   fun:parseUsingClauseBottom
+   fun:parseSchemaClauseBottom
+   fun:parseInsertTableClauseBottom
+   fun:parseInsertTableClause
+   fun:parseInsertBody
+   fun:parseInsertSqlFromStart
+   fun:parseInsertSqlImpl
+   fun:parseInsertSql
+   fun:qParseSql
+   fun:parseSql
+   fun:stmtParseSql
+   fun:stmtSetTbName
+   fun:taos_stmt_set_tbname
+   fun:taos_stmt_set_tbname
+   fun:call_taos_stmt_set_tbname
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:taosMemMalloc
+   fun:setStmtInfo
+   fun:parseInsertBodyBottom
+   fun:parseInsertBody
+   fun:parseInsertSqlFromStart
+   fun:parseInsertSqlImpl
+   fun:parseInsertSql
+   fun:qParseSql
+   fun:parseSql
+   fun:stmtParseSql
+   fun:stmtSetTbName
+   fun:taos_stmt_set_tbname
+   fun:taos_stmt_set_tbname
+   fun:call_taos_stmt_set_tbname
+}
+
+

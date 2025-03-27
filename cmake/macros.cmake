@@ -279,18 +279,15 @@ macro(check_requirements)
   ## check `valgrind`
   tod_find_prog(VALGRIND 3.18 valgrind "--version" "valgrind-(.*)" OUTPUT_VARIABLE)
   if (NOT HAVE_VALGRIND)
-    set(ENABLE_VALGRIND FALSE)
-    message(STATUS "${Yellow}"
-                   "`valgrind 3.18 or above` not found, "
-                   "thus valgrind-related-test-cases would be eliminated, you may refer to https://valgrind.org/"
-                   "${ColorReset}")
-  else()
     if (ENABLE_VALGRIND_TEST)
-      set(ENABLE_VALGRIND TRUE)
-    else()
-      set(ENABLE_VALGRIND FALSE)
+      message(FATAL_ERROR
+        "${Red}"
+        "`valgrind 3.18 or above` not found, "
+        "thus valgrind-related-test-cases would be eliminated, you may refer to https://valgrind.org/"
+        "${ColorReset}")
     endif()
   endif ()
+  set(ENABLE_VALGRIND ${ENABLE_VALGRIND_TEST})
   message(STATUS "Enable valgrind: ${ENABLE_VALGRIND}")
 
   ## check `node`
