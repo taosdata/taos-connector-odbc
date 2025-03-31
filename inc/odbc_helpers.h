@@ -378,6 +378,7 @@ static inline SQLRETURN call_SQLEndTran(const char *file, int line, const char *
   LOGD_ODBC(file, line, func, "SQLEndTran(HandleType:%s,Handle:%p,CompletionType:%s) ...",
       sql_handle_type(HandleType), Handle, sql_completion_type(CompletionType));
   SQLRETURN sr = SQLEndTran(HandleType, Handle, CompletionType);
+  diag(sr, SQL_HANDLE_DBC, Handle);
   diag(sr, SQL_HANDLE_STMT, Handle);
   LOGD_ODBC(file, line, func, "SQLEndTran(HandleType:%s,Handle:%p,CompletionType:%s) => %s",
       sql_handle_type(HandleType), Handle, sql_completion_type(CompletionType),
@@ -532,7 +533,7 @@ static inline SQLRETURN call_SQLGetDiagField(const char *file, int line, const c
   SQLRETURN sr = SQLGetDiagField(HandleType, Handle, RecNumber, DiagIdentifier, DiagInfo, BufferLength, StringLength);
   diag(sr, HandleType, Handle);
   LOGD_ODBC(file, line, func, "SQLGetDiagField(HandleType:%s,Handle:%p,RecNumber:%d,DiagIdentifier:%s,DiagInfo:%p,BufferLength:%d,StringLength:%p(%d)) => %s",
-      sql_handle_type(HandleType), Handle, RecNumber, sql_diag_identifier(DiagIdentifier), DiagInfo, BufferLength, StringLength, *StringLength, sql_return_type(sr));
+            sql_handle_type(HandleType), Handle, RecNumber, sql_diag_identifier(DiagIdentifier), DiagInfo, BufferLength, StringLength, StringLength ? *StringLength : 0, sql_return_type(sr));
   return sr;
 }
 

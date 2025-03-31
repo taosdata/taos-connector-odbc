@@ -23,6 +23,7 @@
  */
 
 #include "odbc_helpers.h"
+#include "os_port.h"
 
 #include "enums.h"
 #include "test_config.h"
@@ -363,8 +364,15 @@ static int do_sql_stmt(SQLHANDLE connh)
 {
   SQLRETURN r;
   SQLHANDLE stmth;
+  SQLHANDLE desch;
 
   r = CALL_SQLAllocHandle(SQL_HANDLE_STMT, connh, &stmth);
+  if (r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO) return -1;
+
+  r = CALL_SQLAllocHandle(SQL_HANDLE_DESC, connh, &desch);
+  if (r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO) return -1;
+
+  r = SQLSetStmtAttr(stmth, SQL_ATTR_APP_PARAM_DESC, desch, 0);
   if (r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO) return -1;
 
   do {
@@ -375,6 +383,8 @@ static int do_sql_stmt(SQLHANDLE connh)
   } while (0);
 
   SQLFreeHandle(SQL_HANDLE_STMT, stmth);
+
+  SQLFreeHandle(SQL_HANDLE_DESC, desch);
 
   return r ? -1 : 0;
 }
@@ -564,6 +574,13 @@ static int test_sql_alloc_env(void)
   SQLRETURN r;
   SQLHANDLE envh;
 
+  int ret = tod_setenv("TAOS_ODBC_DEBUG_BISON", "1", 1);
+  if (ret) {
+    int e = errno;
+    D("set env TAOS_ODBC_DEBUG_BISON failed, error:[%d]%s", e, strerror(e));
+    return -1;
+  }
+
   r = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &envh);
   if (r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO) {
     D("failure in SQLAllocHandle(SQL_HANDLE_ENV)");
@@ -585,6 +602,281 @@ again:
   SQLFreeHandle(SQL_HANDLE_ENV, envh);
 
   return r ? -1 : 0;
+}
+
+__attribute__((unused))
+int test_sql_end_tran() {
+  SQLHENV envh;
+  SQLHDBC connh;
+  SQLRETURN sr;
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &envh);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  sr = CALL_SQLSetEnvAttr(envh, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  // End transaction (commit)
+  sr = CALL_SQLEndTran(SQL_HANDLE_ENV, envh, SQL_COMMIT);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  // End transaction (rollback)
+  sr = CALL_SQLEndTran(SQL_HANDLE_ENV, envh, SQL_ROLLBACK);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_DBC, envh, &connh);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  sr = CALL_SQLConnect(connh, (SQLCHAR*)"TAOS_ODBC_DSN", SQL_NTS, (SQLCHAR*)NULL, SQL_NTS, (SQLCHAR*)NULL, SQL_NTS);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  // End transaction (commit)
+  sr = CALL_SQLEndTran(SQL_HANDLE_DBC, connh, SQL_COMMIT);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  // End transaction (rollback)
+  sr = CALL_SQLEndTran(SQL_HANDLE_DBC, connh, SQL_ROLLBACK);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  sr = CALL_SQLDisconnect(connh);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLFreeHandle(SQL_HANDLE_DBC, connh);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  sr = CALL_SQLFreeHandle(SQL_HANDLE_ENV, envh);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  D("test_sql_end_tran passed.");
+  return 0;
+}
+
+__attribute__((unused))
+int test_sql_diag_rec() {
+  SQLHENV envh;
+  SQLHDBC connh;
+  SQLHDBC desch;
+  SQLRETURN sr;
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &envh);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLSetEnvAttr(envh, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_DBC, envh, &connh);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  sr = CALL_SQLConnect(connh, (SQLCHAR*)"TAOS_ODBC_DSN", SQL_NTS, (SQLCHAR*)NULL, SQL_NTS, (SQLCHAR*)NULL, SQL_NTS);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  // Intentionally cause an error by setting an invalid attribute
+  sr = CALL_SQLSetEnvAttr(envh, -1, NULL, 0);
+  assert(sr == SQL_ERROR);
+
+  const char* file = __FILE__;
+  const char* func = __func__;
+  int line = __LINE__;
+  diag(sr, SQL_HANDLE_ENV, envh);
+
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_DESC, connh, &desch);
+  assert(sr == SQL_SUCCESS);
+
+  // Intentionally cause an error by setting an invalid descriptor attribute
+  sr = SQLSetDescField(desch, -1, SQL_DESC_COUNT, (SQLPOINTER)0, 0);
+  assert(sr == SQL_ERROR);
+
+  line = __LINE__;
+  diag(sr, SQL_HANDLE_DESC, desch);
+
+  sr = CALL_SQLFreeHandle(SQL_HANDLE_DESC, desch);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLDisconnect(connh);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLFreeHandle(SQL_HANDLE_DBC, connh);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  sr = CALL_SQLFreeHandle(SQL_HANDLE_ENV, envh);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  D("test_sql_diag_rec passed.\n");
+  return 0;
+}
+
+__attribute__((unused))
+void test_sql_diag_field_common(SQLSMALLINT handleType, SQLHANDLE handle) {
+  SQLRETURN sr;
+  SQLCHAR sqlState[6];
+  SQLLEN rowNumber;
+  SQLINTEGER diagNumber;
+
+  // Retrieve SQL state using SQLGetDiagField
+  sr = CALL_SQLGetDiagField(handleType, handle, 1, SQL_DIAG_SQLSTATE, sqlState, sizeof(sqlState), NULL);
+  assert(sr == SQL_SUCCESS);
+  D("SQLGetDiagField (%d - SQLState): %s", handleType, sqlState);
+
+  // Retrieve row number using SQLGetDiagField
+  sr = CALL_SQLGetDiagField(handleType, handle, 1, SQL_DIAG_ROW_NUMBER, &rowNumber, sizeof(rowNumber), NULL);
+  assert(sr == SQL_SUCCESS);
+  D("SQLGetDiagField (%d - RowNumber): %lld", handleType, (long long)rowNumber);
+
+  // Retrieve diagnostic number using SQLGetDiagField
+  sr = CALL_SQLGetDiagField(handleType, handle, 1, SQL_DIAG_NUMBER, &diagNumber, sizeof(diagNumber), NULL);
+  // assert(sr == SQL_SUCCESS);
+  D("SQLGetDiagField (%d - DiagNumber): %d", handleType, diagNumber);
+}
+
+__attribute__((unused))
+void test_sql_diag_field_env() {
+  SQLHENV env;
+  SQLRETURN sr;
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
+  assert(sr == SQL_SUCCESS);
+
+  // Intentionally cause an error by setting an invalid attribute
+  sr = CALL_SQLSetEnvAttr(env, -1, NULL, 0);
+  assert(sr == SQL_ERROR);
+
+  // Test SQLGetDiagField for environment handle
+  test_sql_diag_field_common(SQL_HANDLE_ENV, env);
+
+  sr = CALL_SQLFreeHandle(SQL_HANDLE_ENV, env);
+  assert(sr == SQL_SUCCESS);
+
+  D("test_sql_diag_field_env passed.");
+}
+
+__attribute__((unused))
+void test_sql_diag_field_dbc() {
+  SQLHENV env;
+  SQLHDBC dbc;
+  SQLRETURN sr;
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
+  assert(sr == SQL_SUCCESS);
+
+  // Intentionally cause an error by connecting with invalid DSN
+  sr = SQLConnect(dbc, (SQLCHAR*)"InvalidDSN", SQL_NTS, NULL, 0, NULL, 0);
+  assert(sr == SQL_ERROR);
+
+  // Test SQLGetDiagField for connection handle
+  test_sql_diag_field_common(SQL_HANDLE_DBC, dbc);
+
+  sr = CALL_SQLFreeHandle(SQL_HANDLE_DBC, dbc);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLFreeHandle(SQL_HANDLE_ENV, env);
+  assert(sr == SQL_SUCCESS);
+
+  D("test_sqldiagfield_dbc passed.");
+}
+
+__attribute__((unused))
+void test_sql_diag_field_stmt() {
+  SQLHENV env;
+  SQLHDBC dbc;
+  SQLHSTMT stmt;
+  SQLRETURN sr;
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLConnect(dbc, (SQLCHAR*)"TAOS_ODBC_DSN", SQL_NTS, (SQLCHAR*)NULL, SQL_NTS, (SQLCHAR*)NULL, SQL_NTS);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_STMT, dbc, &stmt);
+  assert(sr == SQL_SUCCESS);
+
+  // Intentionally cause an error by executing an invalid SQL statement
+  sr = CALL_SQLExecDirect(stmt, (SQLCHAR*)"INVALID SQL", SQL_NTS);
+  assert(sr == SQL_ERROR);
+
+  // Test SQLGetDiagField for statement handle
+  test_sql_diag_field_common(SQL_HANDLE_STMT, stmt);
+
+  sr = CALL_SQLFreeHandle(SQL_HANDLE_STMT, stmt);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLDisconnect(dbc);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLFreeHandle(SQL_HANDLE_DBC, dbc);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLFreeHandle(SQL_HANDLE_ENV, env);
+  assert(sr == SQL_SUCCESS);
+
+  D("test_sql_diag_field_stmt passed.");
+}
+
+__attribute__((unused))
+void test_sql_diag_field_desc() {
+  SQLHENV env;
+  SQLHDBC dbc;
+  SQLHDESC desc;
+  SQLRETURN sr;
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLConnect(dbc, (SQLCHAR*)"TAOS_ODBC_DSN", SQL_NTS, (SQLCHAR*)NULL, SQL_NTS, (SQLCHAR*)NULL, SQL_NTS);
+  assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_DESC, dbc, &desc);
+  assert(sr == SQL_SUCCESS);
+
+  // Intentionally cause an error by setting an invalid descriptor field
+  sr = SQLSetDescField(desc, -1, SQL_DESC_COUNT, (SQLPOINTER)0, 0);
+  assert(sr == SQL_ERROR);
+
+  // Test SQLGetDiagField for descriptor handle
+  test_sql_diag_field_common(SQL_HANDLE_DESC, desc);
+
+  sr = CALL_SQLFreeHandle(SQL_HANDLE_DESC, desc);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLDisconnect(dbc);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLFreeHandle(SQL_HANDLE_DBC, dbc);
+  assert(sr == SQL_SUCCESS);
+
+  sr = CALL_SQLFreeHandle(SQL_HANDLE_ENV, env);
+  assert(sr == SQL_SUCCESS);
+
+  D("test_sql_diag_field_desc passed.");
+}
+
+__attribute__((unused))
+int test_sql_diag_field() {
+  // test_sql_diag_field_env();
+  // test_sql_diag_field_dbc();
+  test_sql_diag_field_stmt();
+  // test_sql_diag_field_desc();
+  D("test_sql_diag_field passed.");
+  return 0;
 }
 
 static int do_cases(void)
@@ -617,6 +909,9 @@ static int do_cases(void)
   CHK1(test_so, "libtaos_odbc.so", 0);
 #endif
   CHK0(test_sql_alloc_env, 0);
+  CHK0(test_sql_end_tran, 0);
+  CHK0(test_sql_diag_rec, 0);
+  CHK0(test_sql_diag_field, 0);
 
   return 0;
 }

@@ -88,6 +88,7 @@ add_executable(api_test
     $<TARGET_OBJECTS:os_port_obj>
     api_test.c)
 
+target_include_directories(api_test PRIVATE ${CMAKE_SOURCE_DIR}/src/inc)
 target_include_directories(api_test PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/..)
 if(NOT TODBC_WINDOWS)
     target_link_libraries(api_test odbc dl pthread)

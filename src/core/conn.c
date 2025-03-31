@@ -955,10 +955,10 @@ SQLRETURN conn_alloc_stmt(conn_t *conn, SQLHANDLE *OutputHandle)
 
 SQLRETURN conn_alloc_desc(conn_t *conn, SQLHANDLE *OutputHandle)
 {
-  if (conn->cfg.url) {
-    conn_append_err(conn, "HY000", 0, "General error: websocket backend not implemented yet");
-    return SQL_ERROR;
-  }
+  // if (conn->cfg.url) {
+  //   conn_append_err(conn, "HY000", 0, "General error: websocket backend not implemented yet");
+  //   return SQL_ERROR;
+  // }
 
   desc_t *desc = desc_create(conn);
   if (!desc) return SQL_ERROR;

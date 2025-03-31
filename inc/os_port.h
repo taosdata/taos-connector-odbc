@@ -35,6 +35,7 @@ struct tm* localtime_r(const time_t *clock, struct tm *result);
 struct tm* gmtime_r(const time_t *clock, struct tm *result);
 int gettimeofday(struct timeval *tp, void *tzp);
 #else                    /* }{ */
+#include <stdlib.h>
 #include <sys/time.h>
 #endif                   /* } */
 
@@ -81,8 +82,10 @@ static inline LONG atomic_load(atomic_int *obj)
 
 #ifdef _WIN32            /* { */
 char* tod_getenv(const char *name);
+int tod_setenv(const char *name, const char *value, int overwrite);
 #else                    /* }{ */
 #define tod_getenv     getenv
+#define tod_setenv     setenv
 #endif                   /* } */
 
 #ifdef _WIN32            /* { */
