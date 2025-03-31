@@ -1,8 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
+# Determine the script's directory as BASE_DIR
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+BASE_DIR="${SCRIPT_DIR}"
+
 # Configuration parameters
-BASE_DIR="/opt/source/taos_odbc"
 BUILD_DIR="${BASE_DIR}/debug"
 OUTPUT_DIR="${BASE_DIR}/coverage_report"
 REPORT_TITLE="ODBC Core Coverage"
