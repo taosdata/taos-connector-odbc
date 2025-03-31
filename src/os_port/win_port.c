@@ -28,6 +28,7 @@
 #include <stdio.h>
 #ifdef _WIN32
 #include <psapi.h>
+#include <windows.h>
 #pragma comment(lib, "psapi.lib")
 #endif
 
@@ -88,6 +89,20 @@ char* strndup(const char *s, size_t n)
 char* tod_getenv(const char *name)
 {
   return getenv(name);
+}
+
+int tod_setenv(const char *name, const char *value, int overwrite)
+{
+  if (!overwrite && getenv(name)) {
+    return -1;
+  }
+
+  if (SetEnvironmentVariable(name, value) == 0) {
+    errno = GetLastError();
+    return -1;
+  }
+
+  return 0;
 }
 
 static BOOL CALLBACK InitHandleFunction(PINIT_ONCE InitOnce, PVOID Parameter, PVOID *lpContext)
