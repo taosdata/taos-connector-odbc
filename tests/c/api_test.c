@@ -23,6 +23,7 @@
  */
 
 #include "odbc_helpers.h"
+#include "os_port.h"
 
 #include "enums.h"
 #include "test_config.h"
@@ -363,8 +364,15 @@ static int do_sql_stmt(SQLHANDLE connh)
 {
   SQLRETURN r;
   SQLHANDLE stmth;
+  SQLHANDLE desch;
 
   r = CALL_SQLAllocHandle(SQL_HANDLE_STMT, connh, &stmth);
+  if (r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO) return -1;
+
+  r = CALL_SQLAllocHandle(SQL_HANDLE_DESC, connh, &desch);
+  if (r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO) return -1;
+
+  r = SQLSetStmtAttr(stmth, SQL_ATTR_APP_PARAM_DESC, desch, 0);
   if (r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO) return -1;
 
   do {
@@ -375,6 +383,8 @@ static int do_sql_stmt(SQLHANDLE connh)
   } while (0);
 
   SQLFreeHandle(SQL_HANDLE_STMT, stmth);
+
+  SQLFreeHandle(SQL_HANDLE_DESC, desch);
 
   return r ? -1 : 0;
 }
@@ -563,6 +573,13 @@ static int test_sql_alloc_env(void)
 {
   SQLRETURN r;
   SQLHANDLE envh;
+
+  int ret = tod_setenv("TAOS_ODBC_DEBUG_BISON", "1", 1);
+  if (ret) {
+    int e = errno;
+    D("set env TAOS_ODBC_DEBUG_BISON failed, error:[%d]%s", e, strerror(e));
+    return -1;
+  }
 
   r = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &envh);
   if (r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO) {

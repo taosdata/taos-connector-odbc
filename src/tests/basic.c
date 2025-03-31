@@ -57,6 +57,13 @@ static int cmp_strs(const char *s1, const char *s2)
   return 0;
 }
 
+static int test_locale_or_acp(void)
+{
+  const char *s = tod_get_locale_or_ACP();
+  D("locale_or_ACP: [%s]", s);
+  return 0;
+}
+
 static int test_conn_parser(void)
 {
   conn_parser_param_t param = {0};
@@ -1808,6 +1815,7 @@ static struct {
   test_case_f           func;
   const char           *name;
 } _cases[] = {
+  RECORD(test_locale_or_acp),
   RECORD(test_url_parser),
   RECORD(test_conn_parser),
   RECORD(test_ext_parser),
