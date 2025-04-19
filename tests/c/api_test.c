@@ -982,8 +982,38 @@ static int test_sql_diag_field() {
 
 static int do_cases(void)
 {
+  CHK0(test_ok, 0);
+  CHK0(test_failure, -1);
+#ifdef __APPLE__
+  CHK1(test_so, "/tmp/not_exists.dylib", -1);
+  CHK1(test_so, "libtaos_odbc.dylib", 0);
+#elif defined(_WIN32)
+  CHK1(test_so, "taos_odbc.dll", -1);
 
+  char dll_fullname[256] = {0};
+#ifdef TODBC_X86
+  char *dll_fullpath = "C:/TDengine/taos_odbc/x86/bin";
+#else
+  char *dll_fullpath = "C:/TDengine/taos_odbc/x64/bin";
+#endif
+  (void)snprintf(dll_fullname, sizeof(dll_fullname), "%s/%s", dll_fullpath, "taos_odbc.dll");
+
+  if (!SetDllDirectory(dll_fullpath)) {  
+    E("set dll directory failed.");
+    return -1;
+  }
+  CHK1(test_so, dll_fullname, 0);
+
+  CHK1(test_so, "taos_odbc.dll", 0);
+#else
+  CHK1(test_so, "/tmp/not_exists.so", -1);
+  CHK1(test_so, "libtaos_odbc.so", 0);
+#endif
   CHK0(test_sql_alloc_env, 0);
+  CHK0(test_sql_end_tran, 0);
+  CHK0(test_sql_diag_rec, 0);
+  CHK0(test_sql_diag_field, 0);
+
   return 0;
 }
 
