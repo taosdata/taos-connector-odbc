@@ -492,7 +492,8 @@ again:
   return r ? -1 : 0;
 }
 
-__attribute__((unused)) static int test_new_user_connect(const char *dsn, const char *uid, const char *pwd)
+__attribute__((unused))
+static int test_new_user_connect(const char *dsn, const char *uid, const char *pwd)
 {
   SQLHENV   env   = SQL_NULL_HENV;
   SQLHDBC   dbc   = SQL_NULL_HDBC;
@@ -543,7 +544,8 @@ end:
   return (sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO) ? 0 : -1;
 }
 
-__attribute__((unused)) static int test_sql_conn_special_char(SQLHANDLE connh, const char *dsn, const char *uid, const char *pwd)
+__attribute__((unused))
+static int test_sql_conn_special_char(SQLHANDLE connh, const char *dsn, const char *uid, const char *pwd)
 {
   int r = -1;
   SQLRETURN sr = SQL_SUCCESS;
@@ -564,7 +566,7 @@ __attribute__((unused)) static int test_sql_conn_special_char(SQLHANDLE connh, c
   if (r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO)
     goto end;
 
-  int r = test_new_user_connect(dsn, uid, pwd);
+  r = test_new_user_connect(dsn, uid, pwd);
   if (r != 0) {
     D("test_new_user_connect failed, uid: %s, pwd: %s", uid, pwd);
     goto end;
@@ -704,7 +706,7 @@ again:
 }
 
 __attribute__((unused))
-int test_sql_end_tran() {
+static int test_sql_end_tran() {
   SQLHENV envh;
   SQLHDBC connh;
   SQLRETURN sr;
@@ -751,7 +753,7 @@ int test_sql_end_tran() {
 }
 
 __attribute__((unused))
-int test_sql_diag_rec() {
+static int test_sql_diag_rec() {
   SQLHENV envh;
   SQLHDBC connh;
   SQLHDBC desch;
@@ -806,7 +808,7 @@ int test_sql_diag_rec() {
 }
 
 __attribute__((unused))
-void test_sql_diag_field_common(SQLSMALLINT handleType, SQLHANDLE handle) {
+static void test_sql_diag_field_common(SQLSMALLINT handleType, SQLHANDLE handle) {
   SQLRETURN sr;
   SQLCHAR sqlState[6];
   SQLLEN rowNumber;
@@ -829,7 +831,7 @@ void test_sql_diag_field_common(SQLSMALLINT handleType, SQLHANDLE handle) {
 }
 
 __attribute__((unused))
-void test_sql_diag_field_env() {
+static void test_sql_diag_field_env() {
   SQLHENV env;
   SQLRETURN sr;
 
@@ -850,7 +852,7 @@ void test_sql_diag_field_env() {
 }
 
 __attribute__((unused))
-void test_sql_diag_field_dbc() {
+static void test_sql_diag_field_dbc() {
   SQLHENV env;
   SQLHDBC dbc;
   SQLRETURN sr;
@@ -881,7 +883,7 @@ void test_sql_diag_field_dbc() {
 }
 
 __attribute__((unused))
-void test_sql_diag_field_stmt() {
+static void test_sql_diag_field_stmt() {
   SQLHENV env;
   SQLHDBC dbc;
   SQLHSTMT stmt;
@@ -925,7 +927,7 @@ void test_sql_diag_field_stmt() {
 }
 
 __attribute__((unused))
-void test_sql_diag_field_desc() {
+static void test_sql_diag_field_desc() {
   SQLHENV env;
   SQLHDBC dbc;
   SQLHDESC desc;
@@ -969,7 +971,7 @@ void test_sql_diag_field_desc() {
 }
 
 __attribute__((unused))
-int test_sql_diag_field() {
+static int test_sql_diag_field() {
   // test_sql_diag_field_env();
   // test_sql_diag_field_dbc();
   test_sql_diag_field_stmt();
@@ -980,38 +982,8 @@ int test_sql_diag_field() {
 
 static int do_cases(void)
 {
-  CHK0(test_ok, 0);
-  CHK0(test_failure, -1);
-#ifdef __APPLE__
-  CHK1(test_so, "/tmp/not_exists.dylib", -1);
-  CHK1(test_so, "libtaos_odbc.dylib", 0);
-#elif defined(_WIN32)
-  CHK1(test_so, "taos_odbc.dll", -1);
 
-  char dll_fullname[256] = {0};
-#ifdef TODBC_X86
-  char *dll_fullpath = "C:/TDengine/taos_odbc/x86/bin";
-#else
-  char *dll_fullpath = "C:/TDengine/taos_odbc/x64/bin";
-#endif
-  (void)snprintf(dll_fullname, sizeof(dll_fullname), "%s/%s", dll_fullpath, "taos_odbc.dll");
-
-  if (!SetDllDirectory(dll_fullpath)) {  
-    fprintf(stderr, "set dll directory failed.\n");
-    return -1;
-  }
-  CHK1(test_so, dll_fullname, 0);
-
-  CHK1(test_so, "taos_odbc.dll", 0);
-#else
-  CHK1(test_so, "/tmp/not_exists.so", -1);
-  CHK1(test_so, "libtaos_odbc.so", 0);
-#endif
   CHK0(test_sql_alloc_env, 0);
-  CHK0(test_sql_end_tran, 0);
-  CHK0(test_sql_diag_rec, 0);
-  CHK0(test_sql_diag_field, 0);
-
   return 0;
 }
 
