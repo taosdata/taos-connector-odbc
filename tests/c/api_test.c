@@ -527,6 +527,7 @@ static int do_sql_driver_conns(SQLHANDLE connh)
   CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", "root", "taosdata", 0);
   CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", "root", NULL, 0);
   CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", NULL, "taosdata", 0);
+  CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", "root", "@#$%!^&*()!-_+=[]{}:;><?|~,.", -1);
   // CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", "root", "", -1);
   // CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", "", "taosdata", -1);
   // CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", "", "", -1);
