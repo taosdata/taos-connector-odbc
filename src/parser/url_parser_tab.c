@@ -420,6 +420,8 @@ int url_encode_with_database(url_t *url, const char *db, char **out)
 int url_parse_and_encode(const conn_cfg_t *cfg, char **out, url_parser_param_t *param)
 {
   const char *url = cfg->url;
+  const char *uid = cfg->uid;
+  const char *pwd = cfg->pwd;
   const char *ip = cfg->ip;
   uint16_t port = cfg->port;
   const char *db = cfg->db;
@@ -430,6 +432,7 @@ int url_parse_and_encode(const conn_cfg_t *cfg, char **out, url_parser_param_t *
   int r = 0;
 
   r = url_parser_parse(url, strlen(url), param);
+  if (r == 0 && uid && *uid && pwd && *pwd) r = url_set_user_pass(&param->url, uid, strlen(uid), pwd, strlen(pwd));
   if (r == 0 && ip && *ip) r = url_set_host_port(&param->url, ip, port);
   if (r == 0) r = url_encode_with_db(&param->url, conn_mode, db, out);
 

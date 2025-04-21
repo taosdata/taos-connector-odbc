@@ -493,7 +493,104 @@ again:
 }
 
 __attribute__((unused))
-static int do_sql_driver_conns(SQLHANDLE connh)
+static int test_new_user_connect(const char *dsn, const char *uid, const char *pwd)
+{
+  SQLHENV   env   = SQL_NULL_HENV;
+  SQLHDBC   dbc   = SQL_NULL_HDBC;
+  SQLHSTMT  stmt  = SQL_NULL_HSTMT;
+  SQLRETURN sr    = SQL_SUCCESS;
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
+  if (sr != SQL_SUCCESS && sr != SQL_SUCCESS_WITH_INFO)
+    goto end;
+
+  sr = CALL_SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+  if (sr != SQL_SUCCESS && sr != SQL_SUCCESS_WITH_INFO)
+    goto end;
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
+  if (sr != SQL_SUCCESS && sr != SQL_SUCCESS_WITH_INFO)
+    goto end;
+
+  sr = CALL_SQLConnect(dbc, (SQLCHAR *)dsn, SQL_NTS, (SQLCHAR *)uid, SQL_NTS, (SQLCHAR *)pwd, SQL_NTS);
+  if (sr != SQL_SUCCESS && sr != SQL_SUCCESS_WITH_INFO)
+    goto end;
+
+  sr = CALL_SQLAllocHandle(SQL_HANDLE_STMT, dbc, &stmt);
+  if (sr != SQL_SUCCESS && sr != SQL_SUCCESS_WITH_INFO)
+    goto end;
+
+  sr = CALL_SQLExecDirect(stmt, (SQLCHAR *)"show databases", SQL_NTS);
+  if (sr != SQL_SUCCESS && sr != SQL_SUCCESS_WITH_INFO)
+    goto end;
+
+end:
+  if (stmt != SQL_NULL_HSTMT) {
+    CALL_SQLFreeHandle(SQL_HANDLE_STMT, stmt);
+    stmt = SQL_NULL_HSTMT;
+  }
+
+  if (dbc != SQL_NULL_HDBC) {
+    CALL_SQLDisconnect(dbc);
+    CALL_SQLFreeHandle(SQL_HANDLE_DBC, dbc);
+    dbc = SQL_NULL_HDBC;
+  }
+
+  if (env != SQL_NULL_HENV) {
+    CALL_SQLFreeHandle(SQL_HANDLE_ENV, env);
+    env = SQL_NULL_HENV;
+  }
+
+  return (sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO) ? 0 : -1;
+}
+
+__attribute__((unused))
+static int test_sql_conn_special_char(SQLHANDLE connh, const char *dsn, const char *uid, const char *pwd)
+{
+  int r = -1;
+  SQLRETURN sr = SQL_SUCCESS;
+  SQLHANDLE stmth = SQL_NULL_HSTMT;
+  char sql[1024];
+
+
+  sr = CALL_SQLConnect(connh, (SQLCHAR *)dsn, SQL_NTS, (SQLCHAR *)NULL, SQL_NTS, (SQLCHAR *)NULL, SQL_NTS);
+  if (sr != SQL_SUCCESS && sr != SQL_SUCCESS_WITH_INFO)
+    goto end;
+
+  r = CALL_SQLAllocHandle(SQL_HANDLE_STMT, connh, &stmth);
+  if (r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO)
+    goto end;
+
+  (void)snprintf(sql, sizeof(sql), "create user %s pass '%s' sysinfo 1 createdb 1", uid, pwd);
+  r = CALL_SQLExecDirect(stmth, (SQLCHAR *)sql, SQL_NTS);
+  if (r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO)
+    goto end;
+
+  r = test_new_user_connect(dsn, uid, pwd);
+  if (r != 0) {
+    D("test_new_user_connect failed, uid: %s, pwd: %s", uid, pwd);
+    goto end;
+  }
+
+  (void)snprintf(sql, sizeof(sql), "drop user %s", uid);
+  r = CALL_SQLExecDirect(stmth, (SQLCHAR *)sql, SQL_NTS);
+  if (r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO)
+    goto end;
+
+  // Success
+  r = 0;
+
+end:
+  if (stmth != SQL_NULL_HSTMT) {
+    CALL_SQLFreeHandle(SQL_HANDLE_STMT, stmth);
+    stmth = SQL_NULL_HSTMT;
+  }
+
+  CALL_SQLDisconnect(connh);
+  return r;
+}
+
+__attribute__((unused)) static int do_sql_driver_conns(SQLHANDLE connh)
 {
 #ifndef FAKE_TAOS
   CHK4(test_sql_conn, connh, "TAOS_ODBC_DSN", NULL, NULL, 0);
@@ -527,6 +624,7 @@ static int do_sql_driver_conns(SQLHANDLE connh)
   CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", "root", "taosdata", 0);
   CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", "root", NULL, 0);
   CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", NULL, "taosdata", 0);
+  CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", "root", "wrong-password", -1);
   // CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", "root", "", -1);
   // CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", "", "taosdata", -1);
   // CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", "", "", -1);
@@ -541,6 +639,9 @@ static int do_sql_driver_conns(SQLHANDLE connh)
 
   // Note that the ws_connect interface is blocking
   // CHK2(test_sql_driver_conn, connh, "DSN=TAOS_ODBC_WS_DSN;URL={http://www.examples.com};Server=127.0.0.1:6666", -1);
+
+  CHK4(test_sql_conn_special_char, connh, "TAOS_ODBC_WS_DSN", "user_for_api_test", "aD5!@#$%!^&*()!-_+=[]{}:;><?|~,.", 0);
+
 #endif                            /* } */
 
   return 0;
@@ -605,7 +706,7 @@ again:
 }
 
 __attribute__((unused))
-int test_sql_end_tran() {
+static int test_sql_end_tran() {
   SQLHENV envh;
   SQLHDBC connh;
   SQLRETURN sr;
@@ -652,7 +753,7 @@ int test_sql_end_tran() {
 }
 
 __attribute__((unused))
-int test_sql_diag_rec() {
+static int test_sql_diag_rec() {
   SQLHENV envh;
   SQLHDBC connh;
   SQLHDBC desch;
@@ -707,7 +808,7 @@ int test_sql_diag_rec() {
 }
 
 __attribute__((unused))
-void test_sql_diag_field_common(SQLSMALLINT handleType, SQLHANDLE handle) {
+static void test_sql_diag_field_common(SQLSMALLINT handleType, SQLHANDLE handle) {
   SQLRETURN sr;
   SQLCHAR sqlState[6];
   SQLLEN rowNumber;
@@ -730,7 +831,7 @@ void test_sql_diag_field_common(SQLSMALLINT handleType, SQLHANDLE handle) {
 }
 
 __attribute__((unused))
-void test_sql_diag_field_env() {
+static void test_sql_diag_field_env() {
   SQLHENV env;
   SQLRETURN sr;
 
@@ -751,7 +852,7 @@ void test_sql_diag_field_env() {
 }
 
 __attribute__((unused))
-void test_sql_diag_field_dbc() {
+static void test_sql_diag_field_dbc() {
   SQLHENV env;
   SQLHDBC dbc;
   SQLRETURN sr;
@@ -782,7 +883,7 @@ void test_sql_diag_field_dbc() {
 }
 
 __attribute__((unused))
-void test_sql_diag_field_stmt() {
+static void test_sql_diag_field_stmt() {
   SQLHENV env;
   SQLHDBC dbc;
   SQLHSTMT stmt;
@@ -826,7 +927,7 @@ void test_sql_diag_field_stmt() {
 }
 
 __attribute__((unused))
-void test_sql_diag_field_desc() {
+static void test_sql_diag_field_desc() {
   SQLHENV env;
   SQLHDBC dbc;
   SQLHDESC desc;
@@ -870,7 +971,7 @@ void test_sql_diag_field_desc() {
 }
 
 __attribute__((unused))
-int test_sql_diag_field() {
+static int test_sql_diag_field() {
   // test_sql_diag_field_env();
   // test_sql_diag_field_dbc();
   test_sql_diag_field_stmt();
@@ -898,7 +999,7 @@ static int do_cases(void)
   (void)snprintf(dll_fullname, sizeof(dll_fullname), "%s/%s", dll_fullpath, "taos_odbc.dll");
 
   if (!SetDllDirectory(dll_fullpath)) {  
-    fprintf(stderr, "set dll directory failed.\n");
+    E("set dll directory failed.");
     return -1;
   }
   CHK1(test_so, dll_fullname, 0);
