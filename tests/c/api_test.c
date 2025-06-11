@@ -409,6 +409,16 @@ static int do_conn_get_info(SQLHANDLE connh)
   if (r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO) return -1;
   D("SQL_DM_VER: %s", buf);
 
+  // Test SQL_CATALOG_NAME_SEPARATOR with buf as non-NULL
+  r = CALL_SQLGetInfo(connh, SQL_CATALOG_NAME_SEPARATOR, buf, sizeof(buf), &StringLength);
+  if (r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO) return -1;
+  D("SQL_CATALOG_NAME_SEPARATOR (non-NULL): %s", buf);
+
+  // Test SQL_CATALOG_NAME_SEPARATOR with buf as NULL
+  r = CALL_SQLGetInfo(connh, SQL_CATALOG_NAME_SEPARATOR, NULL, 0, &StringLength);
+  if (r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO) return -1;
+  D("SQL_CATALOG_NAME_SEPARATOR (NULL): StringLength=%d", StringLength);
+
   return 0;
 }
 

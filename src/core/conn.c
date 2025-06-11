@@ -1031,8 +1031,17 @@ static SQLRETURN _conn_set_string(
     SQLSMALLINT     BufferLength,
     SQLSMALLINT    *StringLengthPtr)
 {
-  int n = snprintf((char*)InfoValuePtr, BufferLength, "%s", value);
-  if (StringLengthPtr) *StringLengthPtr = n;
+  int n = (int)strlen(value);
+
+  if (StringLengthPtr) {
+    *StringLengthPtr = n;
+  }
+
+  if (!InfoValuePtr) {
+    return SQL_SUCCESS;
+  }
+
+  n = snprintf((char*)InfoValuePtr, BufferLength, "%s", value);
 
   if (n >= BufferLength) {
     conn_append_err_format(conn, "01004", 0, "String data, right truncated:`%s[%d/0x%x]`", sql_info_type(InfoType), InfoType, InfoType);
