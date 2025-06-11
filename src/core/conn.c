@@ -1031,7 +1031,7 @@ static SQLRETURN _conn_set_string(
     SQLSMALLINT     BufferLength,
     SQLSMALLINT    *StringLengthPtr)
 {
-  int n = snprintf((char*)InfoValuePtr, BufferLength, "%s", value);
+  int n = snprintf((char *)InfoValuePtr, InfoValuePtr ? BufferLength : 0, "%s", value);
   if (StringLengthPtr) *StringLengthPtr = n;
 
   if (n >= BufferLength) {
