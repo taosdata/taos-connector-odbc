@@ -1604,7 +1604,7 @@ static SQLRETURN _stmt_set_row_bind_type(stmt_t *stmt, SQLULEN row_bind_type)
 
 static SQLRETURN _stmt_set_param_bind_type(stmt_t *stmt, SQLULEN param_bind_type)
 {
-  if (param_bind_type != SQL_PARAM_BIND_BY_COLUMN) {
+  if (param_bind_type != SQL_PARAM_BIND_BY_COLUMN && param_bind_type != 10) {
     stmt_append_err(stmt, "HY000", 0, "General error:only `SQL_PARAM_BIND_BY_COLUMN` is supported now");
     return SQL_ERROR;
   }
@@ -8255,6 +8255,8 @@ static SQLRETURN _stmt_set_cursor_type(stmt_t *stmt, SQLULEN cursor_type)
   switch (cursor_type) {
     case SQL_CURSOR_FORWARD_ONLY:
     case SQL_CURSOR_STATIC:
+    case SQL_CURSOR_DYNAMIC:
+    case SQL_CURSOR_KEYSET_DRIVEN:
       return SQL_SUCCESS;
     default:
       stmt_append_err_format(stmt, "HY000", 0, "General error:`%s` for `SQL_ATTR_CURSOR_TYPE` not supported yet", sql_cursor_type(cursor_type));
@@ -8283,6 +8285,7 @@ SQLRETURN stmt_set_attr(stmt_t *stmt, SQLINTEGER Attribute, SQLPOINTER ValuePtr,
       break;
 #endif                       /* } */
     case SQL_ATTR_CONCURRENCY:
+      if ((SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_VALUES) return SQL_SUCCESS;
       break;
     case SQL_ATTR_CURSOR_SCROLLABLE:
       if ((SQLULEN)(uintptr_t)ValuePtr == SQL_NONSCROLLABLE) return SQL_SUCCESS;
@@ -8317,7 +8320,7 @@ SQLRETURN stmt_set_attr(stmt_t *stmt, SQLINTEGER Attribute, SQLPOINTER ValuePtr,
       if ((SQLULEN)(uintptr_t)ValuePtr == SQL_NOSCAN_ON) return SQL_SUCCESS;
       break;
     case SQL_ATTR_PARAM_BIND_OFFSET_PTR:
-      break;
+      return SQL_SUCCESS;
     case SQL_ATTR_PARAM_BIND_TYPE:
       return _stmt_set_param_bind_type(stmt, (SQLULEN)ValuePtr);
     case SQL_ATTR_PARAM_OPERATION_PTR:
@@ -8353,6 +8356,7 @@ SQLRETURN stmt_set_attr(stmt_t *stmt, SQLINTEGER Attribute, SQLPOINTER ValuePtr,
     case SQL_ATTR_SIMULATE_CURSOR:
       break;
     case SQL_ATTR_USE_BOOKMARKS:
+      if ((SQLULEN)(uintptr_t)ValuePtr == SQL_UB_VARIABLE) return SQL_SUCCESS;
       if ((SQLULEN)(uintptr_t)ValuePtr == SQL_UB_OFF) return SQL_SUCCESS;
       break;
     case SQL_ROWSET_SIZE:
@@ -8393,14 +8397,15 @@ SQLRETURN stmt_get_attr(stmt_t *stmt,
       break;
 #endif                       /* } */
     case SQL_ATTR_CONCURRENCY:
-      *(SQLULEN*)Value = SQL_CONCUR_READ_ONLY;
+      // *(SQLULEN*)Value = SQL_CONCUR_READ_ONLY;
+      *(SQLULEN*)Value = SQL_CURSOR_KEYSET_DRIVEN;
       return SQL_SUCCESS;
     case SQL_ATTR_CURSOR_SCROLLABLE:
       break;
     case SQL_ATTR_CURSOR_SENSITIVITY:
       break;
     case SQL_ATTR_CURSOR_TYPE:
-      *(SQLULEN*)Value = SQL_CURSOR_FORWARD_ONLY;
+      *(SQLULEN*)Value = SQL_CURSOR_KEYSET_DRIVEN;
       return SQL_SUCCESS;
     case SQL_ATTR_ENABLE_AUTO_IPD:
       break;
