@@ -306,7 +306,8 @@ static void _stmt_init(stmt_t *stmt, conn_t *conn)
   topic_init(&stmt->topic, stmt);
 
   stmt->base = &stmt->tsdb_stmt.base;
-
+  stmt->cursor_type = SQL_CURSOR_FORWARD_ONLY;
+  stmt->concurrency_attr = SQL_CONCUR_LOCK;
   stmt->refc = 1;
 }
 
@@ -1482,7 +1483,7 @@ static SQLRETURN _stmt_fill_IRD(stmt_t *stmt)
     sr = _stmt_col_DESC_UNSIGNED(stmt, _map, &IRD_record->DESC_UNSIGNED);
     if (sr != SQL_SUCCESS) return SQL_ERROR;
 
-    IRD_record->DESC_UPDATABLE = SQL_ATTR_READONLY;
+    IRD_record->DESC_UPDATABLE = SQL_ATTR_WRITE;
   }
 
   return SQL_SUCCESS;
@@ -1604,7 +1605,7 @@ static SQLRETURN _stmt_set_row_bind_type(stmt_t *stmt, SQLULEN row_bind_type)
 
 static SQLRETURN _stmt_set_param_bind_type(stmt_t *stmt, SQLULEN param_bind_type)
 {
-  if (param_bind_type != SQL_PARAM_BIND_BY_COLUMN && param_bind_type != 10) {
+  if (param_bind_type != SQL_PARAM_BIND_BY_COLUMN) {
     stmt_append_err(stmt, "HY000", 0, "General error:only `SQL_PARAM_BIND_BY_COLUMN` is supported now");
     return SQL_ERROR;
   }
@@ -7303,9 +7304,12 @@ static const param_bind_map_t _param_bind_map[] = {
   {SQL_C_CHAR, SQL_TYPE_TIMESTAMP, TSDB_DATA_TYPE_TIMESTAMP,
     _stmt_param_adjust_tsdb_timestamp,
     _stmt_param_conv_sql_timestamp_to_tsdb_timestamp},
-  {SQL_C_CHAR, SQL_VARCHAR, TSDB_DATA_TYPE_TIMESTAMP,
+  {SQL_C_CHAR, SQL_WVARCHAR, TSDB_DATA_TYPE_TIMESTAMP,
     _stmt_param_adjust_tsdb_timestamp,
     _stmt_param_conv_sqlc_char_to_tsdb_timestamp},
+  {SQL_C_CHAR, SQL_VARCHAR, TSDB_DATA_TYPE_TIMESTAMP,
+    _stmt_param_adjust_tsdb_timestamp,
+    _stmt_param_conv_sqlc_char_to_tsdb_timestamp},  
   {SQL_C_CHAR, SQL_VARCHAR, TSDB_DATA_TYPE_VARCHAR,
     _stmt_param_adjust_tsdb_varchar,
     _stmt_param_conv_sqlc_char_to_tsdb_varchar},
@@ -8255,8 +8259,7 @@ static SQLRETURN _stmt_set_cursor_type(stmt_t *stmt, SQLULEN cursor_type)
   switch (cursor_type) {
     case SQL_CURSOR_FORWARD_ONLY:
     case SQL_CURSOR_STATIC:
-    case SQL_CURSOR_DYNAMIC:
-    case SQL_CURSOR_KEYSET_DRIVEN:
+      stmt->cursor_type = cursor_type;
       return SQL_SUCCESS;
     default:
       stmt_append_err_format(stmt, "HY000", 0, "General error:`%s` for `SQL_ATTR_CURSOR_TYPE` not supported yet", sql_cursor_type(cursor_type));
@@ -8285,7 +8288,11 @@ SQLRETURN stmt_set_attr(stmt_t *stmt, SQLINTEGER Attribute, SQLPOINTER ValuePtr,
       break;
 #endif                       /* } */
     case SQL_ATTR_CONCURRENCY:
-      if ((SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_VALUES) return SQL_SUCCESS;
+      if ((SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_LOCK || (SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_READ_ONLY) 
+      {
+        stmt->concurrency_attr = (SQLULEN)ValuePtr;
+        return SQL_SUCCESS;
+      }
       break;
     case SQL_ATTR_CURSOR_SCROLLABLE:
       if ((SQLULEN)(uintptr_t)ValuePtr == SQL_NONSCROLLABLE) return SQL_SUCCESS;
@@ -8320,7 +8327,7 @@ SQLRETURN stmt_set_attr(stmt_t *stmt, SQLINTEGER Attribute, SQLPOINTER ValuePtr,
       if ((SQLULEN)(uintptr_t)ValuePtr == SQL_NOSCAN_ON) return SQL_SUCCESS;
       break;
     case SQL_ATTR_PARAM_BIND_OFFSET_PTR:
-      return SQL_SUCCESS;
+      break;
     case SQL_ATTR_PARAM_BIND_TYPE:
       return _stmt_set_param_bind_type(stmt, (SQLULEN)ValuePtr);
     case SQL_ATTR_PARAM_OPERATION_PTR:
@@ -8356,7 +8363,6 @@ SQLRETURN stmt_set_attr(stmt_t *stmt, SQLINTEGER Attribute, SQLPOINTER ValuePtr,
     case SQL_ATTR_SIMULATE_CURSOR:
       break;
     case SQL_ATTR_USE_BOOKMARKS:
-      if ((SQLULEN)(uintptr_t)ValuePtr == SQL_UB_VARIABLE) return SQL_SUCCESS;
       if ((SQLULEN)(uintptr_t)ValuePtr == SQL_UB_OFF) return SQL_SUCCESS;
       break;
     case SQL_ROWSET_SIZE:
@@ -8397,15 +8403,14 @@ SQLRETURN stmt_get_attr(stmt_t *stmt,
       break;
 #endif                       /* } */
     case SQL_ATTR_CONCURRENCY:
-      // *(SQLULEN*)Value = SQL_CONCUR_READ_ONLY;
-      *(SQLULEN*)Value = SQL_CURSOR_KEYSET_DRIVEN;
+      *(SQLULEN*)Value = stmt->concurrency_attr;
       return SQL_SUCCESS;
     case SQL_ATTR_CURSOR_SCROLLABLE:
       break;
     case SQL_ATTR_CURSOR_SENSITIVITY:
       break;
     case SQL_ATTR_CURSOR_TYPE:
-      *(SQLULEN*)Value = SQL_CURSOR_KEYSET_DRIVEN;
+      *(SQLULEN*)Value = stmt->cursor_type;
       return SQL_SUCCESS;
     case SQL_ATTR_ENABLE_AUTO_IPD:
       break;

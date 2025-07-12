@@ -1117,6 +1117,8 @@ struct stmt_s {
 
   unsigned int               strict:1; // 1: param-truncation as failure
   unsigned int               no_total:1;
+  SQLULEN                    concurrency_attr;
+  SQLULEN                    cursor_type;
 };
 
 struct tls_s {
