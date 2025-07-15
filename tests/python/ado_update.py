@@ -3,9 +3,8 @@ import time
 import datetime
 
 # Import ADODB constants
-adOpenStatic = 2
-adLockReadOnly = 2
-adCmdText = 1
+adCursorType = 2
+adLockType = 2
 
 def create_table_if_not_exists(conn):
     """Ensure table exists"""
@@ -70,8 +69,8 @@ def query_recent_records(conn, isModify=True, limit=5):
         rs.Open(
             Source=query,
             ActiveConnection=conn,
-            CursorType=adOpenStatic,
-            LockType=adLockReadOnly
+            CursorType=adCursorType,
+            LockType=adLockType
         )
 
         records = []

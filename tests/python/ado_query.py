@@ -6,7 +6,6 @@ import os
 adUseClient = 3
 adCursorType = 2
 adLockType = 2
-adCmdText = 1
 
 def connect_tdengine():
     print("Attempting to connect to TDengine database...")
@@ -84,10 +83,10 @@ def connect_tdengine():
             errors = conn.Errors
             for i in range(errors.Count):
                 err = errors.Item(i)
-                print(f"  ADO Error #{i + 1}:")
-                print(f"    Description: {err.Description}")
-                print(f"    Code: {err.Number} (0x{err.Number:08X})")
-                print(f"    Source: {err.Source}")
+                print(f" ADO Error #{i + 1}:")
+                print(f" Description: {err.Description}")
+                print(f" Code: {err.Number} (0x{err.Number:08X})")
+                print(f" Source: {err.Source}")
 
         # Ensure connection is closed
         if 'rs' in locals() and rs.State != 0:
