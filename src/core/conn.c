@@ -66,6 +66,7 @@ const custprod_item_t custprod_array[] = {
   {"general", CUSTP_GENERAL},
   {"kingscada", CUSTP_KINGSCADA},
   {"kepware", CUSTP_KEPWARE},
+  {"ado", CUSTP_ADO},
 };
 
 const custprod_item_t *conn_get_custprod_by_index(size_t index)

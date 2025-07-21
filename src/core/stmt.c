@@ -307,7 +307,11 @@ static void _stmt_init(stmt_t *stmt, conn_t *conn)
 
   stmt->base = &stmt->tsdb_stmt.base;
   stmt->cursor_type = SQL_CURSOR_FORWARD_ONLY;
-  stmt->concurrency_attr = SQL_CONCUR_LOCK;
+  if (stmt->conn->cfg.customproduct == CUSTP_ADO) {
+    stmt->concurrency_attr = SQL_CONCUR_LOCK;
+  } else {
+    stmt->concurrency_attr = SQL_CONCUR_READ_ONLY;
+  }
   stmt->refc = 1;
 }
 
@@ -1483,7 +1487,11 @@ static SQLRETURN _stmt_fill_IRD(stmt_t *stmt)
     sr = _stmt_col_DESC_UNSIGNED(stmt, _map, &IRD_record->DESC_UNSIGNED);
     if (sr != SQL_SUCCESS) return SQL_ERROR;
 
-    IRD_record->DESC_UPDATABLE = SQL_ATTR_WRITE;
+    if (stmt->conn->cfg.customproduct == CUSTP_ADO) {
+      IRD_record->DESC_UPDATABLE = SQL_ATTR_WRITE;
+    } else {
+      IRD_record->DESC_UPDATABLE = SQL_ATTR_READONLY;
+    }
   }
 
   return SQL_SUCCESS;
@@ -8288,10 +8296,12 @@ SQLRETURN stmt_set_attr(stmt_t *stmt, SQLINTEGER Attribute, SQLPOINTER ValuePtr,
       break;
 #endif                       /* } */
     case SQL_ATTR_CONCURRENCY:
-      if ((SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_LOCK || (SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_READ_ONLY) 
-      {
-        stmt->concurrency_attr = (SQLULEN)ValuePtr;
-        return SQL_SUCCESS;
+      if (stmt->conn->cfg.customproduct = CUSTP_ADO) {
+        if ((SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_LOCK || (SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_READ_ONLY) 
+        {
+          stmt->concurrency_attr = (SQLULEN)ValuePtr;
+          return SQL_SUCCESS;
+        }
       }
       break;
     case SQL_ATTR_CURSOR_SCROLLABLE:
