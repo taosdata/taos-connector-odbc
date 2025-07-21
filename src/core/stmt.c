@@ -8264,15 +8264,14 @@ SQLRETURN stmt_execute(stmt_t *stmt)
 
 static SQLRETURN _stmt_set_cursor_type(stmt_t *stmt, SQLULEN cursor_type)
 {
-  switch (cursor_type) {
-    case SQL_CURSOR_FORWARD_ONLY:
-    case SQL_CURSOR_STATIC:
-      stmt->cursor_type = cursor_type;
-      return SQL_SUCCESS;
-    default:
-      stmt_append_err_format(stmt, "HY000", 0, "General error:`%s` for `SQL_ATTR_CURSOR_TYPE` not supported yet", sql_cursor_type(cursor_type));
-      return SQL_ERROR;
+  
+  if (SQL_CURSOR_FORWARD_ONLY == cursor_type || SQL_CURSOR_STATIC == SQL_CURSOR_STATIC) {
+    stmt->cursor_type = cursor_type;
+    return SQL_SUCCESS;
   }
+
+  stmt_append_err_format(stmt, "HY000", 0, "General error:`%s` for `SQL_ATTR_CURSOR_TYPE` not supported yet", sql_cursor_type(cursor_type));
+  return SQL_ERROR;
 }
 
 SQLRETURN stmt_set_attr(stmt_t *stmt, SQLINTEGER Attribute, SQLPOINTER ValuePtr, SQLINTEGER StringLength)

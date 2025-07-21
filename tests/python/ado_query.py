@@ -103,7 +103,7 @@ def query_tdengine():
         # Use DSN connection string
         conn = win32com.client.Dispatch("ADODB.Connection")
         # Use DSN connection string
-        conn_str = "DSN=u-156;"
+        conn_str = "DSN=TAOS_ODBC_WS_DSN;"
         # Open connection
         conn.Open(conn_str)
         print(f"--Successfully connected to TDengine database!")

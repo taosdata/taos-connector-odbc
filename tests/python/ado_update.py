@@ -106,7 +106,7 @@ def main():
     try:
         # Create main connection
         conn = win32com.client.Dispatch("ADODB.Connection")
-        conn_str = "DSN=u-156;"
+        conn_str = "DSN=TAOS_ODBC_WS_DSN;"
         conn.Open(conn_str)
         print("Successfully connected to TDengine database!")
 
