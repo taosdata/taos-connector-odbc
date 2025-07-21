@@ -8545,6 +8545,26 @@ SQLRETURN stmt_tables(stmt_t *stmt,
   return _stmt_fill_IRD(stmt);
 }
 
+static SQLRETURN _stmt_get_diag_cursor_row_number(
+    stmt_t         *stmt,
+    SQLSMALLINT     RecNumber,
+    SQLSMALLINT     DiagIdentifier,
+    SQLPOINTER      DiagInfoPtr,
+    SQLSMALLINT     BufferLength,
+    SQLSMALLINT    *StringLengthPtr)
+{
+  (void)DiagIdentifier;
+  (void)BufferLength;
+  (void)StringLengthPtr;
+  
+  if (RecNumber == 0) {
+    *(SQLLEN*)DiagInfoPtr = SQL_ROW_NUMBER_UNKNOWN;;
+  } else {
+    *(SQLINTEGER*)DiagInfoPtr = (SQLINTEGER)stmt->errs.count;
+  }
+  return SQL_SUCCESS;
+}
+
 static SQLRETURN _stmt_get_diag_field_row_number(
     stmt_t         *stmt,
     SQLSMALLINT     RecNumber,
@@ -8610,6 +8630,8 @@ SQLRETURN stmt_get_diag_field(
       return errs_get_diag_field_sqlstate(&stmt->errs, RecNumber, DiagIdentifier, DiagInfoPtr, BufferLength, StringLengthPtr);
     case SQL_DIAG_ROW_NUMBER:
       return _stmt_get_diag_field_row_number(stmt, RecNumber, DiagIdentifier, DiagInfoPtr, BufferLength, StringLengthPtr);
+    case SQL_DIAG_CURSOR_ROW_COUNT:
+      return _stmt_get_diag_cursor_row_number(stmt, RecNumber, DiagIdentifier, DiagInfoPtr, BufferLength, StringLengthPtr);
     case SQL_DIAG_NUMBER:
       return _stmt_get_diag_number(stmt, DiagIdentifier, DiagInfoPtr, BufferLength, StringLengthPtr);
     default:
