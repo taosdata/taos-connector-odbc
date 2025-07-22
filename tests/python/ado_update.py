@@ -1,7 +1,7 @@
 import win32com.client
 import time
 import datetime
-from tests.python.ado_utils import create_table, insert_data, connect_to_database, close_connection
+from ado_utils import create_table, insert_data, connect_to_database, close_connection
 
 # Import ADODB constants
 adCursorType = 2
