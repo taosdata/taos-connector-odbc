@@ -7317,7 +7317,7 @@ static const param_bind_map_t _param_bind_map[] = {
     _stmt_param_conv_sqlc_char_to_tsdb_timestamp},
   {SQL_C_CHAR, SQL_VARCHAR, TSDB_DATA_TYPE_TIMESTAMP,
     _stmt_param_adjust_tsdb_timestamp,
-    _stmt_param_conv_sqlc_char_to_tsdb_timestamp},  
+    _stmt_param_conv_sqlc_char_to_tsdb_timestamp},
   {SQL_C_CHAR, SQL_VARCHAR, TSDB_DATA_TYPE_VARCHAR,
     _stmt_param_adjust_tsdb_varchar,
     _stmt_param_conv_sqlc_char_to_tsdb_varchar},
@@ -8264,14 +8264,15 @@ SQLRETURN stmt_execute(stmt_t *stmt)
 
 static SQLRETURN _stmt_set_cursor_type(stmt_t *stmt, SQLULEN cursor_type)
 {
-  
-  if (SQL_CURSOR_FORWARD_ONLY == cursor_type || SQL_CURSOR_STATIC == SQL_CURSOR_STATIC) {
-    stmt->cursor_type = cursor_type;
-    return SQL_SUCCESS;
+  switch (cursor_type) {
+    case SQL_CURSOR_FORWARD_ONLY:
+    case SQL_CURSOR_STATIC:
+      stmt->cursor_type = cursor_type;
+      return SQL_SUCCESS;
+    default:
+      stmt_append_err_format(stmt, "HY000", 0, "General error:`%s` for `SQL_ATTR_CURSOR_TYPE` not supported yet", sql_cursor_type(cursor_type));
+      return SQL_ERROR;
   }
-
-  stmt_append_err_format(stmt, "HY000", 0, "General error:`%s` for `SQL_ATTR_CURSOR_TYPE` not supported yet", sql_cursor_type(cursor_type));
-  return SQL_ERROR;
 }
 
 SQLRETURN stmt_set_attr(stmt_t *stmt, SQLINTEGER Attribute, SQLPOINTER ValuePtr, SQLINTEGER StringLength)
@@ -8567,7 +8568,7 @@ static SQLRETURN _stmt_get_diag_cursor_row_number(
   (void)StringLengthPtr;
   
   if (RecNumber == 0) {
-    *(SQLLEN*)DiagInfoPtr = SQL_ROW_NUMBER_UNKNOWN;;
+    *(SQLLEN*)DiagInfoPtr = SQL_ROW_NUMBER_UNKNOWN;
   } else {
     *(SQLINTEGER*)DiagInfoPtr = (SQLINTEGER)stmt->errs.count;
   }
