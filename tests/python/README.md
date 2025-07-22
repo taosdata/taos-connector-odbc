@@ -5,7 +5,7 @@ This directory contains Python scripts for testing TDengine database operations 
 ## Files Overview
 
 ### Utility Module
-- **`tdengine_utils.py`** - Common utility functions extracted from test scripts:
+- **`ado_utils.py`** - Common utility functions extracted from test scripts:
   - `create_table()` - Creates test database and table
   - `insert_data()` - Safely inserts data with error handling
   - `connect_to_database()` - Creates database connection
@@ -14,7 +14,6 @@ This directory contains Python scripts for testing TDengine database operations 
 ### Test Scripts
 - **`ado_insert.py`** - Tests data insertion and querying operations
 - **`ado_query.py`** - Tests advanced querying with filtering and sorting
-- **`example_usage.py`** - Example of using the utility functions
 
 ## Refactoring Changes
 
@@ -28,7 +27,7 @@ The common functions `create_table` and `insert_data` have been extracted from t
 
 ### Usage Pattern:
 ```python
-from tdengine_utils import create_table, insert_data, connect_to_database, close_connection
+from ado_utils import create_table, insert_data, connect_to_database, close_connection
 
 # Connect to database
 conn = connect_to_database("DSN_NAME")
