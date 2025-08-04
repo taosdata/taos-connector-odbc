@@ -5407,6 +5407,13 @@ static const sqlc_sql_map_t          _sqlc_sql_map[] = {
     _stmt_param_check_dummy,
     _stmt_param_guess_sqlc_short},
 
+  {SQL_C_SHORT, SQL_BIT,
+    _stmt_param_bind_set_APD_record_sqlc_short,
+    _stmt_param_bind_set_IPD_record_sql_tinyint,
+    _stmt_param_get_sqlc_short,
+    _stmt_param_check_dummy,
+    _stmt_param_guess_sqlc_short},  
+
   {SQL_C_STINYINT, SQL_TINYINT,
     _stmt_param_bind_set_APD_record_sqlc_tinyint,
     _stmt_param_bind_set_IPD_record_sql_tinyint,
@@ -7397,6 +7404,10 @@ static const param_bind_map_t _param_bind_map[] = {
   {SQL_C_SHORT, SQL_SMALLINT, TSDB_DATA_TYPE_SMALLINT,
     _stmt_param_adjust_reuse_sqlc_short,
     _stmt_param_conv_dummy},
+
+  {SQL_C_SHORT, SQL_BIT, TSDB_DATA_TYPE_BOOL,
+    _stmt_param_adjust_reuse_sqlc_short,
+    _stmt_param_conv_dummy},  
 
   {SQL_C_STINYINT, SQL_TINYINT, TSDB_DATA_TYPE_TINYINT,
     _stmt_param_adjust_reuse_sqlc_tinyint,

@@ -450,7 +450,7 @@ static SQLRETURN _tsdb_stmt_post_check(tsdb_stmt_t *stmt)
     stmt_append_err(stmt->owner, "HY000", 0, "General error:statement-without-parameter-placemarker not allowed to be prepared");
     return SQL_ERROR;
   }
-  if (n != stmt->params.qms) {
+  if (stmt->owner->conn->cfg.customproduct != CUSTP_ADO && n != stmt->params.qms) {
     stmt_append_err_format(stmt->owner, "HY000", 0,
         "General error:statement parsed by taos_odbc has #%d parameter-placemarkers, but [taosc] reports #%d parameter-placemarkers",
         stmt->params.qms, n);
