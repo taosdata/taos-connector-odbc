@@ -436,6 +436,7 @@ enum custprod_type_e {
   CUSTP_GENERAL           = 0,
   CUSTP_KINGSCADA         = 1,
   CUSTP_KEPWARE           = 2,
+  CUSTP_ADO               = 3,
 };
 
 struct custprod_item_s {
@@ -1117,6 +1118,8 @@ struct stmt_s {
 
   unsigned int               strict:1; // 1: param-truncation as failure
   unsigned int               no_total:1;
+  SQLULEN                    concurrency_attr;
+  SQLULEN                    cursor_type;
 };
 
 struct tls_s {

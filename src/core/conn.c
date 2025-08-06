@@ -66,6 +66,7 @@ const custprod_item_t custprod_array[] = {
   {"general", CUSTP_GENERAL},
   {"kingscada", CUSTP_KINGSCADA},
   {"kepware", CUSTP_KEPWARE},
+  {"ado", CUSTP_ADO},
 };
 
 const custprod_item_t *conn_get_custprod_by_index(size_t index)
@@ -1244,7 +1245,7 @@ SQLRETURN conn_get_info(
 #endif                               /* } */
     } break;
     case SQL_DRIVER_VER:
-      return _conn_set_string(conn, "01.01.0000", InfoType, InfoValuePtr, BufferLength, StringLengthPtr);
+      return _conn_set_string(conn, "01.01.0001", InfoType, InfoValuePtr, BufferLength, StringLengthPtr);
     case SQL_DYNAMIC_CURSOR_ATTRIBUTES1:
       // https://learn.microsoft.com/en-us/sql/odbc/reference/syntax/sqlgetinfo-function?view=sql-server-ver16
       *(SQLUINTEGER*)InfoValuePtr = SQL_CA1_NEXT | SQL_CA1_ABSOLUTE | SQL_CA1_RELATIVE;

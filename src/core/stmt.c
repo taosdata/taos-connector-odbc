@@ -306,7 +306,12 @@ static void _stmt_init(stmt_t *stmt, conn_t *conn)
   topic_init(&stmt->topic, stmt);
 
   stmt->base = &stmt->tsdb_stmt.base;
-
+  stmt->cursor_type = SQL_CURSOR_FORWARD_ONLY;
+  if (stmt->conn->cfg.customproduct == CUSTP_ADO) {
+    stmt->concurrency_attr = SQL_CONCUR_LOCK;
+  } else {
+    stmt->concurrency_attr = SQL_CONCUR_READ_ONLY;
+  }
   stmt->refc = 1;
 }
 
@@ -1482,7 +1487,11 @@ static SQLRETURN _stmt_fill_IRD(stmt_t *stmt)
     sr = _stmt_col_DESC_UNSIGNED(stmt, _map, &IRD_record->DESC_UNSIGNED);
     if (sr != SQL_SUCCESS) return SQL_ERROR;
 
-    IRD_record->DESC_UPDATABLE = SQL_ATTR_READONLY;
+    if (stmt->conn->cfg.customproduct == CUSTP_ADO) {
+      IRD_record->DESC_UPDATABLE = SQL_ATTR_WRITE;
+    } else {
+      IRD_record->DESC_UPDATABLE = SQL_ATTR_READONLY;
+    }
   }
 
   return SQL_SUCCESS;
@@ -5398,6 +5407,13 @@ static const sqlc_sql_map_t          _sqlc_sql_map[] = {
     _stmt_param_check_dummy,
     _stmt_param_guess_sqlc_short},
 
+  {SQL_C_SHORT, SQL_BIT,
+    _stmt_param_bind_set_APD_record_sqlc_short,
+    _stmt_param_bind_set_IPD_record_sql_tinyint,
+    _stmt_param_get_sqlc_short,
+    _stmt_param_check_dummy,
+    _stmt_param_guess_sqlc_short},  
+
   {SQL_C_STINYINT, SQL_TINYINT,
     _stmt_param_bind_set_APD_record_sqlc_tinyint,
     _stmt_param_bind_set_IPD_record_sql_tinyint,
@@ -7303,6 +7319,9 @@ static const param_bind_map_t _param_bind_map[] = {
   {SQL_C_CHAR, SQL_TYPE_TIMESTAMP, TSDB_DATA_TYPE_TIMESTAMP,
     _stmt_param_adjust_tsdb_timestamp,
     _stmt_param_conv_sql_timestamp_to_tsdb_timestamp},
+  {SQL_C_CHAR, SQL_WVARCHAR, TSDB_DATA_TYPE_TIMESTAMP,
+    _stmt_param_adjust_tsdb_timestamp,
+    _stmt_param_conv_sqlc_char_to_tsdb_timestamp},
   {SQL_C_CHAR, SQL_VARCHAR, TSDB_DATA_TYPE_TIMESTAMP,
     _stmt_param_adjust_tsdb_timestamp,
     _stmt_param_conv_sqlc_char_to_tsdb_timestamp},
@@ -7385,6 +7404,10 @@ static const param_bind_map_t _param_bind_map[] = {
   {SQL_C_SHORT, SQL_SMALLINT, TSDB_DATA_TYPE_SMALLINT,
     _stmt_param_adjust_reuse_sqlc_short,
     _stmt_param_conv_dummy},
+
+  {SQL_C_SHORT, SQL_BIT, TSDB_DATA_TYPE_BOOL,
+    _stmt_param_adjust_reuse_sqlc_short,
+    _stmt_param_conv_dummy},  
 
   {SQL_C_STINYINT, SQL_TINYINT, TSDB_DATA_TYPE_TINYINT,
     _stmt_param_adjust_reuse_sqlc_tinyint,
@@ -8255,6 +8278,7 @@ static SQLRETURN _stmt_set_cursor_type(stmt_t *stmt, SQLULEN cursor_type)
   switch (cursor_type) {
     case SQL_CURSOR_FORWARD_ONLY:
     case SQL_CURSOR_STATIC:
+      stmt->cursor_type = cursor_type;
       return SQL_SUCCESS;
     default:
       stmt_append_err_format(stmt, "HY000", 0, "General error:`%s` for `SQL_ATTR_CURSOR_TYPE` not supported yet", sql_cursor_type(cursor_type));
@@ -8283,6 +8307,13 @@ SQLRETURN stmt_set_attr(stmt_t *stmt, SQLINTEGER Attribute, SQLPOINTER ValuePtr,
       break;
 #endif                       /* } */
     case SQL_ATTR_CONCURRENCY:
+      if (stmt->conn->cfg.customproduct = CUSTP_ADO) {
+        if ((SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_LOCK || (SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_READ_ONLY) 
+        {
+          stmt->concurrency_attr = (SQLULEN)ValuePtr;
+          return SQL_SUCCESS;
+        }
+      }
       break;
     case SQL_ATTR_CURSOR_SCROLLABLE:
       if ((SQLULEN)(uintptr_t)ValuePtr == SQL_NONSCROLLABLE) return SQL_SUCCESS;
@@ -8393,14 +8424,14 @@ SQLRETURN stmt_get_attr(stmt_t *stmt,
       break;
 #endif                       /* } */
     case SQL_ATTR_CONCURRENCY:
-      *(SQLULEN*)Value = SQL_CONCUR_READ_ONLY;
+      *(SQLULEN*)Value = stmt->concurrency_attr;
       return SQL_SUCCESS;
     case SQL_ATTR_CURSOR_SCROLLABLE:
       break;
     case SQL_ATTR_CURSOR_SENSITIVITY:
       break;
     case SQL_ATTR_CURSOR_TYPE:
-      *(SQLULEN*)Value = SQL_CURSOR_FORWARD_ONLY;
+      *(SQLULEN*)Value = stmt->cursor_type;
       return SQL_SUCCESS;
     case SQL_ATTR_ENABLE_AUTO_IPD:
       break;
@@ -8535,6 +8566,26 @@ SQLRETURN stmt_tables(stmt_t *stmt,
   return _stmt_fill_IRD(stmt);
 }
 
+static SQLRETURN _stmt_get_diag_cursor_row_number(
+    stmt_t         *stmt,
+    SQLSMALLINT     RecNumber,
+    SQLSMALLINT     DiagIdentifier,
+    SQLPOINTER      DiagInfoPtr,
+    SQLSMALLINT     BufferLength,
+    SQLSMALLINT    *StringLengthPtr)
+{
+  (void)DiagIdentifier;
+  (void)BufferLength;
+  (void)StringLengthPtr;
+  
+  if (RecNumber == 0) {
+    *(SQLLEN*)DiagInfoPtr = SQL_ROW_NUMBER_UNKNOWN;
+  } else {
+    *(SQLINTEGER*)DiagInfoPtr = (SQLINTEGER)stmt->errs.count;
+  }
+  return SQL_SUCCESS;
+}
+
 static SQLRETURN _stmt_get_diag_field_row_number(
     stmt_t         *stmt,
     SQLSMALLINT     RecNumber,
@@ -8600,6 +8651,8 @@ SQLRETURN stmt_get_diag_field(
       return errs_get_diag_field_sqlstate(&stmt->errs, RecNumber, DiagIdentifier, DiagInfoPtr, BufferLength, StringLengthPtr);
     case SQL_DIAG_ROW_NUMBER:
       return _stmt_get_diag_field_row_number(stmt, RecNumber, DiagIdentifier, DiagInfoPtr, BufferLength, StringLengthPtr);
+    case SQL_DIAG_CURSOR_ROW_COUNT:
+      return _stmt_get_diag_cursor_row_number(stmt, RecNumber, DiagIdentifier, DiagInfoPtr, BufferLength, StringLengthPtr);
     case SQL_DIAG_NUMBER:
       return _stmt_get_diag_number(stmt, DiagIdentifier, DiagInfoPtr, BufferLength, StringLengthPtr);
     default:
