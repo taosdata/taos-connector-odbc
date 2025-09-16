@@ -8307,7 +8307,7 @@ SQLRETURN stmt_set_attr(stmt_t *stmt, SQLINTEGER Attribute, SQLPOINTER ValuePtr,
       break;
 #endif                       /* } */
     case SQL_ATTR_CONCURRENCY:
-      if (stmt->conn->cfg.customproduct = CUSTP_ADO) {
+      if (stmt->conn->cfg.customproduct == CUSTP_ADO) {
         if ((SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_LOCK || (SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_READ_ONLY) 
         {
           stmt->concurrency_attr = (SQLULEN)ValuePtr;
