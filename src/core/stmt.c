@@ -54,6 +54,8 @@
 #include <time.h>
 #include <wchar.h>
 
+#define TIME_STR_MAX_LEN 64
+
 static void _param_bind_meta_reset(param_bind_meta_t *param_bind_meta)
 {
   if (!param_bind_meta) return;
@@ -3473,9 +3475,9 @@ static SQLRETURN _stmt_conv_sql_c_char_to_tsdb_timestamp_x(stmt_t *stmt, const c
   int64_t v = 0;
   // OW("len:%zd", len);
 
-  char buf[64];
+  char buf[TIME_STR_MAX_LEN];
   int n = snprintf(buf, sizeof(buf), "%.*s", (int)len, src);
-  if (len >= 64) {
+  if (len >= TIME_STR_MAX_LEN) {
       stmt_append_err_format(stmt, "22007", 0,
           "Invalid datetime format:timestamp is required, but got ==[%.*s]==", (int)len, src);
       return SQL_ERROR;    
