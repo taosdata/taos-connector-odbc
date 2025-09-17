@@ -3473,11 +3473,19 @@ static SQLRETURN _stmt_conv_sql_c_char_to_tsdb_timestamp_x(stmt_t *stmt, const c
   int64_t v = 0;
   // OW("len:%zd", len);
 
+  char buf[64];
+  int n = snprintf(buf, sizeof(buf), "%.*s", (int)len, src);
+  if (len >= 64) {
+      stmt_append_err_format(stmt, "22007", 0,
+          "Invalid datetime format:timestamp is required, but got ==[%.*s]==", (int)len, src);
+      return SQL_ERROR;    
+  }
+  buf[len] = '\0';
   char *end = NULL;
-  strtol(src, &end, 0);
+  strtol(buf, &end, 0);
   if (end && !*end) {
     // TODO: precision
-    sr = _stmt_sql_c_char_to_tsdb_timestamp(stmt, src, &v);
+    sr = _stmt_sql_c_char_to_tsdb_timestamp(stmt, buf, &v);
     if (sr == SQL_ERROR) return SQL_ERROR;
   } else {
     int64_t tz_default = tod_get_local_timezone();
@@ -3485,10 +3493,10 @@ static SQLRETURN _stmt_conv_sql_c_char_to_tsdb_timestamp_x(stmt_t *stmt, const c
     ts_parser_param_t param = {0};
     // param.ctx.debug_flex = 1;
     // param.ctx.debug_bison = 1;
-    r = ts_parser_parse(src, len, &param, tz_default);
+    r = ts_parser_parse(buf, len, &param, tz_default);
     if (r) {
       stmt_append_err_format(stmt, "22007", 0,
-          "Invalid datetime format:timestamp is required, but got ==[%.*s]==", (int)len, src);
+          "Invalid datetime format:timestamp is required, but got ==[%.*s]==", (int)len, buf);
       return SQL_ERROR;
     }
 
