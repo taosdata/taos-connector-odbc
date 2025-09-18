@@ -15,7 +15,7 @@ adFilterAffectedRecords = 2
 adFilterFetchedRecords = 3
 adFilterConflictingRecords = 5
 
-def connect_tdengine():
+def connect_tdengine(dbname='test'):
     print("Attempting to connect to TDengine database...")
 
     try:
@@ -32,12 +32,12 @@ def connect_tdengine():
             return
 
         # Insert test data using utility function
-        insert_data(conn, 'now', 'device_001', 25.3, 45.2, True)
-        insert_data(conn, 'now-10s', 'device_002', 26.8, 42.7, False)
-        insert_data(conn, 'now-20s', 'device_003', 24.1, 47.9, True)
-        insert_data(conn, 'now-30s', 'device_003', 25.1, 47.9, True)
-        insert_data(conn, 'now-40s', 'device_003', 26.1, 47.9, True)
-        insert_data(conn, 'now-50s', 'device_003', 26.1, 47.9, True)
+        insert_data(conn, 'now', 'device_001', 25.3, 45.2, dbname, True)
+        insert_data(conn, 'now-10s', 'device_002', 26.8, 42.7, dbname, False)
+        insert_data(conn, 'now-20s', 'device_003', 24.1, 47.9, dbname, True)
+        insert_data(conn, 'now-30s', 'device_003', 25.1, 47.9, dbname, True)
+        insert_data(conn, 'now-40s', 'device_003', 26.1, 47.9, dbname, True)
+        insert_data(conn, 'now-50s', 'device_003', 26.1, 47.9, dbname, True)
 
         # Query data
         query = "SELECT * FROM test.devices;"
@@ -79,16 +79,16 @@ def connect_tdengine():
             rs.Close()
         close_connection(conn if 'conn' in locals() else None)
 
-def query_tdengine():
+def query_tdengine(dbname='test'):
     try:
         # Create connection using utility function
-        conn = connect_to_database("u-156")
+        conn = connect_to_database("TAOS_ODBC_WS_DSN")
         if not conn:
             return
             
         rs = win32com.client.Dispatch("ADODB.Recordset")
         rs.CursorLocation = adUseClient  # Must set to client cursor
-        query = "SELECT * FROM test.devices;"
+        query = f"SELECT * FROM {dbname}.devices;"
         rs.Open(query, conn, adCursorType, adLockType)
 
         print(f"Total records: {rs.RecordCount}")
