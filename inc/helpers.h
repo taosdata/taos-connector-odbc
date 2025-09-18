@@ -78,6 +78,9 @@ char *tod_strerror_x(int errnum, char *buf, size_t buflen) FA_HIDDEN;
 #define tod_strncasecmp     strncasecmp
 #endif
 
+size_t tod_wstrnlen(const char *buf, size_t len);
+size_t tod_wstrlen(const char *buf);
+
 EXTERN_C_END
 
 #endif // _helpers_h_

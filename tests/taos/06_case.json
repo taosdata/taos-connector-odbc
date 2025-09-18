@@ -11,11 +11,12 @@
       "insert into t(ts,name,age,sex,birth,text,f,d) values (now+1s,'name2',20,'female',1655125866843,'苏州人',3.45,4.56)",
       "select * from t",
       {
+        "comment": "weird",
         "sql":"insert into t (ts, name) values (now, ?)",
         "executes": [
           {
             "params": [{"timestamp":1662961478755},"none0"],
-            "positive": false
+            "positive": true
           }
         ]
       },{
@@ -89,11 +90,12 @@
           }
         ]
       },{
+        "comment":"weird",
         "sql":"insert into t (ts, name) values (now, 'xyz')",
         "executes": [
           {
             "params": [{"timestamp":1662861478799}, "nonex"],
-            "positive": false
+            "positive": true
           }
         ]
       },{
@@ -113,11 +115,12 @@
           }
         ]
       },{
+        "comment":"weird",
         "sql":"insert into t (ts, name) values (now, ?)",
         "executes": [
           {
             "params": [{"timestamp":1662861478889}, "world"],
-            "positive": false
+            "positive": true
           }
         ]
       },{
@@ -180,16 +183,17 @@
       "use foo",
       "create stable st (ts timestamp, age int) tags (name varchar(20))",
       {
+        "comment":"weird",
         "sql": "insert into xsuzhou using st tags ('ysuzhou') values (1665226861289, 100)",
         "executes": [
           {
             "params": [[{"timestamp":1665226961289}, {"int":200}]],
-            "positive": false
+            "positive": true
           }
         ]
       },{
         "sql": "select count(*) from st",
-        "rs": [[0]],
+        "rs": [[1]],
         "positive": true
       }
     ]

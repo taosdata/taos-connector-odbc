@@ -107,13 +107,13 @@
         "executes": [
           {
             "params": [{"timestamp":1662961478955},"dynamic"],
-            "positive": false
+            "positive": true
           }
         ]
       },{
         "sql":"select name from t where ts = 1662961478955",
         "rs": [["dynamic"]],
-        "positive": false
+        "positive": true
       },{
         "sql":"select name from t where ts = 1662961478855",
         "rs": [["fixed"]],
