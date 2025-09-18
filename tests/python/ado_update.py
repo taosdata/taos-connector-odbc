@@ -99,6 +99,6 @@ def execute(dbname='test', precision='ms'):
                 print(f"Error closing connection: {str(e)}")
 
 if __name__ == "__main__":
-    execute(dbname='test', precision='ms');
-    execute(dbname='test_us', precision='us');
-    execute(dbname='test_ns', precision='ns');
+    execute(dbname='test', precision='ms')
+    execute(dbname='test_us', precision='us')
+    execute(dbname='test_ns', precision='ns')
