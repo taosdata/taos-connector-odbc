@@ -363,15 +363,21 @@ static int _prepare_on_statement(TAOS *taos, TAOS_STMT *stmt)
     {__LINE__, "select * from t where ts > ? and name = ?", TSDB_CODE_SUCCESS, 2, 0, 0, 0},
     {__LINE__, "insert into ? values (?, ?)", TSDB_CODE_PAR_TABLE_NOT_EXIST, 2, 0, 1, 1},
     {__LINE__, "insert into suzhou using st1 tags (?) values (?, ?)", TSDB_CODE_SUCCESS, 2, 1, 0, 1},
-    {__LINE__, "insert into suzhou using st1 tags ('suzhou') values (now(), 3)", TSDB_CODE_TSC_INVALID_OPERATION, 2, 1, 0, 1}, // FLAW: no parameter-place-marker, but succeed
+
+    // fixed: since TDengine:02736bad02beadc60d7a93490365f00b69e3c64d
+    // {__LINE__, "insert into suzhou using st1 tags ('suzhou') values (now(), 3)", TSDB_CODE_TSC_INVALID_OPERATION, 2, 1, 0, 1}, // FLAW: no parameter-place-marker, but succeed
+
     {__LINE__, "insert into ? using st1 tags (?) values (?, ?)", TSDB_CODE_TSC_STMT_TBNAME_ERROR, 0, 0, 0, 1},
 
     {__LINE__, "insert into ? using st1 tags (?) values (?, ?)", TSDB_CODE_TSC_STMT_TBNAME_ERROR, 0, 0, 0, 1},
     {__LINE__, "insert into t (ts, name) values (?, ?)", TSDB_CODE_SUCCESS, 2, 0, 0, 1},
-    {__LINE__, "insert into t (ts, name) values (?, 'a')", TSDB_CODE_TSC_INVALID_OPERATION, 2, 0, 0, 1},
+
+    // since TDengine:02736bad02beadc60d7a93490365f00b69e3c64d
+    {__LINE__, "insert into t (ts, name) values (?, 'a')", TSDB_CODE_SUCCESS, 2, 0, 0, 1},
 
     {__LINE__, "insert into ? (ts, name) values (?, ?)", TSDB_CODE_PAR_TABLE_NOT_EXIST, 0, 0, 0, 1},
-    {__LINE__, "insert into t (ts, name) values (now(), 'a')", TSDB_CODE_TSC_INVALID_OPERATION, 2, 0, 0, 1},   // FLAW: no parameter-place-marker, but succeed
+
+    {__LINE__, "insert into t (ts, name) values (now(), 'a')", TSDB_CODE_SUCCESS, 2, 0, 0, 1},
 
     {__LINE__, "insert into suzhou values (?, ?)", TSDB_CODE_SUCCESS, 2, 0, 0, 1},
     {__LINE__, "select * from t where ts > ? and name = ? foo = ?", TSDB_CODE_PAR_SYNTAX_ERROR, 0, 0, 0, 0},    // syntax error will corrupt stmt environment, so put it last
@@ -1657,13 +1663,13 @@ static int _prepare_get_tag_col_fields(const arg_t *arg, const stage_t stage, TA
     RECORD("insert into t values (?, ?, ?, ?)", TSDB_CODE_SUCCESS, 0, 4),
     RECORD("insert into t (ts, v, mark) values (?, ?, ?)", TSDB_CODE_SUCCESS, 0, 3),
     RECORD("insert into t (ts) values (?)", TSDB_CODE_SUCCESS, 0, 1),
-    RECORD("insert into t (ts) values (1665025866843)", TSDB_CODE_TSC_INVALID_OPERATION, 0, 0),
-    RECORD("insert into t (ts, v) values (now(), 3)", TSDB_CODE_TSC_INVALID_OPERATION, 0, 0),
-    RECORD("insert into t (ts, v) values (1665025866843, 3)", TSDB_CODE_TSC_INVALID_OPERATION, 0, 0),
-    RECORD("insert into t (ts, v) values (now(), ?)", TSDB_CODE_TSC_INVALID_OPERATION, 0, 0),
-    RECORD("insert into t (ts, v) values (1665025866843, ?)", TSDB_CODE_TSC_INVALID_OPERATION, 0, 0),
-    RECORD("insert into t (ts, v, mark) values (1665025866843, ?, ?)", TSDB_CODE_TSC_INVALID_OPERATION, 0, 0),
-    RECORD("insert into t values (1665025866843, ?, ?, ?)", TSDB_CODE_TSC_INVALID_OPERATION, 0, 0),
+    RECORD("insert into t (ts) values (1665025866843)", TSDB_CODE_SUCCESS, 0, 1),
+    RECORD("insert into t (ts, v) values (now(), 3)", TSDB_CODE_SUCCESS, 0, 2),
+    RECORD("insert into t (ts, v) values (1665025866843, 3)", TSDB_CODE_SUCCESS, 0, 2),
+    RECORD("insert into t (ts, v) values (now(), ?)", TSDB_CODE_SUCCESS, 0, 2),
+    RECORD("insert into t (ts, v) values (1665025866843, ?)", TSDB_CODE_SUCCESS, 0, 2),
+    RECORD("insert into t (ts, v, mark) values (1665025866843, ?, ?)", TSDB_CODE_SUCCESS, 0, 3),
+    RECORD("insert into t values (1665025866843, ?, ?, ?)", TSDB_CODE_SUCCESS, 0, 4),
     RECORD("insert into t using st (val, feat) tags (?, ?) (ts, v, mark) values (?, ?, ?)", TSDB_CODE_SUCCESS, 2, 3),
     RECORD("insert into t using st (val) tags (?) (ts, v, mark) values (?, ?, ?)", TSDB_CODE_SUCCESS, 1, 3),
     RECORD("insert into t using st (val) tags (4) (ts, v, mark) values (?, ?, ?)", TSDB_CODE_SUCCESS, 1, 3),  // NOTE: weird!!!, literal tag value, but get_tag_fields still reports!!!

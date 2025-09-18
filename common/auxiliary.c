@@ -409,3 +409,33 @@ const char* tod_hexify(char *hex, size_t nr, const unsigned char *bin, size_t n)
   return p;
 }
 
+size_t tod_wstrnlen(const char *buf, size_t len)
+{
+  size_t i = 0;
+  for (i=0; i+1 < len; i += 2) {
+    const char c1 = buf[i];
+    const char c2 = buf[i+1];
+    if (c1) continue;
+    if (c2) continue;
+    break;
+  }
+
+  return i;
+}
+
+size_t tod_wstrlen(const char *buf)
+{
+  size_t i = 0;
+
+  for (i=0; 1; i += 2) {
+    const char c1 = buf[i];
+    const char c2 = buf[i+1];
+    if (c1) continue;
+    if (c2) continue;
+    break;
+  }
+
+  return i;
+}
+
+
