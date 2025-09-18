@@ -1,8 +1,7 @@
 import win32com.client
 import time
 import datetime
-import pytz
-from ado_utils import create_table, get_data_time, insert_data, connect_to_database, close_connection
+from ado_utils import create_table, insert_data, connect_to_database, close_connection
 
 # import threading
 
@@ -11,11 +10,11 @@ adCursorType = 2
 adLockType = 2
 
 
-def query_recent_records(conn, dbname='test', precision='ms', isAddNew=True, limit=5):
+def query_recent_records(conn, isAddNew=True, limit=5):
     """Query recent records"""
     try:
         rs = win32com.client.Dispatch("ADODB.Recordset")
-        query = f"SELECT * FROM {dbname}.devices ORDER BY ts DESC LIMIT {limit};"
+        query = f"SELECT * FROM test.devices ORDER BY ts DESC LIMIT {limit};"
         rs.Open(
             Source=query,
             ActiveConnection=conn,
@@ -29,33 +28,11 @@ def query_recent_records(conn, dbname='test', precision='ms', isAddNew=True, lim
             if isAddNew:
                 rs.AddNew()
                 # current_ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-                if precision == 'ms':
-                    rs.Fields("ts").Value = int(time.time() * 1000)
-                elif precision == 'us':
-                    rs.Fields("ts").Value = int(time.time() * 1_000_000)
-                elif precision == 'ns':
-                    rs.Fields("ts").Value = int(time.time() * 1_000_000_000)
-                else:
-                    rs.Fields("ts").Value = int(time.time() * 1000)
+                rs.Fields("ts").Value = int(time.time() * 1000)
                 rs.Fields("device_id").Value = 'device_id_new_1'
                 rs.Fields("temperature").Value = 1234
                 rs.Fields("humidity").Value = 12233
                 rs.Update()
-
-                rs.AddNew()
-                if precision == 'ms':
-                    rs.Fields("ts").Value = get_data_time('ms')
-                elif precision == 'us':
-                    rs.Fields("ts").Value = get_data_time('us')
-                elif precision == 'ns':
-                    rs.Fields("ts").Value = get_data_time('ns')
-                else:
-                    rs.Fields("ts").Value = get_data_time('s')
-                rs.Fields("device_id").Value = 'device_id_new_2'
-                rs.Fields("temperature").Value = 1234
-                rs.Fields("humidity").Value = 12233
-                rs.Update()
-
             while not rs.EOF:
                 record = {
                     'ts': rs.Fields("ts").Value,
@@ -78,7 +55,7 @@ def query_recent_records(conn, dbname='test', precision='ms', isAddNew=True, lim
             rs.Close()
 
 
-def execute(dbname='test', precision='ms'):
+def main():
     """Main program"""
     conn = None
     try:
@@ -88,7 +65,7 @@ def execute(dbname='test', precision='ms'):
             return
 
         # Ensure table exists
-        if not create_table(conn, dbname, precision):
+        if not create_table(conn):
             return
 
         print("Main program: Starting to monitor data changes and add new records...")
@@ -99,12 +76,12 @@ def execute(dbname='test', precision='ms'):
 
             # Insert new record
             device_id = f"main_device_{i + 1:03d}"
-            if insert_data(conn, f'now +{i}a', device_id, 26.5 + i, 58.2 + i, dbname):
+            if insert_data(conn, f'now +{i}a', device_id, 26.5 + i, 58.2 + i):
                 print(f"Successfully added main program device: {device_id}")
 
         # Query and display recent records
-        query_recent_records(conn, dbname, precision)
-        records = query_recent_records(conn, dbname, precision, False)
+        query_recent_records(conn)
+        records = query_recent_records(conn, False)
         if records:
             print(f"Recent {len(records)} records:")
             for idx, record in enumerate(records):
@@ -118,6 +95,8 @@ def execute(dbname='test', precision='ms'):
         else:
             print("No records found")
 
+
+
     except Exception as e:
         print(f"Main program error: {str(e)}")
     finally:
@@ -126,6 +105,4 @@ def execute(dbname='test', precision='ms'):
 
 
 if __name__ == "__main__":
-    execute(dbname='test', precision='ms');
-    execute(dbname='test_us', precision='us');
-    execute(dbname='test_ns', precision='ns');
+    main()
