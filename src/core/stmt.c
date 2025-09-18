@@ -3483,7 +3483,7 @@ static SQLRETURN _stmt_conv_sql_c_char_to_tsdb_timestamp_x(stmt_t *stmt, const c
 
   char buf[TIME_STR_MAX_LEN];
   int n = snprintf(buf, sizeof(buf), "%.*s", (int)len, src);
-  if (n < 0 || n >= TIME_STR_MAX_LEN){
+  if (n <= 0 || n >= TIME_STR_MAX_LEN) {
     stmt_append_err_format(stmt, "22007", 0,
         "Invalid datetime format:timestamp is required, but got ==[%.*s]==", (int)len, src);
     return SQL_ERROR;
