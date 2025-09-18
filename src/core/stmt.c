@@ -54,8 +54,6 @@
 #include <time.h>
 #include <wchar.h>
 
-#define TIME_STR_MAX_LEN 64
-
 static void _param_bind_meta_reset(param_bind_meta_t *param_bind_meta)
 {
   if (!param_bind_meta) return;
@@ -3468,12 +3466,6 @@ static SQLRETURN _stmt_sql_c_char_to_tsdb_timestamp(stmt_t *stmt, const char *s,
 
 static SQLRETURN _stmt_conv_sql_c_char_to_tsdb_timestamp_x(stmt_t *stmt, const char *src, size_t len, int precision, int64_t *dst)
 {
-  if (src == NULL || len <= 0 || len >= TIME_STR_MAX_LEN) {
-      stmt_append_err_format(stmt, "22007", 0,
-          "Invalid datetime format:timestamp is required, but got ==[%.*s]==", (int)len, src);
-      return SQL_ERROR;    
-  }
-
   int r = 0;
 
   SQLRETURN sr = SQL_SUCCESS;
@@ -3481,20 +3473,11 @@ static SQLRETURN _stmt_conv_sql_c_char_to_tsdb_timestamp_x(stmt_t *stmt, const c
   int64_t v = 0;
   // OW("len:%zd", len);
 
-  char buf[TIME_STR_MAX_LEN];
-  int n = snprintf(buf, sizeof(buf), "%.*s", (int)len, src);
-  if (n <= 0 || n >= TIME_STR_MAX_LEN) {
-    stmt_append_err_format(stmt, "22007", 0,
-        "Invalid datetime format:timestamp is required, but got ==[%.*s]==", (int)len, src);
-    return SQL_ERROR;
-  }
-  
-  buf[len] = '\0';
   char *end = NULL;
-  strtol(buf, &end, 0);
+  strtol(src, &end, 0);
   if (end && !*end) {
     // TODO: precision
-    sr = _stmt_sql_c_char_to_tsdb_timestamp(stmt, buf, &v);
+    sr = _stmt_sql_c_char_to_tsdb_timestamp(stmt, src, &v);
     if (sr == SQL_ERROR) return SQL_ERROR;
   } else {
     int64_t tz_default = tod_get_local_timezone();
@@ -3502,10 +3485,10 @@ static SQLRETURN _stmt_conv_sql_c_char_to_tsdb_timestamp_x(stmt_t *stmt, const c
     ts_parser_param_t param = {0};
     // param.ctx.debug_flex = 1;
     // param.ctx.debug_bison = 1;
-    r = ts_parser_parse(buf, len, &param, tz_default);
+    r = ts_parser_parse(src, len, &param, tz_default);
     if (r) {
       stmt_append_err_format(stmt, "22007", 0,
-          "Invalid datetime format:timestamp is required, but got ==[%.*s]==", (int)len, buf);
+          "Invalid datetime format:timestamp is required, but got ==[%.*s]==", (int)len, src);
       return SQL_ERROR;
     }
 

@@ -3,21 +3,18 @@ TDengine utility functions for ADO operations
 Common functions for database table creation and data insertion
 """
 
-import datetime
-import time
-import pytz
 import win32com.client
 
-def create_table(conn, dbname='test', precision='ms'):
+def create_table(conn):
     """Ensure table exists"""
     try:
-        conn.Execute(f"DROP DATABASE IF EXISTS {dbname};")
+        conn.Execute("DROP DATABASE IF EXISTS test;")
         # Create test database
-        conn.Execute(f"CREATE DATABASE IF NOT EXISTS {dbname} PRECISION '{precision}';")
+        conn.Execute("CREATE DATABASE IF NOT EXISTS test;")
 
         # Create test table
-        create_table_sql = f"""
-            CREATE TABLE IF NOT EXISTS {dbname}.devices (
+        create_table_sql = """
+            CREATE TABLE IF NOT EXISTS test.devices (
                   ts TIMESTAMP,
                   device_id NCHAR(20),
                   temperature FLOAT,
@@ -33,13 +30,13 @@ def create_table(conn, dbname='test', precision='ms'):
         return False
 
 
-def insert_data(conn, ts, device_id, temperature, humidity, dbname='test', status=True):
+def insert_data(conn, ts, device_id, temperature, humidity, status=True):
     """Safely insert data (using parameterized SQL)"""
     try:
         # Use parameterized SQL to prevent SQL injection
         # Insert test data
         insert_sql = f"""        
-        INSERT INTO {dbname}.devices (ts, device_id, temperature, humidity, status)         
+        INSERT INTO test.devices (ts, device_id, temperature, humidity, status)         
         VALUES             
             ({ts}, '{device_id}', {temperature}, {humidity}, true);        
         """
@@ -84,19 +81,3 @@ def close_connection(conn):
             print("Database connection closed")
         except Exception as e:
             print(f"Error closing connection: {str(e)}")
-
-def get_data_time(precision='ms'):
-    current_ts = datetime.datetime.now(pytz.timezone('Asia/Shanghai'))
-    base_time = current_ts.strftime('%Y-%m-%d %H:%M:%S')
-
-    if precision == 'ns':
-        nanoseconds = int(time.time_ns() % 1_000_000_000)
-        return f"{base_time}.{nanoseconds:09d}"
-    elif precision == 'us':
-        microseconds = current_ts.microsecond
-        return f"{base_time}.{microseconds:06d}"
-    elif precision == 'ms':
-        milliseconds = current_ts.microsecond // 1000
-        return f"{base_time}.{milliseconds:03d}"
-    else:
-        return f"{base_time}"
