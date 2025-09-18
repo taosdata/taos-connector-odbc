@@ -1266,13 +1266,13 @@ int strs_keep(strs_t *strs, size_t cap)
 int is_all_digits(const char *str, int len) {
   if (str == NULL || *str == '\0' || len <= 0) {
         return 0;
-    }
+  }
     
-    for (int i = 0; i < len; i++) {
-        if (!isdigit((unsigned char)str[i])) {
-            return 0;
-        }
-    }
-    return 1;
+  for (int i = 0; i < len; i++) {
+      if (!isdigit((unsigned char)str[i])) {
+          return 0;
+      }
+  }
+  return 1;
 }
 
