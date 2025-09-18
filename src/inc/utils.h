@@ -100,6 +100,7 @@ int mem_copy_bin(mem_t *mem, const unsigned char *src, size_t len) FA_HIDDEN;
 
 int iconv_calc(iconv_t cnv, const char *in, size_t len, size_t *outbytes) FA_HIDDEN;
 
+
 typedef struct buf_s               buf_t;
 struct buf_s {
   char               *base;
@@ -228,7 +229,7 @@ void strs_reset(strs_t *strs) FA_HIDDEN;
 void strs_release(strs_t *strs) FA_HIDDEN;
 int strs_keep(strs_t *strs, size_t cap) FA_HIDDEN;
 int strs_flat(strs_t *strs, str_t *str) FA_HIDDEN;
-
+int is_all_digits(const char *str, int len) FA_HIDDEN;
 
 EXTERN_C_END
 
