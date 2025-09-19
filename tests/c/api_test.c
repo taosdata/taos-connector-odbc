@@ -822,7 +822,7 @@ static void test_sql_diag_field_common(SQLSMALLINT handleType, SQLHANDLE handle)
   SQLRETURN sr;
   SQLCHAR sqlState[6];
   SQLLEN rowNumber;
-  SQLINTEGER diagNumber;
+  SQLINTEGER diagNumber = 0;
 
   // Retrieve SQL state using SQLGetDiagField
   sr = CALL_SQLGetDiagField(handleType, handle, 1, SQL_DIAG_SQLSTATE, sqlState, sizeof(sqlState), NULL);

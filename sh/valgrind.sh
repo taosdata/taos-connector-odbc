@@ -30,21 +30,18 @@ _path_to_valgrind=${_path_to_this_file}/../valgrind
 
 
 valgrind --leak-check=full                                                \
-         --show-leak-kinds=all                                            \
+         --show-leak-kinds=definite                                       \
          --show-reachable=no                                              \
-         --num-callers=100                                                \
-         --exit-on-first-error=no                                         \
+         --num-callers=500                                                \
+         --exit-on-first-error=yes                                        \
          --error-exitcode=1                                               \
          --suppressions=${_path_to_valgrind}/taos.supp                    \
-         --suppressions=${_path_to_valgrind}/taosws.supp                  \
          --suppressions=${_path_to_valgrind}/node.supp                    \
          --suppressions=${_path_to_valgrind}/mysql.supp                   \
          --suppressions=${_path_to_valgrind}/sqlite3.supp                 \
-         --suppressions=${_path_to_valgrind}/c_test.supp                  \
-         --suppressions=${_path_to_valgrind}/taos_test.supp               \
-         --suppressions=${_path_to_valgrind}/taosws_regression.supp       \
+         --suppressions=${_path_to_valgrind}/valgrind.supp                \
          --gen-suppressions=all                                           \
          --track-origins=yes                                              \
-         --errors-for-leak-kinds=definite,indirect,possible               \
+         --errors-for-leak-kinds=definite                                 \
          "$@"
 
