@@ -2498,7 +2498,7 @@ static int conformance_prepare(TAOS *taos)
     // NOTE: taosc specific behavior
     {"insert into suzhou using s tags (3) values (?, ?)", 0, 1, 2, 0},
     // NOTE: taosc specific behavior
-    {"insert into suzhou using s tags (3) values (now(), 4)", 0, 0, 0, 0},
+    {"insert into suzhou using s tags (3) values (now(), 4)", 0, 1, 2, 0},
     // subtable insert
     {"insert into suzhou using s tags (?) (ts) values (?)", 0, 1, 1, 0},
     // normal table insert

@@ -5599,10 +5599,12 @@ static SQLRETURN _stmt_param_get_sqlc(stmt_t *stmt, param_state_t *param_state)
 static SQLRETURN _stmt_param_get(stmt_t *stmt, param_state_t *param_state)
 {
   size_t irow                  = param_state->i_row;
+  size_t iparam                = param_state->i_param;
   sqlc_data_t *sqlc_data       = &param_state->sqlc_data;
   desc_record_t *APD_record    = param_state->APD_record;
 
   SQLSMALLINT ValueType = (SQLSMALLINT)APD_record->DESC_CONCISE_TYPE;
+  const SQLLEN BufferLength = APD_record->DESC_OCTET_LENGTH;
 
   sqlc_data->type = ValueType;
 
@@ -5617,13 +5619,86 @@ static SQLRETURN _stmt_param_get(stmt_t *stmt, param_state_t *param_state)
 
   sqlc_data->is_null = 0;
   const char *base    = buffer ? buffer + APD_record->DESC_OCTET_LENGTH * irow : NULL;
-  size_t len = (len_arr && (len_arr[irow] != SQL_NTS)) ? (size_t)(len_arr[irow]) : (base ? strlen(base) : 0);
+  size_t len = BufferLength;
+
+  switch (ValueType) {
+    case SQL_C_BIT:
+    case SQL_C_STINYINT:
+    case SQL_C_TINYINT:
+    case SQL_C_UTINYINT:
+    case SQL_C_SSHORT:
+    case SQL_C_SHORT:
+    case SQL_C_USHORT:
+    case SQL_C_SLONG:
+    case SQL_C_LONG:
+    case SQL_C_ULONG:
+    case SQL_C_SBIGINT:
+    case SQL_C_UBIGINT:
+    case SQL_C_FLOAT:
+    case SQL_C_DOUBLE:
+      break;
+    case SQL_C_CHAR:
+      if (!len_arr) {
+        len = base ? strnlen(base, BufferLength) : 0;
+      } else if (len_arr[irow] == SQL_NTS) {
+        len = base ? strlen(base) : 0;
+      } else {
+        len = len_arr[irow];
 #ifndef TODBC_X86
-  // NOTE: this is to hacking common_lisp plain-odbc `feature`
-  if (len_arr && len >> 32) {
-    len = (int32_t)len;
-  }
+        // NOTE: this is to hacking common_lisp plain-odbc `feature`
+        if (len_arr && len >> 32) {
+          len = (int32_t)len;
+        }
 #endif
+      }
+      if (base[len]) {
+        int r = mem_copy_bin(&sqlc_data->mem, (const unsigned char*)base, len);
+        if (r) {
+          stmt_append_err_format(stmt, "HY000", 0,
+              "General error:col(%zd,%zd) of [%d/%x]%s not null terminated and out of memory when caching",
+              irow + 1, iparam + 1, ValueType, ValueType, sqlc_data_type(ValueType));
+          return SQL_ERROR;
+        }
+        base = (const char*)sqlc_data->mem.base;
+      }
+      break;
+    case SQL_C_WCHAR:
+      if (!len_arr) {
+        len = base ? tod_wstrnlen(base, BufferLength) : 0;
+      } else if (len_arr[irow] == SQL_NTS) {
+        len = base ? tod_wstrlen(base) : 0;
+      } else {
+        len = len_arr[irow];
+#ifndef TODBC_X86
+        // NOTE: this is to hacking common_lisp plain-odbc `feature`
+        if (len_arr && len >> 32) {
+          len = (int32_t)len;
+        }
+#endif
+      }
+      if (base[len] || base[len+1]) {
+        int r = mem_copy_bin(&sqlc_data->mem, (const unsigned char*)base, len);
+        if (r) {
+          stmt_append_err_format(stmt, "HY000", 0,
+              "General error:col(%zd,%zd) of [%d/%x]%s not null terminated and out of memory when caching",
+              irow + 1, iparam + 1, ValueType, ValueType, sqlc_data_type(ValueType));
+          return SQL_ERROR;
+        }
+        base = (const char*)sqlc_data->mem.base;
+      }
+      break;
+    case SQL_C_BINARY:
+      if (len_arr) {
+        len = len_arr[irow];
+      }
+      break;
+    default:
+      stmt_append_err_format(stmt, "HY000", 0,
+          "General error:param#%zd of [%d/%x]%s not supported yet",
+          iparam + 1, ValueType, ValueType, sqlc_data_type(ValueType));
+      return SQL_ERROR;
+  }
+
   param_state->sqlc_base = base;
   param_state->sqlc_len  = len;
 

@@ -928,8 +928,8 @@ static int list_table_columns(handles_t* handles, const char* catalog, const cha
     D("Remarks: %s", (remarks_ind == SQL_NULL_DATA) ? "NULL" : (char*)remarks);
     D("Column Def: %s", (column_def_ind == SQL_NULL_DATA) ? "NULL" : (char*)column_def);
     D("SQL Data Type: %d", sql_data_type);
-    D("SQL DateTime Sub: %d", sql_datetime_sub);
-    D("Char Octet Length: %d", char_octet_length);
+    D("SQL DateTime Sub: %s:%d", (sql_datetime_sub_ind == SQL_NULL_DATA) ? "NULL" : "", (sql_datetime_sub_ind == SQL_NULL_DATA) ? 0 : sql_datetime_sub);
+    D("Char Octet Length: %s:%d", (char_octet_length_ind == SQL_NULL_DATA) ? "NULL" : "", (char_octet_length_ind == SQL_NULL_DATA) ? 0 : char_octet_length);
     D("Ordinal Position: %d", ordinal_position);
     D("Is Nullable: %s", (is_nullable_ind == SQL_NULL_DATA) ? "NULL" : (char*)is_nullable);
     D("----------------------------------------");

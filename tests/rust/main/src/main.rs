@@ -47,7 +47,9 @@ fn main() {
 
   // let env: Environment<Odbc3> = create_environment_v3().unwrap();
   let env: Environment<Odbc3> = create_environment_v3_with_os_db_encoding(encode, encode).unwrap();
-  _do_test_cases_in_env(&env)
+  _do_test_cases_in_env(&env);
+
+  println!("==success==")
 }
 
 fn _test_connect(env: &Environment<Odbc3>, conn_str: &str) -> bool {
