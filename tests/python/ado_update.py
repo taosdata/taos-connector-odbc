@@ -7,11 +7,11 @@ from ado_utils import create_table, insert_data, connect_to_database, close_conn
 adCursorType = 2
 adLockType = 2
 
-def query_recent_records(conn, isModify=True, limit=5):
+def query_recent_records(conn, dbname='test', precision='ms', isModify=True, limit=5):
     """Query recent records"""
     try:
         rs = win32com.client.Dispatch("ADODB.Recordset")
-        query = f"SELECT * FROM test.devices ORDER BY ts DESC LIMIT {limit};"
+        query = f"SELECT * FROM {dbname}.devices ORDER BY ts DESC LIMIT {limit};"
         rs.Open(
             Source=query,
             ActiveConnection=conn,
@@ -46,7 +46,7 @@ def query_recent_records(conn, isModify=True, limit=5):
         if 'rs' in locals() and rs.State != 0:
             rs.Close()
 
-def main():
+def execute(dbname='test', precision='ms'):
     """Main program"""
     conn = None
     try:
@@ -57,7 +57,7 @@ def main():
         print("Successfully connected to TDengine database!")
 
         # Ensure table exists
-        if not create_table(conn):
+        if not create_table(conn, dbname, precision):
             return
 
         print("Main program: Starting to monitor data changes and add new records...")
@@ -68,12 +68,12 @@ def main():
 
             # Insert new record
             device_id = f"main_device_{i + 1:03d}"
-            if insert_data(conn, f'now +{i}a', device_id, 26.5 + i, 58.2 + i):
+            if insert_data(conn, f'now +{i}a', device_id, 26.5 + i, 58.2 + i, dbname):
                 print(f"Successfully added main program device: {device_id}")
 
         # Query and display recent records
-        query_recent_records(conn)
-        records = query_recent_records(conn, False)
+        query_recent_records(conn, dbname, precision)
+        records = query_recent_records(conn, dbname, precision, False)
         if records:
             print(f"Recent {len(records)} records:")
             for idx, record in enumerate(records):
@@ -99,4 +99,6 @@ def main():
                 print(f"Error closing connection: {str(e)}")
 
 if __name__ == "__main__":
-    main()
+    execute(dbname='test', precision='ms')
+    execute(dbname='test_us', precision='us')
+    execute(dbname='test_ns', precision='ns')
