@@ -58,7 +58,8 @@ def test_case0():
 
   # Using a DSN, but providing a password as well
   cnxn = pyodbc.connect('DSN=TAOS_ODBC_DSN;PWD=taosdata')
-  cnxn.setencoding(encoding='utf-8')
+  if not os.name == 'nt':
+    cnxn.setencoding(encoding='utf-8')
 
   # Create a cursor from the connection
   cursor = cnxn.cursor()
@@ -157,7 +158,7 @@ def check_with_values(cnxn, sql, nr_rows, nr_cols, *vals):
   idx = 0
   while row:
     assert i_row < nr_rows, "expected {0} rows, but got ==more rows==".format(nr_rows)
-      
+
     for i_col in range(0, nr_cols):
       assert row[i_col] == vals[idx], f"[{i_row+1,i_col+1}]:expected [{vals[idx]}], but got =={row[i_col]}=="
       idx += 1
