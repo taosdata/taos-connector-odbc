@@ -5412,7 +5412,7 @@ static const sqlc_sql_map_t          _sqlc_sql_map[] = {
     _stmt_param_bind_set_IPD_record_sql_tinyint,
     _stmt_param_get_sqlc_short,
     _stmt_param_check_dummy,
-    _stmt_param_guess_sqlc_short},  
+    _stmt_param_guess_sqlc_short},
 
   {SQL_C_STINYINT, SQL_TINYINT,
     _stmt_param_bind_set_APD_record_sqlc_tinyint,
@@ -7482,7 +7482,7 @@ static const param_bind_map_t _param_bind_map[] = {
 
   {SQL_C_SHORT, SQL_BIT, TSDB_DATA_TYPE_BOOL,
     _stmt_param_adjust_reuse_sqlc_short,
-    _stmt_param_conv_dummy},  
+    _stmt_param_conv_dummy},
 
   {SQL_C_STINYINT, SQL_TINYINT, TSDB_DATA_TYPE_TINYINT,
     _stmt_param_adjust_reuse_sqlc_tinyint,
@@ -8383,7 +8383,7 @@ SQLRETURN stmt_set_attr(stmt_t *stmt, SQLINTEGER Attribute, SQLPOINTER ValuePtr,
 #endif                       /* } */
     case SQL_ATTR_CONCURRENCY:
       if (stmt->conn->cfg.customproduct == CUSTP_ADO) {
-        if ((SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_LOCK || (SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_READ_ONLY) 
+        if ((SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_LOCK || (SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_READ_ONLY)
         {
           stmt->concurrency_attr = (SQLULEN)ValuePtr;
           return SQL_SUCCESS;
@@ -8652,7 +8652,7 @@ static SQLRETURN _stmt_get_diag_cursor_row_number(
   (void)DiagIdentifier;
   (void)BufferLength;
   (void)StringLengthPtr;
-  
+
   if (RecNumber == 0) {
     *(SQLLEN*)DiagInfoPtr = SQL_ROW_NUMBER_UNKNOWN;
   } else {
@@ -8948,11 +8948,165 @@ SQLRETURN stmt_extended_fetch(
     SQLULEN         *RowCountPtr,
     SQLUSMALLINT    *RowStatusArray)
 {
-  (void)RowCountPtr;
-  (void)RowStatusArray;
-  stmt_append_err_format(stmt, "HY000", 0, "General error:FetchOrientation[%d/0x%x],FetchOffset[%zd/0x%zx] not supported yet",
-      FetchOrientation, FetchOrientation, FetchOffset, FetchOffset);
-  return SQL_ERROR;
+  SQLRETURN sr = SQL_SUCCESS;
+
+  _get_data_ctx_reset(&stmt->get_data_ctx);
+
+  stmt_base_t *base = stmt->base;
+  tsdb_rows_block_t *rows_block = NULL;
+
+  if (base == &stmt->tsdb_stmt.base) {
+    rows_block = &stmt->tsdb_stmt.res.rows_block;
+  } else if (base == &stmt->columns.base) {
+    rows_block = &stmt->columns.desc.res.rows_block;
+  } else if (base == &stmt->tables.base) {
+    rows_block = &stmt->tables.stmt.res.rows_block;
+  } else if (base == &stmt->primarykeys.base) {
+    rows_block = &stmt->primarykeys.desc.res.rows_block;
+  } else if (base == &stmt->typesinfo.base) {
+    stmt_append_err(stmt, "HY000", 0, "General error:SQLExtendedFetch not supported for SQLGetTypeInfo");
+    return SQL_ERROR;
+  } else if (base == &stmt->topic.base) {
+    stmt_append_err(stmt, "HY000", 0, "General error:SQLExtendedFetch not supported for subscription topics");
+    return SQL_ERROR;
+  } else {
+    stmt_append_err(stmt, "HY000", 0, "General error:SQLExtendedFetch used without active result set");
+    return SQL_ERROR;
+  }
+
+  // Handle different fetch orientations
+  D("stmt.c[%d]:stmt_extended_fetch():ENTRY FetchOrientation=%d FetchOffset=%ld block(pos=%zd,nr=%zd)",
+      __LINE__, FetchOrientation, FetchOffset, rows_block->pos, rows_block->nr);
+
+  switch (FetchOrientation) {
+    case SQL_FETCH_NEXT: {
+      // Fetch next row (normal sequential fetch)
+      D("stmt.c[%d]:stmt_extended_fetch():FETCH_NEXT before pos=%zd", __LINE__, rows_block->pos);
+      sr = base->fetch_row(base);
+      D("stmt.c[%d]:stmt_extended_fetch():FETCH_NEXT after sr=%d pos=%zd", __LINE__, sr, rows_block->pos);
+      break;
+    }
+
+    case SQL_FETCH_FIRST: {
+      // Reset to first row in current block
+      D("stmt.c[%d]:stmt_extended_fetch():FETCH_FIRST before pos=%zd", __LINE__, rows_block->pos);
+      rows_block->pos = 0;
+      sr = base->fetch_row(base);
+      D("stmt.c[%d]:stmt_extended_fetch():FETCH_FIRST after sr=%d pos=%zd", __LINE__, sr, rows_block->pos);
+      break;
+    }
+
+    case SQL_FETCH_LAST: {
+      // Move to last row in current block
+      // Set pos to nr-1, so next fetch_row call will make it nr (last row)
+      if (rows_block->nr == 0) {
+        sr = SQL_NO_DATA;
+      } else {
+        rows_block->pos = rows_block->nr - 1;
+        sr = base->fetch_row(base);
+      }
+      break;
+    }
+
+    case SQL_FETCH_PRIOR: {
+      // Move to previous row in current block
+      if (rows_block->pos <= 1) {
+        sr = SQL_NO_DATA;
+      } else {
+        rows_block->pos -= 2;
+        sr = base->fetch_row(base);
+      }
+      break;
+    }
+
+    case SQL_FETCH_ABSOLUTE: {
+      // Move to absolute row number (1-based) within current block or next blocks
+      if (FetchOffset <= 0) {
+        sr = SQL_NO_DATA;
+      } else if (FetchOffset <= (SQLLEN)rows_block->nr) {
+        // Row is in current block
+        rows_block->pos = FetchOffset - 1;
+        sr = base->fetch_row(base);
+      } else {
+        // Only support rows within current block
+        sr = SQL_NO_DATA;
+      }
+      break;
+    }
+
+    case SQL_FETCH_RELATIVE: {
+      // Move relative to current position
+      // pos is 1-based, so current position is pos
+      SQLLEN new_pos = (SQLLEN)rows_block->pos + FetchOffset;
+      if (new_pos <= 0 || new_pos > (SQLLEN)rows_block->nr) {
+        sr = SQL_NO_DATA;
+      } else {
+        rows_block->pos = new_pos - 1;
+        sr = base->fetch_row(base);
+      }
+      break;
+    }
+
+    default: {
+      stmt_append_err_format(stmt, "HY000", 0,
+          "General error:FetchOrientation[%d/0x%x] not supported yet",
+          FetchOrientation, FetchOrientation);
+      return SQL_ERROR;
+    }
+  }
+
+  // Fill in the row data
+  if (sr == SQL_SUCCESS) {
+    descriptor_t *ARD = _stmt_ARD(stmt);
+    desc_header_t *ARD_header = &ARD->header;
+    size_t i_row = 0;
+
+    sr = _stmt_fill_row(stmt, i_row);
+
+    D("stmt.c[%d]:stmt_extended_fetch():AFTER_FILL_ROW sr=%d", __LINE__, sr);
+
+    // Log first few columns' data to check if COLUMN_NAME is empty
+    for (int col_idx = 1; col_idx <= 5 && col_idx <= ARD_header->DESC_COUNT; ++col_idx) {
+      desc_record_t *rec = &ARD->records[col_idx - 1];
+      if (rec->DESC_TYPE == SQL_C_CHAR && rec->DESC_DATA_PTR) {
+        char *data_ptr = (char*)rec->DESC_DATA_PTR;
+        size_t len = strlen(data_ptr);
+        D("stmt.c[%d]:stmt_extended_fetch():ARD_COL[%d](ptr:%p;len:%zu;data:'%.*s')",
+            __LINE__, col_idx, data_ptr, len, (int)(len < 50 ? len : 50), data_ptr);
+      }
+    }
+
+    // Set row count if provided
+    if (RowCountPtr) {
+      *RowCountPtr = 1;
+    }
+
+    // Set row status if provided
+    if (RowStatusArray) {
+      RowStatusArray[0] = SQL_ROW_SUCCESS;
+    }
+
+    descriptor_t *IRD = _stmt_IRD(stmt);
+    desc_header_t *IRD_header = &IRD->header;
+
+    if (IRD_header->DESC_ROWS_PROCESSED_PTR) {
+      *IRD_header->DESC_ROWS_PROCESSED_PTR = 1;
+    }
+  } else if (sr == SQL_NO_DATA) {
+    D("stmt.c[%d]:stmt_extended_fetch():RESULT SQL_NO_DATA", __LINE__);
+    if (RowCountPtr) {
+      *RowCountPtr = 0;
+    }
+    if (RowStatusArray) {
+      RowStatusArray[0] = SQL_ROW_NOROW;
+    }
+  } else {
+    D("stmt.c[%d]:stmt_extended_fetch():RESULT ERROR sr=%d", __LINE__, sr);
+  }
+
+  D("stmt.c[%d]:stmt_extended_fetch():EXIT sr=%d", __LINE__, sr);
+
+  return sr;
 }
 
 SQLRETURN stmt_foreign_keys(
