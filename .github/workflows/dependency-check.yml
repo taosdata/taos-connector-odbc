@@ -21,6 +21,7 @@ permissions:
   contents: read
   security-events: write
   pull-requests: write
+  issues: write
 
 jobs:
   dependency-security-scan:
@@ -41,7 +42,7 @@ jobs:
       - name: Install CMake and dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential libtaos-dev libiconv-hook-dev
+          sudo apt-get install -y cmake build-essential libiconv-hook-dev
 
       - name: Generate CMake dependency list
         id: extract-deps
