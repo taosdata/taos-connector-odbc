@@ -395,6 +395,58 @@ jobs:
           print(f"Generated SARIF with {len(vulns)} findings")
           EOF
 
+      - name: Generate CycloneDX SBOM
+        if: always()
+        run: |
+          python3 << 'EOF'
+          import json
+          from datetime import datetime
+
+          with open('dependencies.json', 'r', encoding='utf-8') as f:
+              deps_list = json.load(f)
+
+          components = []
+          for name, info in deps_list:
+              version = info.get('version', 'unknown')
+              dep_type = info.get('type', 'unknown')
+              ecosystem = info.get('ecosystem', 'C-Library')
+
+              component = {
+                  "type": "library",
+                  "name": name,
+                  "version": version,
+                  "properties": [
+                      {"name": "dependency:type", "value": dep_type},
+                      {"name": "dependency:ecosystem", "value": ecosystem}
+                  ]
+              }
+
+              if version not in ('unknown', 'any', 'system'):
+                  component["purl"] = f"pkg:generic/{name}@{version}"
+
+              components.append(component)
+
+          sbom = {
+              "bomFormat": "CycloneDX",
+              "specVersion": "1.4",
+              "version": 1,
+              "metadata": {
+                  "timestamp": datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
+                  "component": {
+                      "type": "application",
+                      "name": "taos-connector-odbc",
+                      "description": "TDengine ODBC Connector dependency SBOM"
+                  }
+              },
+              "components": components
+          }
+
+          with open('sbom-cyclonedx.json', 'w', encoding='utf-8') as f:
+              json.dump(sbom, f, indent=2)
+
+          print(f"✅ Generated sbom-cyclonedx.json with {len(components)} components")
+          EOF
+
       - name: Upload SARIF to GitHub Security
         if: always()
         uses: github/codeql-action/upload-sarif@v4
@@ -410,6 +462,7 @@ jobs:
           path: |
             dependency-security-report.md
             dependency-security.sarif
+            sbom-cyclonedx.json
             dependencies.json
             vulnerabilities.json
           retention-days: 30
