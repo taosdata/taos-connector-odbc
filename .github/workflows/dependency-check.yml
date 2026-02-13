@@ -77,15 +77,35 @@ jobs:
                           deps[pkg_name] = version
 
               # Extract pkg_config directives
-              for match in re.finditer(r'pkg_check_modules\s*\(\s*\w+\s+([A-Za-z0-9_\-]+)(?:\s+(.+?))?[\);]', content):
-                  pkg_spec = match.group(1)
-                  # Parse package spec (e.g., "taos>=2.0.0")
-                  pkg_match = re.match(r'([A-Za-z0-9_\-]+)(?:([><=]+)(.+))?', pkg_spec)
-                  if pkg_match:
-                      pkg_name = pkg_match.group(1)
-                      version = pkg_match.group(3) or 'any'
-                      if pkg_name not in deps:
-                          deps[pkg_name] = version
+              # Capture full argument list after the module variable, then parse tokens,
+              # discarding known options like REQUIRED/QUIET and treating the rest as
+              # package specifications.
+              for match in re.finditer(r'(?s)pkg_check_modules\s*\(\s*\w+\s+(.+?)\)', content, re.IGNORECASE):
+                  args = match.group(1).strip()
+                  if not args:
+                      continue
+                  tokens = re.split(r'\s+', args)
+                  # Known option keywords for pkg_check_modules
+                  option_keywords = {
+                      'REQUIRED',
+                      'QUIET',
+                      'NO_CMAKE_PATH',
+                      'NO_SYSTEM_ENVIRONMENT_PATH',
+                      'NO_CMAKE_ENVIRONMENT_PATH',
+                      'ALLOW_SYSTEM_CFLAGS',
+                  }
+                  for token in tokens:
+                      if not token:
+                          continue
+                      if token.upper() in option_keywords:
+                          continue
+                      # Parse package spec token (e.g., "taos>=2.0.0")
+                      pkg_match = re.match(r'([A-Za-z0-9_\-]+)(?:([><=]+)(.+))?', token)
+                      if pkg_match:
+                          pkg_name = pkg_match.group(1)
+                          version = pkg_match.group(3) or 'any'
+                          if pkg_name not in deps:
+                              deps[pkg_name] = version
 
           # Parse system library dependencies from includes
           system_libs = ['iconv', 'taos', 'taosws']
@@ -418,12 +438,13 @@ jobs:
             `;
 
             try {
-              github.rest.issues.createComment({
+              await github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 body: comment
               });
+              console.log('Comment posted successfully');
             } catch (e) {
               console.log('Failed to comment on PR:', e.message || e);
             }

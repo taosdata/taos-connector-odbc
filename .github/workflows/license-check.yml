@@ -446,12 +446,13 @@ jobs:
             `;
 
             try {
-              github.rest.issues.createComment({
+              await github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 body: comment
               });
+              console.log('Comment posted successfully');
             } catch (e) {
               console.warn('Failed to comment on PR:', e.message || e);
             }
