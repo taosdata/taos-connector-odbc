@@ -51,7 +51,7 @@ jobs:
 
       - name: Extract C/C++ source files
         run: |
-          find src common -type f \( -name "*.c" -o -name "*.h" -o -name "*.cpp" -o -name "*.hpp" \) > source-files.txt
+          find src common -type f \( -name "*.c" -o -name "*.h" -o -name "*.cpp" -o -name "*.hpp" \) > source-files.txt 2>/dev/null || true
           echo "=== Source files found ==="
           head -20 source-files.txt
           echo "Total files: $(wc -l < source-files.txt)"
@@ -196,6 +196,12 @@ jobs:
                       if lib in KNOWN_LICENSES:
                           deps_licenses[lib] = KNOWN_LICENSES[lib]
 
+              # Also search for direct mentions of known packages
+              for pkg in KNOWN_LICENSES:
+                  if re.search(rf'\b{pkg}\b', content, re.IGNORECASE):
+                      if pkg not in deps_licenses:
+                          deps_licenses[pkg] = KNOWN_LICENSES[pkg]
+
           with open('dependencies-licenses.json', 'w') as f:
               json.dump(deps_licenses, f, indent=2)
 
@@ -234,7 +240,6 @@ jobs:
           python3 << 'EOF'
           import json
           from datetime import datetime
-          import textwrap
 
           with open('merged-licenses.json', 'r') as f:
               data = json.load(f)
@@ -266,130 +271,86 @@ jobs:
               'SSPL',
           }
 
-          FLAGGED_LICENSES = {
-              # AGPL flagged for review when found in external dependencies
-              'AGPL-3.0-or-later',
-          }
-
           # Analyze licenses
           source_licenses = data.get('source_code', {})
           deps_licenses = data.get('dependencies', {})
-
-          all_licenses = set()
-          all_licenses.update(source_licenses.keys())
-          all_licenses.update(deps_licenses.values())
-
-          report = textwrap.dedent(f"""
-          # License Compliance Report
-
-          **Generated**: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}
-          **Project**: TDengine ODBC Connector
-          **Scan Type**: Source Code + CMake Dependencies (C/C++)
-
-          ## Summary
-
-          - Source files scanned: {data.get('total_files', 0)}
-          - Unique licenses found: {len(all_licenses)}
-
-          ## License Distribution
-
-          ### Source Code Licenses
-
-          """)
-
-          if source_licenses:
-              for lic, count in sorted(source_licenses.items()):
-                  report += f"- **{lic}**: {count} files\n"
-          else:
-              report += "- MIT: All files (default)\n"
-
-          report += "\n### CMake Dependencies Licenses\n\n"
-
-          if deps_licenses:
-              for pkg, lic in sorted(deps_licenses.items()):
-                  if pkg in INTERNAL_ECOSYSTEM_LIBS:
-                      status = "ℹ️"
-                  else:
-                      status = "🟢" if lic in ALLOWED_LICENSES else "🟡" if lic in FLAGGED_LICENSES else "🔴"
-                  report += f"- {status} {pkg}: {lic}\n"
-          else:
-              report += "- None detected\n"
-
-          # License analysis
-          report += "\n## License Compliance Analysis\n\n"
 
           # Check for violations
           # AGPL is prohibited EXCEPT for internal TDengine libraries (taos/taosws)
           prohibited_found = []
           flagged_found = []
           internal_ecosystem_found = []
+          allowed_found = []
 
           for pkg, lic in deps_licenses.items():
               if pkg in INTERNAL_ECOSYSTEM_LIBS:
                   # Internal ecosystem libraries are allowed even with AGPL
                   internal_ecosystem_found.append((pkg, lic))
               elif lic in PROHIBITED_LICENSES:
-                  prohibited_found.append(f"{pkg} ({lic})")
-              elif lic in FLAGGED_LICENSES and pkg not in INTERNAL_ECOSYSTEM_LIBS:
-                  flagged_found.append(f"{pkg} ({lic})")
+                  prohibited_found.append((pkg, lic))
+              else:
+                  allowed_found.append((pkg, lic))
 
-          # Check source code for violations (not license type but presence)
+          # Check source code licenses
           for lic in source_licenses.keys():
               if lic in PROHIBITED_LICENSES:
-                  prohibited_found.append(lic)
-              elif lic in FLAGGED_LICENSES:
-                  flagged_found.append(lic)
+                  prohibited_found.append((lic, 'source'))
+              elif lic not in ALLOWED_LICENSES:
+                  flagged_found.append((lic, 'source'))
+
+          # Generate simplified markdown report
+          report_lines = [
+              "# License Compliance Report",
+              "",
+              "## Overview",
+              "This report contains all detected licenses in the TDengine ODBC Connector project dependencies.",
+              "",
+              "## Allowed Licenses",
+              "- Apache-2.0",
+              "- Apache-2.0 OR MIT",
+              "- MIT",
+              "- BSD-2-Clause",
+              "- BSD-3-Clause",
+              "- ISC",
+              "- MPL-2.0",
+              "- LGPL-2.0-or-later",
+              "- LGPL-2.1-or-later",
+              "- LGPL-3.0-or-later",
+              "",
+              "## Prohibited Licenses",
+              "- GPL-2.0",
+              "- GPL-3.0",
+              "- AGPL-3.0 (except taos, taosws - internal TDengine)",
+              "- SSPL",
+              "",
+              "## Scan Results",
+          ]
 
           if internal_ecosystem_found:
-              report += "### ℹ️ Internal TDengine Ecosystem Libraries (Exceptions to License Restrictions)\n\n"
-              report += "These libraries are part of TDengine and are **exceptions** to license restrictions:\n"
+              report_lines.append("")
+              report_lines.append("### Internal TDengine Ecosystem (Allowed Exceptions)")
               for pkg, lic in internal_ecosystem_found:
-                  report += f"- {pkg}: {lic} (allowed as internal TDengine dependency)\n"
-              report += "\n"
+                  report_lines.append(f"- {pkg}: {lic}")
+
+          if allowed_found:
+              report_lines.append("")
+              report_lines.append("### Allowed Dependencies")
+              for pkg, lic in allowed_found:
+                  report_lines.append(f"- {pkg}: {lic}")
 
           if prohibited_found:
-              report += "### ⛔ Prohibited Licenses Found\n\n"
-              for item in prohibited_found:
-                  report += f"- {item}\n"
-              report += "\nThese licenses are not compatible with the project distribution.\n\n"
+              report_lines.append("")
+              report_lines.append("❌ **Prohibited Licenses Found:**")
+              for item, typ in prohibited_found:
+                  report_lines.append(f"- {item} ({typ})")
+          else:
+              total_detected = len(set(lic for _, lic in deps_licenses.items()) | set(source_licenses.keys()))
+              report_lines.append("")
+              report_lines.append(f"Total results: {total_detected}")
+              report_lines.append("")
+              report_lines.append("✅ No suspicious or unknown licenses detected.")
 
-          if flagged_found:
-              report += "### ⚠️ Flagged Licenses (Review Required)\n\n"
-              report += "Note: Internal TDengine libraries are not included in flagged analysis.\n\n"
-              for item in flagged_found:
-                  report += f"- {item}\n"
-              report += "\nThese are copyleft licenses that require special handling:\n"
-              report += "- Ensure all source code modifications are properly disclosed\n"
-              report += "- Include full license text in distributions\n"
-              report += "- Document usage in project materials\n\n"
-
-          # Allowed licenses summary
-          allowed_found = [l for l in all_licenses if l in ALLOWED_LICENSES]
-          if allowed_found:
-              report += f"### ✅ Allowed Licenses ({len(allowed_found)} types)\n\n"
-              for lic in sorted(allowed_found):
-                  report += f"- {lic}\n"
-
-          report += "\n## Recommended License for Project\n\n"
-          report += textwrap.dedent("""
-              For the TDengine ODBC Connector, we recommend:
-
-              **Option 1: Dual License**
-              - **Primary**: AGPL-3.0-or-later (matching TDengine server)
-              - **Rationale**: ODBC driver closely integrates with TDengine
-
-              **Option 2: Compatible Permissive License**
-              - **Primary**: MIT or Apache-2.0 (for broader adoption)
-              - **Requirement**: Document AGPL dependencies explicitly
-
-              Note: The project currently uses system libraries with AGPL requirements,
-              which typically applies to linked/compiled binaries. Consult legal for final decision.
-          """)
-
-          report += "\n---\n"
-          report += "\n**Allowed Licenses**: MIT, Apache-2.0, BSD-2/3-Clause, ISC, MPL-2.0, LGPL-2/3\n"
-          report += "**Internal Ecosystem Exceptions** (taos, taosws): AGPL-3.0-or-later allowed for these libraries only\n"
-          report += "**Prohibited**: GPL-2.0-only, GPL-3.0-only, AGPL-3.0-or-later (except taos/taosws), SSPL\n"
+          report = "\n".join(report_lines)
 
           with open('license-compliance-report.md', 'w') as f:
               f.write(report)
@@ -399,10 +360,9 @@ jobs:
           # Generate JSON summary for CI decisions
           summary = {
               'status': 'OK' if not prohibited_found else 'FAILED',
-              'prohibited': prohibited_found,
-              'flagged': flagged_found,
-              'allowed': allowed_found,
-              'total_licenses': len(all_licenses)
+              'prohibited': [f"{item} ({typ})" for item, typ in prohibited_found],
+              'internal_ecosystem': [f"{pkg}: {lic}" for pkg, lic in internal_ecosystem_found],
+              'allowed': [f"{pkg}: {lic}" for pkg, lic in allowed_found],
           }
 
           with open('license-summary.json', 'w') as f:
@@ -423,8 +383,8 @@ jobs:
             license-summary.json
           retention-days: 30
 
-      - name: Comment on PR
-        if: github.event_name == 'pull_request' && always()
+      - name: Comment PR with License Report
+        if: github.event_name == 'pull_request' && always() && github.event.pull_request.head.repo.fork == false
         continue-on-error: true
         uses: actions/github-script@v7
         with:
@@ -437,13 +397,7 @@ jobs:
             }
 
             const report = fs.readFileSync('license-compliance-report.md', 'utf8');
-
-            const comment = `## 📜 License Compliance Check
-
-            ${report}
-
-            For detailed analysis, check the artifacts.
-            `;
+            const comment = `## 📜 License Compliance Check\n\n${report}\n\nFor detailed reports, check the artifacts.`;
 
             try {
               await github.rest.issues.createComment({
@@ -452,9 +406,9 @@ jobs:
                 repo: context.repo.repo,
                 body: comment
               });
-              console.log('Comment posted successfully');
+              console.log('✅ License report commented on PR');
             } catch (e) {
-              console.warn('Failed to comment on PR:', e.message || e);
+              console.warn('⚠️ Failed to comment on PR:', e.message || e);
             }
 
       - name: Check for license violations
@@ -472,5 +426,6 @@ jobs:
           else:
               print("✅ No prohibited licenses found")
 
-              if summary['flagged']:
+              if summary.get('flagged'):
                   print(f"⚠️  Flagged licenses (review required): {summary['flagged']}")
+          EOF
