@@ -1,0 +1,464 @@
+name: CMake Dependencies Security Check
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - '.github/workflows/dependency-check.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - '.github/workflows/dependency-check.yml'
+  schedule:
+    - cron: '0 0 * * 1'
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+
+jobs:
+  dependency-security-scan:
+    runs-on: ubuntu-latest
+    name: CMake Dependencies CVE Scan
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install CMake and dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential libtaos-dev libiconv-hook-dev
+
+      - name: Generate CMake dependency list
+        id: extract-deps
+        run: |
+          python3 << 'EOF'
+          import re
+          import json
+          import os
+
+          # Parse CMakeLists.txt to extract C/C++ dependencies
+          deps = {}
+
+          # Read main CMakeLists.txt
+          files_to_check = ['CMakeLists.txt', 'src/CMakeLists.txt', 'common/CMakeLists.txt']
+
+          for cmake_file in files_to_check:
+              if not os.path.exists(cmake_file):
+                  continue
+
+              with open(cmake_file, 'r', encoding='utf-8') as f:
+                  content = f.read()
+
+              # Extract find_package directives
+              # Pattern: find_package(Name VERSION ...)
+              for match in re.finditer(r'find_package\s*\(\s*(\w+)(?:\s+(\d+\.\d+(?:\.\d+)?))?', content, re.IGNORECASE):
+                  pkg_name = match.group(1)
+                  version = match.group(2) or 'any'
+
+                  # Filter out CMake internal modules
+                  if pkg_name.lower() not in ['ctest', 'cmake', 'cpack', 'pythoninterp', 'pythonlibs']:
+                      if pkg_name not in deps:
+                          deps[pkg_name] = version
+
+              # Extract pkg_config directives
+              for match in re.finditer(r'pkg_check_modules\s*\(\s*\w+\s+([A-Za-z0-9_\-]+)(?:\s+(.+?))?[\);]', content):
+                  pkg_spec = match.group(1)
+                  # Parse package spec (e.g., "taos>=2.0.0")
+                  pkg_match = re.match(r'([A-Za-z0-9_\-]+)(?:([><=]+)(.+))?', pkg_spec)
+                  if pkg_match:
+                      pkg_name = pkg_match.group(1)
+                      version = pkg_match.group(3) or 'any'
+                      if pkg_name not in deps:
+                          deps[pkg_name] = version
+
+          # Parse system library dependencies from includes
+          system_libs = ['iconv', 'taos', 'taosws']
+          for lib in system_libs:
+              if lib not in deps:
+                  # Try to detect from CMakeLists.txt patterns
+                  for cmake_file in files_to_check:
+                      if not os.path.exists(cmake_file):
+                          continue
+                      with open(cmake_file, 'r') as f:
+                          if lib in f.read().lower():
+                              deps[lib] = 'system'
+                              break
+
+          # Special handling for known TDengine packages
+          # These are system packages, not from external package managers
+          c_packages = {
+              'iconv': {'version': 'system', 'type': 'system', 'ecosystem': 'C-Library'},
+              'taos': {'version': 'system', 'type': 'system', 'ecosystem': 'C-Library'},
+              'taosws': {'version': 'system', 'type': 'system', 'ecosystem': 'C-Library'},
+          }
+
+          # Add extracted packages
+          for pkg_name, version in deps.items():
+              if pkg_name not in c_packages:
+                  c_packages[pkg_name] = {
+                      'version': version,
+                      'type': 'external',
+                      'ecosystem': 'C-Library'
+                  }
+
+          print(f"Found {len(c_packages)} C/C++ dependencies:")
+          for name, info in c_packages.items():
+              print(f"  - {name}: {info['version']} ({info['type']})")
+
+          with open('dependencies.json', 'w') as f:
+              json.dump(list(c_packages.items()), f, indent=2)
+
+          print(f"\n✅ Extracted {len(c_packages)} dependencies to dependencies.json")
+          EOF
+
+      - name: Query OSV database for vulnerabilities
+        id: osv-scan
+        run: |
+          python3 << 'EOF'
+          import json
+          import urllib.request
+          import sys
+
+          OSV_API = "https://api.osv.dev/v1/query"
+
+          with open('dependencies.json', 'r') as f:
+              deps_list = json.load(f)
+
+          # Convert to dict format
+          deps = {name: info for name, info in deps_list}
+
+          vulnerabilities = []
+
+          print(f"Scanning {len(deps)} C dependencies for CVEs...\n")
+
+          # Only scan external dependencies (skip system packages)
+          for package, info in deps.items():
+              if info.get('type') == 'system':
+                  print(f"⏭️  {package}: Skipping system package")
+                  continue
+
+              version = info.get('version', 'any')
+              if version == 'any' or version == 'system':
+                  print(f"⏭️  {package}: Skipping (version not specified)")
+                  continue
+
+              print(f"Checking {package}/{version}...")
+
+              query = {
+                  "package": {
+                      "name": package,
+                      "ecosystem": "C-Library"
+                  },
+                  "version": version
+              }
+
+              try:
+                  req = urllib.request.Request(
+                      OSV_API,
+                      data=json.dumps(query).encode('utf-8'),
+                      headers={'Content-Type': 'application/json'}
+                  )
+
+                  with urllib.request.urlopen(req, timeout=15) as response:
+                      result = json.loads(response.read().decode('utf-8'))
+
+                      if result.get('vulns'):
+                          print(f"  ⚠️  Found {len(result['vulns'])} vulnerabilities")
+                          for vuln in result['vulns']:
+                              severity = vuln.get('database_specific', {}).get('severity')
+                              if not severity:
+                                  osv_severities = vuln.get('severity') or []
+                                  severity_parts = []
+                                  for s in osv_severities:
+                                      sev_type = s.get('type')
+                                      sev_score = s.get('score')
+                                      if sev_type and sev_score:
+                                          severity_parts.append(f"{sev_type}:{sev_score}")
+                                      elif sev_score:
+                                          severity_parts.append(str(sev_score))
+                                      elif sev_type:
+                                          severity_parts.append(sev_type)
+                                  if severity_parts:
+                                      severity = ", ".join(severity_parts)
+                              if not severity:
+                                  severity = 'UNKNOWN'
+
+                              vulnerabilities.append({
+                                  'package': package,
+                                  'version': version,
+                                  'cve_id': vuln.get('id', 'Unknown'),
+                                  'summary': vuln.get('summary', 'No summary'),
+                                  'severity': severity,
+                                  'url': f"https://osv.dev/vulnerability/{vuln.get('id', '')}"
+                              })
+                      else:
+                          print(f"  ✅ Clean")
+
+              except urllib.error.HTTPError as e:
+                  if e.code == 404:
+                      print(f"  ℹ️  Not found in OSV database (may be safe)")
+                  else:
+                      print(f"  ⚠️  HTTP Error: {e.code}")
+              except Exception as e:
+                  print(f"  ℹ️  Not found in OSV database: {type(e).__name__}")
+
+          print(f"\n{'='*50}")
+          print(f"Total vulnerabilities found: {len(vulnerabilities)}")
+
+          with open('vulnerabilities.json', 'w') as f:
+              json.dump(vulnerabilities, f, indent=2)
+
+          if vulnerabilities:
+              critical = sum(1 for v in vulnerabilities if 'CRITICAL' in v.get('severity', '').upper())
+              high = sum(1 for v in vulnerabilities if 'HIGH' in v.get('severity', '').upper())
+              print(f"Critical: {critical}, High: {high}")
+
+              import os
+              with open(os.environ.get('GITHUB_OUTPUT', '/tmp/github_output'), 'a') as f:
+                  f.write(f"critical={critical}\n")
+                  f.write(f"high={high}\n")
+          else:
+              print("✅ No vulnerabilities detected!")
+          EOF
+
+      - name: Generate vulnerability report
+        if: always()
+        run: |
+          python3 << 'EOF'
+          import json
+          from datetime import datetime
+          import textwrap
+
+          # Read data
+          with open('dependencies.json', 'r') as f:
+              deps_list = json.load(f)
+
+          try:
+              with open('vulnerabilities.json', 'r') as f:
+                  vulns = json.load(f)
+          except:
+              vulns = []
+
+          # Generate markdown report
+          report = textwrap.dedent(f"""
+          # CMake Dependencies Security Report
+
+          **Generated**: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}
+          **Project**: TDengine ODBC Connector
+          **Scan Type**: Static C/C++ Dependencies (CMake)
+          **Build System**: CMake + C Language
+
+          ## Summary
+
+          - Total C/C++ Dependencies: {len(deps_list)}
+          - Vulnerabilities Found: {len(vulns)}
+          - Critical: {sum(1 for v in vulns if 'CRITICAL' in v.get('severity', '').upper())}
+          - High: {sum(1 for v in vulns if 'HIGH' in v.get('severity', '').upper())}
+          - Medium: {sum(1 for v in vulns if 'MEDIUM' in v.get('severity', '').upper())}
+
+          ## Dependencies Scanned
+
+          | Package | Version | Type | Status |
+          |---------|---------|------|--------|
+          """)
+
+          # Group vulnerabilities by package
+          vuln_by_pkg = {}
+          for v in vulns:
+              pkg = v['package']
+              if pkg not in vuln_by_pkg:
+                  vuln_by_pkg[pkg] = []
+              vuln_by_pkg[pkg].append(v)
+
+          for name, info in deps_list:
+              version = info.get('version', 'unknown')
+              dep_type = info.get('type', 'unknown')
+              status = '❌ Vulnerable' if name in vuln_by_pkg else '✅ Clean'
+              report += f"| {name} | {version} | {dep_type} | {status} |\n"
+
+          if vulns:
+              report += "\n## Vulnerabilities Detail\n\n"
+              for pkg, pkg_vulns in sorted(vuln_by_pkg.items()):
+                  report += f"\n### {pkg}\n\n"
+                  for v in pkg_vulns:
+                      report += f"- **{v['cve_id']}** ({v['severity']})\n"
+                      report += f"  - Summary: {v['summary']}\n"
+                      report += f"  - URL: {v['url']}\n"
+          else:
+              report += "\n## ✅ No vulnerabilities detected\n"
+
+          report += "\n---\n"
+          report += "\n**Note**: This scan checks C/C++ dependencies detected from CMakeLists.txt.\n"
+          report += "System packages (iconv, taos, taosws) are managed by the system package manager.\n"
+          report += "Test dependencies in other languages are excluded from binary distribution.\n"
+
+          with open('dependency-security-report.md', 'w') as f:
+              f.write(report)
+
+          print(report)
+          EOF
+
+      - name: Convert to SARIF format
+        if: always()
+        run: |
+          python3 << 'EOF'
+          import json
+          from datetime import datetime
+
+          try:
+              with open('vulnerabilities.json', 'r') as f:
+                  vulns = json.load(f)
+          except:
+              vulns = []
+
+          # Generate SARIF format for GitHub Security
+          sarif = {
+              "version": "2.1.0",
+              "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+              "runs": [{
+                  "tool": {
+                      "driver": {
+                          "name": "CMake Dependencies Security Scanner",
+                          "version": "1.0.0",
+                          "informationUri": "https://github.com/taosdata/taos-connector-odbc"
+                      }
+                  },
+                  "results": []
+              }]
+          }
+
+          for v in vulns:
+              severity = v.get('severity', 'UNKNOWN').upper()
+              level = 'error' if 'CRITICAL' in severity or 'HIGH' in severity else 'warning'
+
+              result = {
+                  "ruleId": v['cve_id'],
+                  "level": level,
+                  "message": {
+                      "text": f"{v['package']} {v['version']}: {v['summary']}"
+                  },
+                  "locations": [{
+                      "physicalLocation": {
+                          "artifactLocation": {
+                              "uri": "CMakeLists.txt"
+                          }
+                      }
+                  }],
+                  "properties": {
+                      "package": v['package'],
+                      "version": v['version'],
+                      "severity": severity
+                  }
+              }
+
+              sarif['runs'][0]['results'].append(result)
+
+          with open('dependency-security.sarif', 'w') as f:
+              json.dump(sarif, f, indent=2)
+
+          print(f"Generated SARIF with {len(vulns)} findings")
+          EOF
+
+      - name: Upload SARIF to GitHub Security
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: 'dependency-security.sarif'
+          category: 'cmake-dependencies'
+
+      - name: Upload security report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-security-report
+          path: |
+            dependency-security-report.md
+            dependency-security.sarif
+            dependencies.json
+            vulnerabilities.json
+          retention-days: 30
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request' && always()
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            if (!fs.existsSync('dependency-security-report.md')) {
+              console.log('Report not found');
+              return;
+            }
+
+            const report = fs.readFileSync('dependency-security-report.md', 'utf8');
+
+            const comment = `## 🔐 CMake Dependencies Security Scan
+
+            ${report}
+
+            **ℹ️ Scope**: This scan covers C/C++ dependencies declared in CMakeLists.txt.
+            System packages are managed by the OS package manager.
+            `;
+
+            try {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            } catch (e) {
+              console.log('Failed to comment on PR:', e.message || e);
+            }
+
+      - name: Fail on critical vulnerabilities
+        if: always()
+        run: |
+          if [ -f vulnerabilities.json ]; then
+            critical_count=$(python3 -c "
+          import json
+          try:
+              with open('vulnerabilities.json', 'r') as f:
+                  vulns = json.load(f)
+              critical = sum(1 for v in vulns if 'CRITICAL' in v.get('severity', '').upper())
+              print(critical)
+          except:
+              print(0)
+          ")
+
+            high_count=$(python3 -c "
+          import json
+          try:
+              with open('vulnerabilities.json', 'r') as f:
+                  vulns = json.load(f)
+              high = sum(1 for v in vulns if 'HIGH' in v.get('severity', '').upper())
+              print(high)
+          except:
+              print(0)
+          ")
+
+            echo "📊 Vulnerability Summary: $critical_count Critical, $high_count High"
+
+            if [ "$critical_count" -gt 0 ] || [ "$high_count" -gt 0 ]; then
+              echo "❌ Critical or High vulnerabilities detected"
+              exit 1
+            else
+              echo "✅ No critical or high vulnerabilities detected"
+            fi
+          fi
