@@ -162,9 +162,9 @@ jobs:
 
           # Known licenses for system C libraries
           KNOWN_LICENSES = {
-              'iconv': 'LGPL-2.1-or-later',
-              'taos': 'AGPL-3.0-or-later',  # TDengine is AGPL
-              'taosws': 'AGPL-3.0-or-later',
+              'iconv': 'LGPL-2.1',
+              'taos': 'AGPL-3.0',  # TDengine is AGPL
+              'taosws': 'MIT',
           }
 
           deps_licenses = {}
@@ -246,29 +246,31 @@ jobs:
 
           # Define allowed and prohibited licenses
           ALLOWED_LICENSES = {
-              'MIT',
               'Apache-2.0',
-              'Apache-2.0 OR MIT',
+              'MIT',
               'BSD-2-Clause',
               'BSD-3-Clause',
               'ISC',
-              'MPL-2.0',
-              'LGPL-2.0-or-later',
-              'LGPL-2.1-or-later',
-              'LGPL-3.0-or-later',
           }
 
           # Internal TDengine ecosystem libraries (exceptions to license restrictions)
           INTERNAL_ECOSYSTEM_LIBS = {
               'taos',
-              'taosws',
+          }
+
+          # Linux/macOS system-provided dependencies (not managed by this project)
+          SYSTEM_EXCEPTION_LIBS = {
+              'iconv',
           }
 
           PROHIBITED_LICENSES = {
-              'GPL-2.0-only',
-              'GPL-3.0-only',
-              'AGPL-3.0-or-later',  # Prohibited EXCEPT for taos/taosws (internal ecosystem)
+              'GPL-2.0',
+              'GPL-3.0',
+              'AGPL-3.0',  # Prohibited EXCEPT for taos (internal ecosystem)
               'SSPL',
+              'MPL-2.0',
+              'LGPL-2.0',
+              'LGPL-2.1',
           }
 
           # Analyze licenses
@@ -276,16 +278,21 @@ jobs:
           deps_licenses = data.get('dependencies', {})
 
           # Check for violations
-          # AGPL is prohibited EXCEPT for internal TDengine libraries (taos/taosws)
+          # AGPL is prohibited EXCEPT for internal TDengine libraries (taos)
+          # System exception libraries are excluded from project dependency policy checks
           prohibited_found = []
           flagged_found = []
           internal_ecosystem_found = []
+          system_exceptions_found = []
           allowed_found = []
 
           for pkg, lic in deps_licenses.items():
               if pkg in INTERNAL_ECOSYSTEM_LIBS:
                   # Internal ecosystem libraries are allowed even with AGPL
                   internal_ecosystem_found.append((pkg, lic))
+              elif pkg in SYSTEM_EXCEPTION_LIBS:
+                  # Linux/macOS system library; excluded from project-managed dependency checks
+                  system_exceptions_found.append((pkg, lic))
               elif lic in PROHIBITED_LICENSES:
                   prohibited_found.append((pkg, lic))
               else:
@@ -307,21 +314,21 @@ jobs:
               "",
               "## Allowed Licenses",
               "- Apache-2.0",
-              "- Apache-2.0 OR MIT",
               "- MIT",
               "- BSD-2-Clause",
               "- BSD-3-Clause",
               "- ISC",
-              "- MPL-2.0",
-              "- LGPL-2.0-or-later",
-              "- LGPL-2.1-or-later",
-              "- LGPL-3.0-or-later",
               "",
               "## Prohibited Licenses",
               "- GPL-2.0",
               "- GPL-3.0",
-              "- AGPL-3.0 (except taos, taosws - internal TDengine)",
+              "- AGPL-3.0 (except taos - internal TDengine)",
               "- SSPL",
+              "- MPL-2.0",
+              "- LGPL-2.0",
+              "- LGPL-2.1",
+              "- LGPL-3.0",
+
               "",
               "## Scan Results",
           ]
@@ -331,6 +338,12 @@ jobs:
               report_lines.append("### Internal TDengine Ecosystem (Allowed Exceptions)")
               for pkg, lic in internal_ecosystem_found:
                   report_lines.append(f"- {pkg}: {lic}")
+
+          if system_exceptions_found:
+              report_lines.append("")
+              report_lines.append("### System Exceptions (Excluded from Project Dependency Policy)")
+              for pkg, lic in system_exceptions_found:
+                  report_lines.append(f"- {pkg}: {lic} (Linux/macOS system-provided, not installed/managed by this project)")
 
           if allowed_found:
               report_lines.append("")
@@ -362,6 +375,7 @@ jobs:
               'status': 'OK' if not prohibited_found else 'FAILED',
               'prohibited': [f"{item} ({typ})" for item, typ in prohibited_found],
               'internal_ecosystem': [f"{pkg}: {lic}" for pkg, lic in internal_ecosystem_found],
+              'system_exceptions': [f"{pkg}: {lic}" for pkg, lic in system_exceptions_found],
               'allowed': [f"{pkg}: {lic}" for pkg, lic in allowed_found],
           }
 
