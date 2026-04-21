@@ -38,9 +38,6 @@
 
 #include "conn_parser.h"
 
-#ifdef HAVE_TAOSWS           /* { */
-#include "taosws_helpers.h"
-#endif                       /* } */
 
 #include <string.h>
 
@@ -300,79 +297,6 @@ static int validate_url(HWND hDlg, const char *url, url_parser_param_t *param)
   return 0;
 }
 
-#ifdef HAVE_TAOSWS                                        /* { */
-static void check_taosws_connection(HWND hDlg, config_t *config, url_parser_param_t *param)
-{
-  int r = 0;
-  HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(hDlg, GWLP_HINSTANCE);
-  char title[100]; title[0] = '\0';
-  char message[256]; message[0] = '\0';
-  LoadString(hInstance, IDS_TEST_CONN_TITLE, title, sizeof(title));
-#ifdef TODBC_X86
-  snprintf(title, sizeof(title), "%s (x86)", title);
-#endif
-  
-  if (config->url[0] == '\0') {
-    LoadString(hInstance, IDS_TEST_CONN_NO_URL_FAILURE, message, sizeof(message));
-    MessageBox(hDlg, message, title, MB_OK | MB_ICONEXCLAMATION);
-    return;
-  }
-  r = validate_url(hDlg, config->url, param);
-  if (r) return;
-  char *out = NULL;
-  if (config->user[0]) {
-    r = url_set_user_pass(&param->url, config->user, strlen(config->user), config->password, strlen(config->password));
-    if (r) {
-      LoadString(hInstance, IDS_TEST_CONN_BIND_URL_FAILURE, message, sizeof(message));
-      MessageBox(hDlg, message, title, MB_OK | MB_ICONEXCLAMATION);
-      return;
-    }
-  }
-  r = url_encode_with_database(&param->url, config->database, &out);
-  if (r) {
-    
-    LoadString(hInstance, IDS_TEST_CONN_ENCODE_URL_FAILURE, message, sizeof(message));
-    MessageBox(hDlg, message, title, MB_OK | MB_ICONEXCLAMATION);
-    return;
-  }
-
-  char buf[4096]; buf[0] = '\0';
-  WS_TAOS *taosws = CALL_ws_connect(out);
-  if (!taosws) {
-    int e = ws_errno(NULL);
-    const char *errstr = ws_errstr(NULL);
-    const char *from = "UTF-8";
-    const char *to   = "GB18030";
-    iconv_t cnv = iconv_open(to, from);
-    if (cnv == (iconv_t)-1) {
-      int e = errno;
-      LoadString(hInstance, IDS_TEST_CONN_MSG_FAILURE, message, sizeof(message));
-      snprintf(buf, sizeof(buf), "%s:[%d]%s:no convertion from %s to %s", message, e, strerror(e), from, to);
-      MessageBox(hDlg, buf, title, MB_OK | MB_ICONEXCLAMATION);
-    } else {
-      char gb18030[2048];
-      char   *inbuf        = (char*)errstr;
-      char   *outbuf       = gb18030;
-      size_t  inbytesleft  = strlen(errstr);
-      size_t  outbytesleft = sizeof(gb18030);
-      iconv(cnv, &inbuf, &inbytesleft, &outbuf, &outbytesleft);
-      *outbuf = '\0';
-      iconv_close(cnv);
-      LoadString(hInstance, IDS_TEST_CONN_MSG_FAILURE, message, sizeof(message));
-      snprintf(buf, sizeof(buf), "%s:[%d]%s\n%s", message, e, gb18030, out);
-      MessageBox(hDlg, buf, title, MB_OK | MB_ICONEXCLAMATION);
-    }
-  } else {
-    CALL_ws_close(taosws);
-    LoadString(hInstance, IDS_TEST_CONN_MSG_SUCCESS, message, sizeof(message));
-    snprintf(buf, sizeof(buf), "%s\n%s", message, out);
-    MessageBox(hDlg, buf, title, MB_OK | MB_ICONEXCLAMATION);
-  }
-  // snprintf(buf, sizeof(buf), "About to connect with:\n%s\n\nbut not implemented yet", out ? out : config->url);
-  // MessageBox(hDlg, buf, "Warning!", MB_OK | MB_ICONEXCLAMATION);
-  TOD_SAFE_FREE(out);
-}
-#endif                                                    /* } */
 
 static INT_PTR OnTest(HWND hDlg, WPARAM wParam, LPARAM lParam, url_parser_param_t *param)
 {
@@ -384,13 +308,6 @@ static INT_PTR OnTest(HWND hDlg, WPARAM wParam, LPARAM lParam, url_parser_param_
   // }
   if (config.taos_checked) {
     check_taos_connection(hDlg, &config);
-  } else {
-#ifdef HAVE_TAOSWS                                        /* { */
-    check_taosws_connection(hDlg, &config, param);
-#else                                                     /* }{ */
-    MessageBox(hDlg, "not built with `taosws-rs`", "Error", MB_OK | MB_ICONEXCLAMATION);
-    return FALSE;
-#endif                                                    /* } */
   }
   return TRUE;
 }
@@ -450,7 +367,7 @@ static void LoadComboBoxOptions(HINSTANCE hInstance, HWND hWndCombo)
 
   LoadString(hInstance, IDS_COMBO_APP_NAME_OPT_KEPWARE, message, sizeof(message));
   SendMessage(hWndCombo, CB_ADDSTRING, 0, (LPARAM)message);
-#endif 
+#endif
 }
 
 static INT_PTR OnInitDlg(HWND hDlg, WPARAM wParam, LPARAM lParam)
@@ -494,7 +411,7 @@ static INT_PTR OnInitDlg(HWND hDlg, WPARAM wParam, LPARAM lParam)
 
           SQLGetPrivateProfileString(v, "URL", "", k, sizeof(k), "Odbc.ini");
           SetDlgItemText(hDlg, IDC_EDT_URL, k);
-  
+
           SQLGetPrivateProfileString(v, "DB", "", k, sizeof(k), "Odbc.ini");
           SetDlgItemText(hDlg, IDC_EDT_DB, k);
 
@@ -541,7 +458,7 @@ static INT_PTR OnInitDlg(HWND hDlg, WPARAM wParam, LPARAM lParam)
           SQLGetPrivateProfileString(v, "CUSTOMPRODUCT", "", k, sizeof(k), "Odbc.ini");
           if (k[0]) {
             int index = (int)SendMessage(hWndCombo, CB_SELECTSTRING, -1, (LPARAM)k);
-            
+
             if (index == CB_ERR) {
               SendMessage(hWndCombo, CB_SETCURSEL, 0, 0);
             }

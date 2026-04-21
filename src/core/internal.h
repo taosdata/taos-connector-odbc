@@ -38,9 +38,6 @@
 #include "parser.h"
 
 #include "taos_helpers.h"
-#ifdef HAVE_TAOSWS           /* { */
-#include "taosws_helpers.h"
-#endif                       /* } */
 
 EXTERN_C_BEGIN
 
@@ -428,8 +425,8 @@ struct charset_conv_mgr_s {
 
 typedef enum backend_e                backend_e;
 enum backend_e {
-  BACKEND_TAOS,
-  BACKEND_TAOSWS,
+  BACKEND_NATIVE,
+  BACKEND_WEBSOCKET,
 };
 
 enum custprod_type_e {
@@ -719,7 +716,6 @@ struct tsdb_fields_s {
 
 struct tsdb_rows_block_s {
   TAOS_ROW            rows;
-  const void         *ws_ptr;        // NOTE: libtaosws, ugly for the moment!!!
   size_t              nr;
   size_t              pos;           // 1-based
 };

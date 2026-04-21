@@ -34,9 +34,6 @@
 #include "conn_parser.h"
 #include "stmt.h"
 #include "taos_helpers.h"
-#ifdef HAVE_TAOSWS           /* { */
-#include "taosws_helpers.h"
-#endif                       /* } */
 #include "tls.h"
 #include "ts_parser.h"
 #include "url_parser.h"
@@ -343,11 +340,9 @@ static int _conn_setup_iconvs(conn_t *conn)
     return -1;
   }
 
-#ifdef HAVE_TAOSWS           /* { */
   if (conn->cfg.url) {
-    tsdb_charset = "UTF-8";  // NOTE: as required by taosws.h?
+    tsdb_charset = "UTF-8";  // WebSocket mode only supports UTF-8
   }
-#endif                       /* } */
 
 #ifdef FAKE_TAOS            /* { */
   sqlc_charset = "GB18030";
@@ -525,74 +520,73 @@ static SQLRETURN _conn_post_connected(conn_t *conn)
   return SQL_SUCCESS;
 }
 
+static int s_driver_initialized = 0;
+
+static void _init_driver_type(const conn_cfg_t *cfg)
+{
+  if (s_driver_initialized) return;
+  s_driver_initialized = 1;
+
+#ifdef _WIN32
+  // Workaround: The unified taos.dll (v3.4+) corrupts the MSVC CRT's internal
+  // timezone state during initialization. Calling _tzset() beforehand forces the
+  // CRT to cache the correct system timezone from the Windows registry, preventing
+  // subsequent localtime_s() calls from returning UTC instead of local time.
+  _tzset();
+#endif
+
+  const char *driver_type = cfg->url ? "websocket" : "native";
+  int rc = taos_options(TSDB_OPTION_DRIVER, driver_type);
+  OD("taos_options(TSDB_OPTION_DRIVER, \"%s\") => %d", driver_type, rc);
+}
+
 static SQLRETURN _do_conn_connect(conn_t *conn)
 {
   SQLRETURN sr;
 
   ds_conn_setup(&conn->ds_conn);
 
+  _init_driver_type(&conn->cfg);
+
   const conn_cfg_t *cfg = &conn->cfg;
   const char *db = cfg->db;
-  if (conn->cfg.url) {
-#ifdef HAVE_TAOSWS           /* { */
-    char *url = NULL;
-    url_parser_param_t param = {0};
-    int r = url_parse_and_encode(&conn->cfg, &url, &param);
-    if (r) {
-      conn_append_err_format(conn, "HY000", 0, "General error:assembling url failed:[%s]/[%s:%d]/[%s]:cause:[%s]", conn->cfg.url, conn->cfg.ip, conn->cfg.port, conn->cfg.db, param.ctx.err_msg);
-      url_parser_param_release(&param);
-      return SQL_ERROR;
-    }
-    url_parser_param_release(&param);
-    conn->ds_conn.taos = CALL_ws_connect(url);
-    if (!conn->ds_conn.taos) {
-      conn_append_err_format(conn, "08001", ws_errno(NULL), "Client unable to establish connection:[%s][%s]", url, ws_errstr(NULL));
-      TOD_SAFE_FREE(url);
-      return SQL_ERROR;
-    }
-    TOD_SAFE_FREE(url);
-#else                        /* }{ */
-    conn_append_err_format(conn, "08001", 0, "Client unable to establish connection:websocket backend not supported yet");
-    return SQL_ERROR;
-#endif                       /* } */
-  } else {
-    if (db && (tod_strcasecmp(db, "information_schema")==0 || tod_strcasecmp(db, "performance_schema")==0)) {
-      db = NULL;
-    }
 
-    conn->ds_conn.taos = CALL_taos_connect(cfg->ip, cfg->uid, cfg->pwd, db, cfg->port);
-    if (!conn->ds_conn.taos) {
-      char buf[1024];
-      fixed_buf_t buffer = {0};
-      buffer.buf = buf;
-      buffer.cap = sizeof(buf);
-      buffer.nr  = 0;
-      int n = 0;
-      fixed_buf_sprintf(n, &buffer, "taos_odbc://");
-      if (cfg->uid) fixed_buf_sprintf(n, &buffer, "%s:*@", cfg->uid);
-      if (cfg->ip) {
-        if (cfg->port) {
-          fixed_buf_sprintf(n, &buffer, "%s:%d", cfg->ip, cfg->port);
-        } else {
-          fixed_buf_sprintf(n, &buffer, "%s", cfg->ip);
-        }
+  if (db && (tod_strcasecmp(db, "information_schema")==0 || tod_strcasecmp(db, "performance_schema")==0)) {
+    db = NULL;
+  }
+
+  conn->ds_conn.taos = CALL_taos_connect(cfg->ip, cfg->uid, cfg->pwd, db, cfg->port);
+  if (!conn->ds_conn.taos) {
+    char buf[1024];
+    fixed_buf_t buffer = {0};
+    buffer.buf = buf;
+    buffer.cap = sizeof(buf);
+    buffer.nr  = 0;
+    int n = 0;
+    fixed_buf_sprintf(n, &buffer, "taos_odbc://");
+    if (cfg->uid) fixed_buf_sprintf(n, &buffer, "%s:*@", cfg->uid);
+    if (cfg->ip) {
+      if (cfg->port) {
+        fixed_buf_sprintf(n, &buffer, "%s:%d", cfg->ip, cfg->port);
       } else {
-        fixed_buf_sprintf(n, &buffer, "localhost");
+        fixed_buf_sprintf(n, &buffer, "%s", cfg->ip);
       }
-      if (cfg->db) fixed_buf_sprintf(n, &buffer, "/%s", cfg->db);
-
-      conn_append_err_format(conn, "08001", taos_errno(NULL), "Client unable to establish connection:[%s][%s]", buffer.buf, taos_errstr(NULL));
-      return SQL_ERROR;
+    } else {
+      fixed_buf_sprintf(n, &buffer, "localhost");
     }
-    if (conn->cfg.db && db == NULL) {
-      // FIXME: vulnerability!!!
-      int e = CALL_taos_select_db(conn->ds_conn.taos, conn->cfg.db);
-      if (e) {
-        const char *estr = taos_errstr(NULL);
-        conn_append_err_format(conn, "HY000", e, "General error:[taosc]%s, selecting db:%s", estr, cfg->db);
-        conn_disconnect(conn);
-        return SQL_ERROR;
-      }
+    if (cfg->db) fixed_buf_sprintf(n, &buffer, "/%s", cfg->db);
+
+    conn_append_err_format(conn, "08001", taos_errno(NULL), "Client unable to establish connection:[%s][%s]", buffer.buf, taos_errstr(NULL));
+    return SQL_ERROR;
+  }
+  if (conn->cfg.db && db == NULL) {
+    // FIXME: vulnerability!!!
+    int e = CALL_taos_select_db(conn->ds_conn.taos, conn->cfg.db);
+    if (e) {
+      const char *estr = taos_errstr(NULL);
+      conn_append_err_format(conn, "HY000", e, "General error:[taosc]%s, selecting db:%s", estr, cfg->db);
+      conn_disconnect(conn);
+      return SQL_ERROR;
     }
   }
 
@@ -627,7 +621,7 @@ static void _conn_fill_out_connection_str(
   }
   if (n>0) count += n;
 
-  if (conn->cfg.backend == BACKEND_TAOSWS) {
+  if (conn->cfg.backend == BACKEND_WEBSOCKET) {
     OA_NIY(conn->cfg.url);
     fixed_buf_sprintf(n, &buffer, "URL={%s};", conn->cfg.url);
     if (n>0) count += n;
@@ -712,16 +706,9 @@ static int _conn_cfg_init_by_dsn(conn_cfg_t *cfg, char *ebuf, size_t elen)
       snprintf(ebuf, elen, "@%d:%s():out of memory", __LINE__, __func__);
       return -1;
     }
-    cfg->backend = BACKEND_TAOSWS;
+    cfg->backend = BACKEND_WEBSOCKET;
   } else {
-    cfg->backend = BACKEND_TAOS;
-  }
-
-  if (cfg->backend == BACKEND_TAOSWS) {
-#ifndef HAVE_TAOSWS          /* { */
-    snprintf(ebuf, elen, "@%d:%s():`URL=%s`, but the driver not built with websocket functionality", __LINE__, __func__, cfg->url);
-    return -1;
-#endif                       /* } */
+    cfg->backend = BACKEND_NATIVE;
   }
 
   buf[0] = '\0';
@@ -1154,12 +1141,6 @@ static const char* ds_conn_get_uid(ds_conn_t *ds_conn)
   OA_NIY(ds_conn->conn);
 
   conn_t *conn = ds_conn->conn;
-#ifdef HAVE_TAOSWS           /* { */
-  if (conn->cfg.url) {
-    conn_append_err(conn, "HY000", 0, "General error:websocket backend not implemented yet");
-    return NULL;
-  }
-#endif                       /* } */
 
   // NOTE: [taosc] has no user-name bounded to database, thus we choose login name to return
   return conn->cfg.uid;
