@@ -326,6 +326,7 @@ struct tsdb_param_column_s {
   mem_t           mem;
   mem_t           mem_length;
   mem_t           mem_is_null;
+  uintptr_t       buffer_stride;
 
   TAOS_FIELD_E    tsdb_field;
 };
@@ -341,7 +342,7 @@ struct tsdb_binds_s {
   int                        cap;
   int                        nr;
 
-  TAOS_MULTI_BIND           *mbs;
+  TAOS_STMT2_BIND           *binds;
 };
 
 struct desc_record_s {
@@ -715,7 +716,7 @@ struct tsdb_fields_s {
 };
 
 struct tsdb_rows_block_s {
-  TAOS_ROW            rows;
+  const void         *block;
   size_t              nr;
   size_t              pos;           // 1-based
 };
@@ -728,7 +729,7 @@ struct tsdb_res_s {
   tsdb_fields_t              fields;
   tsdb_rows_block_t          rows_block;
 
-  unsigned int               res_is_from_taos_query:1;
+  unsigned int               res_needs_free:1;
   unsigned int               eof:1;
 };
 
@@ -754,7 +755,7 @@ struct tsdb_stmt_s {
 
   const sqlc_tsdb_t         *current_sql;
 
-  TAOS_STMT                 *stmt;
+  TAOS_STMT2                *stmt;
   // for insert-parameterized-statement
   tsdb_params_t              params;
 
@@ -927,7 +928,7 @@ struct param_state_s {
   TAOS_FIELD_E              *tsdb_field;
 
   tsdb_param_column_t       *param_column;
-  TAOS_MULTI_BIND           *tsdb_bind;
+  TAOS_STMT2_BIND           *tsdb_bind;
 
   const char                *sqlc_base;
   size_t                     sqlc_len;

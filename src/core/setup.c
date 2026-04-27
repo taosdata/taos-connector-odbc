@@ -306,9 +306,8 @@ static INT_PTR OnTest(HWND hDlg, WPARAM wParam, LPARAM lParam, url_parser_param_
   //   MessageBox(hDlg, "DSN must be specified", "Warning", MB_OK | MB_ICONEXCLAMATION);
   //   return FALSE;
   // }
-  if (config.taos_checked) {
-    check_taos_connection(hDlg, &config);
-  }
+  // Both native and websocket now use taos_connect via unified taos.dll
+  check_taos_connection(hDlg, &config);
   return TRUE;
 }
 

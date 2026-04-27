@@ -328,6 +328,93 @@ static inline int call_taos_stmt_affected_rows_once(const char *file, int line, 
   return r;
 }
 
+static inline TAOS_STMT2* call_taos_stmt2_init(const char *file, int line, const char *func, TAOS *taos, TAOS_STMT2_OPTION *option)
+{
+  LOGD_TAOS(file, line, func, "taos_stmt2_init(taos:%p,option:%p) ...", taos, option);
+  TAOS_STMT2 *stmt = taos_stmt2_init(taos, option);
+  if (!stmt) {
+    LOGE_TAOS(file, line, func, "taos_stmt2_init(taos:%p,option:%p) => NULL", taos, option);
+  }
+  LOGD_TAOS(file, line, func, "taos_stmt2_init(taos:%p,option:%p) => %p", taos, option, stmt);
+  return stmt;
+}
+
+static inline int call_taos_stmt2_prepare(const char *file, int line, const char *func, TAOS_STMT2 *stmt, const char *sql, unsigned long length)
+{
+  int n = (int)(length ? length : (sql ? strlen(sql) : 0));
+  LOGD_TAOS(file, line, func, "taos_stmt2_prepare(stmt:%p,sql:%.*s,length:%ld) ...", stmt, n, sql, length);
+  int r = taos_stmt2_prepare(stmt, sql, length);
+  LOGD_TAOS(file, line, func, "taos_stmt2_prepare(stmt:%p,sql:%.*s,length:%ld) => %d", stmt, n, sql, length, r);
+  return r;
+}
+
+static inline int call_taos_stmt2_bind_param(const char *file, int line, const char *func, TAOS_STMT2 *stmt, TAOS_STMT2_BINDV *bindv, int32_t col_idx)
+{
+  LOGD_TAOS(file, line, func, "taos_stmt2_bind_param(stmt:%p,bindv:%p,col_idx:%d) ...", stmt, bindv, col_idx);
+  int r = taos_stmt2_bind_param(stmt, bindv, col_idx);
+  LOGD_TAOS(file, line, func, "taos_stmt2_bind_param(stmt:%p,bindv:%p,col_idx:%d) => %d", stmt, bindv, col_idx, r);
+  return r;
+}
+
+static inline int call_taos_stmt2_exec(const char *file, int line, const char *func, TAOS_STMT2 *stmt, int *affected_rows)
+{
+  LOGD_TAOS(file, line, func, "taos_stmt2_exec(stmt:%p,affected_rows:%p) ...", stmt, affected_rows);
+  int r = taos_stmt2_exec(stmt, affected_rows);
+  int n = affected_rows ? *affected_rows : 0;
+  LOGD_TAOS(file, line, func, "taos_stmt2_exec(stmt:%p,affected_rows:%p(%d)) => %d", stmt, affected_rows, n, r);
+  return r;
+}
+
+static inline int call_taos_stmt2_close(const char *file, int line, const char *func, TAOS_STMT2 *stmt)
+{
+  LOGD_TAOS(file, line, func, "taos_stmt2_close(stmt:%p) ...", stmt);
+  int r = taos_stmt2_close(stmt);
+  LOGD_TAOS(file, line, func, "taos_stmt2_close(stmt:%p) => %d", stmt, r);
+  return r;
+}
+
+static inline int call_taos_stmt2_is_insert(const char *file, int line, const char *func, TAOS_STMT2 *stmt, int *insert)
+{
+  LOGD_TAOS(file, line, func, "taos_stmt2_is_insert(stmt:%p,insert:%p) ...", stmt, insert);
+  int r = taos_stmt2_is_insert(stmt, insert);
+  int n = insert ? *insert : 0;
+  LOGD_TAOS(file, line, func, "taos_stmt2_is_insert(stmt:%p,insert:%p(%d)) => %d", stmt, insert, n, r);
+  return r;
+}
+
+static inline int call_taos_stmt2_get_fields(const char *file, int line, const char *func, TAOS_STMT2 *stmt, int *count, TAOS_FIELD_ALL **fields)
+{
+  LOGD_TAOS(file, line, func, "taos_stmt2_get_fields(stmt:%p,count:%p,fields:%p) ...", stmt, count, fields);
+  int r = taos_stmt2_get_fields(stmt, count, fields);
+  int n = count ? *count : 0;
+  TAOS_FIELD_ALL *p = fields ? *fields : NULL;
+  LOGD_TAOS(file, line, func, "taos_stmt2_get_fields(stmt:%p,count:%p(%d),fields:%p(%p)) => %d", stmt, count, n, fields, p, r);
+  return r;
+}
+
+static inline void call_taos_stmt2_free_fields(const char *file, int line, const char *func, TAOS_STMT2 *stmt, TAOS_FIELD_ALL *fields)
+{
+  LOGD_TAOS(file, line, func, "taos_stmt2_free_fields(stmt:%p,fields:%p) ...", stmt, fields);
+  taos_stmt2_free_fields(stmt, fields);
+  LOGD_TAOS(file, line, func, "taos_stmt2_free_fields(stmt:%p,fields:%p) => void", stmt, fields);
+}
+
+static inline TAOS_RES* call_taos_stmt2_result(const char *file, int line, const char *func, TAOS_STMT2 *stmt)
+{
+  LOGD_TAOS(file, line, func, "taos_stmt2_result(stmt:%p) ...", stmt);
+  TAOS_RES *res = taos_stmt2_result(stmt);
+  LOGD_TAOS(file, line, func, "taos_stmt2_result(stmt:%p) => %p", stmt, res);
+  return res;
+}
+
+static inline char* call_taos_stmt2_error(const char *file, int line, const char *func, TAOS_STMT2 *stmt)
+{
+  (void)file;
+  (void)line;
+  (void)func;
+  return taos_stmt2_error(stmt);
+}
+
 static inline TAOS_RES* call_taos_query(const char *file, int line, const char *func, TAOS *taos, const char *sql)
 {
   LOGD_TAOS(file, line, func, "taos_query(taos:%p,sql:%s) ...", taos, sql);
@@ -844,6 +931,17 @@ static inline int call_taos_get_current_db(const char *file, int line, const cha
 #define CALL_taos_stmt_affected_rows(...) call_taos_stmt_affected_rows(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_taos_stmt_affected_rows_once(...) call_taos_stmt_affected_rows_once(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 
+#define CALL_taos_stmt2_init(...) call_taos_stmt2_init(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define CALL_taos_stmt2_prepare(...) call_taos_stmt2_prepare(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define CALL_taos_stmt2_bind_param(...) call_taos_stmt2_bind_param(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define CALL_taos_stmt2_exec(...) call_taos_stmt2_exec(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define CALL_taos_stmt2_close(...) call_taos_stmt2_close(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define CALL_taos_stmt2_is_insert(...) call_taos_stmt2_is_insert(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define CALL_taos_stmt2_get_fields(...) call_taos_stmt2_get_fields(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define CALL_taos_stmt2_free_fields(...) call_taos_stmt2_free_fields(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define CALL_taos_stmt2_result(...) call_taos_stmt2_result(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define CALL_taos_stmt2_error(...) call_taos_stmt2_error(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+
 #define CALL_taos_query(...) call_taos_query(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 
 #define CALL_taos_fetch_row(...) call_taos_fetch_row(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
@@ -966,7 +1064,7 @@ struct tsdb_data_s {
 
 int helper_get_tsdb(TAOS_RES *res, int block, TAOS_FIELD *fields, int time_precision, TAOS_ROW rows, int i_row, int i_col, tsdb_data_t *tsdb, char *buf, size_t len) FA_HIDDEN;
 
-int helper_get_tsdb_ws(int time_precision, const char *name, uint8_t col_type, const void *col_data, uint32_t col_len, int i_row, int i_col, tsdb_data_t *tsdb, char *buf, size_t len) FA_HIDDEN;
+int helper_get_tsdb_from_raw_block(const void *block, int nr_rows, TAOS_FIELD *fields, int time_precision, int i_row, int i_col, tsdb_data_t *tsdb, char *buf, size_t len) FA_HIDDEN;
 
 EXTERN_C_END
 

@@ -520,24 +520,55 @@ static SQLRETURN _conn_post_connected(conn_t *conn)
   return SQL_SUCCESS;
 }
 
-static int s_driver_initialized = 0;
+// Driver initialization states
+#define DRIVER_UNINIT    0
+#define DRIVER_NATIVE    1
+#define DRIVER_WEBSOCKET 2
 
-static void _init_driver_type(const conn_cfg_t *cfg)
+static volatile long s_driver_state = DRIVER_UNINIT;
+
+static SQLRETURN _init_driver_type(conn_t *conn)
 {
-  if (s_driver_initialized) return;
-  s_driver_initialized = 1;
+  const conn_cfg_t *cfg = &conn->cfg;
+  long desired = cfg->url ? DRIVER_WEBSOCKET : DRIVER_NATIVE;
+  const char *driver_type = cfg->url ? "websocket" : "native";
 
+  long prev = InterlockedCompareExchange(&s_driver_state, desired, DRIVER_UNINIT);
+
+  if (prev == DRIVER_UNINIT) {
+    // First caller: perform initialization
 #ifdef _WIN32
-  // Workaround: The unified taos.dll (v3.4+) corrupts the MSVC CRT's internal
-  // timezone state during initialization. Calling _tzset() beforehand forces the
-  // CRT to cache the correct system timezone from the Windows registry, preventing
-  // subsequent localtime_s() calls from returning UTC instead of local time.
-  _tzset();
+    // Workaround: The unified taos.dll (v3.4+) corrupts the MSVC CRT's internal
+    // timezone state during initialization. Calling _tzset() beforehand forces the
+    // CRT to cache the correct system timezone from the Windows registry, preventing
+    // subsequent localtime_s() calls from returning UTC instead of local time.
+    _tzset();
 #endif
 
-  const char *driver_type = cfg->url ? "websocket" : "native";
-  int rc = taos_options(TSDB_OPTION_DRIVER, driver_type);
-  OD("taos_options(TSDB_OPTION_DRIVER, \"%s\") => %d", driver_type, rc);
+    int rc = taos_options(TSDB_OPTION_DRIVER, driver_type);
+    OD("taos_options(TSDB_OPTION_DRIVER, \"%s\") => %d", driver_type, rc);
+
+    if (rc) {
+      // Reset state so future calls can retry
+      InterlockedExchange(&s_driver_state, DRIVER_UNINIT);
+      conn_append_err_format(conn, "HY000", rc,
+          "General error:taos_options(TSDB_OPTION_DRIVER, \"%s\") failed: %d", driver_type, rc);
+      return SQL_ERROR;
+    }
+    return SQL_SUCCESS;
+  }
+
+  if (prev == desired) {
+    // Already initialized with the same mode
+    return SQL_SUCCESS;
+  }
+
+  // Mismatch: process already initialized with a different mode
+  const char *existing = (prev == DRIVER_NATIVE) ? "native" : "websocket";
+  conn_append_err_format(conn, "HY000", 0,
+      "General error:driver already initialized as \"%s\", cannot switch to \"%s\" within the same process",
+      existing, driver_type);
+  return SQL_ERROR;
 }
 
 static SQLRETURN _do_conn_connect(conn_t *conn)
@@ -546,7 +577,8 @@ static SQLRETURN _do_conn_connect(conn_t *conn)
 
   ds_conn_setup(&conn->ds_conn);
 
-  _init_driver_type(&conn->cfg);
+  sr = _init_driver_type(conn);
+  if (sr != SQL_SUCCESS) return SQL_ERROR;
 
   const conn_cfg_t *cfg = &conn->cfg;
   const char *db = cfg->db;

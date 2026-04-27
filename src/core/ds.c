@@ -241,12 +241,12 @@ static int _ds_res_tsdb_fetch_block(ds_res_t *ds_res)
   TAOS_RES *res = (TAOS_RES*)ds_res->res;
 
   int rows_in_block = 0;
-  TAOS_ROW rows = NULL;
-  r = CALL_taos_fetch_block_s(res, &rows_in_block, &rows);
+  void *raw_block = NULL;
+  r = CALL_taos_fetch_raw_block(res, &rows_in_block, &raw_block);
   if (r == 0) {
     ds_block_t *ds_block = &ds_res->block;
     ds_block->nr_rows_in_block = rows_in_block;
-    ds_block->block            = rows;
+    ds_block->block            = raw_block;
   }
 
   return r;
@@ -265,10 +265,12 @@ static int _ds_block_tsdb_get_into_tsdb(ds_block_t *ds_block, int i_row, int i_c
   int block_mode = 1;
   TAOS_RES     *res    = (TAOS_RES*)ds_res->res;
   TAOS_FIELD   *fields = (TAOS_FIELD*)ds_res->fields.fields;
-  TAOS_ROW      block  = (TAOS_ROW)ds_block->block;
+  const void   *block  = ds_block->block;
   int result_precision = ds_res->result_precision;
 
-  return helper_get_tsdb(res, block_mode, fields, result_precision, block, i_row, i_col, tsdb, ds_err->str, sizeof(ds_err->str));
+  (void)res;
+  (void)block_mode;
+  return helper_get_tsdb_from_raw_block(block, ds_block->nr_rows_in_block, fields, result_precision, i_row, i_col, tsdb, ds_err->str, sizeof(ds_err->str));
 }
 
 static void _ds_res_setup(ds_res_t *ds_res)
