@@ -122,11 +122,15 @@ macro(check_requirements)
     set(REQUIRED_LIB_PATH "")
   endif()
 
-  ## check `taos`
-  set(TAOS_LIB_NAME "taos")
+  ## check `taos` (use taosws on 32-bit Windows)
+  if(TODBC_X86)
+    set(TAOS_LIB_NAME "taosws")
+  else()
+    set(TAOS_LIB_NAME "taos")
+  endif()
   find_library(TAOS NAMES ${TAOS_LIB_NAME} PATHS ${REQUIRED_LIB_PATH})
   if(${TAOS} STREQUAL TAOS-NOTFOUND)
-    message(FATAL_ERROR "${Red}`libtaos.so/libtaos.dylib/taos.dll/taos.lib` is required but not found, you may refer to https://github.com/taosdata/TDengine${ColorReset}")
+    message(FATAL_ERROR "${Red}`${TAOS_LIB_NAME}` is required but not found, you may refer to https://github.com/taosdata/TDengine${ColorReset}")
   endif()
 
   set(CMAKE_REQUIRED_LIBRARIES ${TAOS_LIB_NAME})
