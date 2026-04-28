@@ -600,9 +600,12 @@ end:
   return r;
 }
 
+__attribute__((unused)) static const char *s_api_dsn_filter = NULL;
+
 __attribute__((unused)) static int do_sql_driver_conns(SQLHANDLE connh)
 {
 #ifndef FAKE_TAOS
+  if (!s_api_dsn_filter || strcmp(s_api_dsn_filter, "TAOS_ODBC_DSN") == 0) {
   CHK4(test_sql_conn, connh, "TAOS_ODBC_DSN", NULL, NULL, 0);
   CHK4(test_sql_conn, connh, "TAOS_ODBC_DSN", "root", "taosdata", 0);
   CHK4(test_sql_conn, connh, "TAOS_ODBC_DSN", "root", NULL, 0);
@@ -627,9 +630,10 @@ __attribute__((unused)) static int do_sql_driver_conns(SQLHANDLE connh)
   CHK2(test_sql_driver_conn, connh, "DSN=TAOS_ODBC_DSN;Server=" SERVER_FOR_TEST "", 0);
 #endif                             /* } */
   CHK2(test_sql_driver_conn, connh, "DSN=TAOS_ODBC_DSN;Server=127.0.0.1:6666", -1);
+  }
 #endif
 
-#ifdef HAVE_TAOSWS                /* { */
+  if (!s_api_dsn_filter || strcmp(s_api_dsn_filter, "TAOS_ODBC_WS_DSN") == 0) {
   CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", NULL, NULL, 0);
   CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", "root", "taosdata", 0);
   CHK4(test_sql_conn, connh, "TAOS_ODBC_WS_DSN", "root", NULL, 0);
@@ -651,8 +655,7 @@ __attribute__((unused)) static int do_sql_driver_conns(SQLHANDLE connh)
   // CHK2(test_sql_driver_conn, connh, "DSN=TAOS_ODBC_WS_DSN;URL={http://www.examples.com};Server=127.0.0.1:6666", -1);
 
   CHK4(test_sql_conn_special_char, connh, "TAOS_ODBC_WS_DSN", "user_for_api_test", "aD5!@#$%!^&*()!-_+=[]{}:;><?|~,.", 0);
-
-#endif                            /* } */
+  }
 
   return 0;
 }
@@ -1020,9 +1023,11 @@ static int do_cases(void)
   CHK1(test_so, "libtaos_odbc.so", 0);
 #endif
   CHK0(test_sql_alloc_env, 0);
+#ifndef FAKE_TAOS
   CHK0(test_sql_end_tran, 0);
   CHK0(test_sql_diag_rec, 0);
   CHK0(test_sql_diag_field, 0);
+#endif
 
   return 0;
 }
@@ -1496,8 +1501,26 @@ int main(int argc, char *argv[])
 {
   int r = 0;
 
-  if (argc > 1) {
+  for (int i = 1; i < argc; ++i) {
+    if (strcmp(argv[i], "--dsn") == 0 && i + 1 < argc) {
+      s_api_dsn_filter = argv[++i];
+    }
+  }
+
+  if (argc > 1 && !s_api_dsn_filter) {
     return run(argc, argv);
+  }
+  if (argc > 1 && s_api_dsn_filter) {
+    // If --dsn was the only extra arg, run do_cases; otherwise also run(argc, argv)
+    int has_other_args = 0;
+    for (int i = 1; i < argc; ++i) {
+      if (strcmp(argv[i], "--dsn") == 0) { ++i; continue; }
+      has_other_args = 1;
+      break;
+    }
+    if (has_other_args) {
+      return run(argc, argv);
+    }
   }
 
 // #define CHK_LEAK

@@ -2451,9 +2451,7 @@ static int test_cases_get_data(SQLHANDLE henv)
 #ifndef FAKE_TAOS
     {"DSN=TAOS_ODBC_DSN", TAOS_ODBC, __LINE__},
 #endif
-#ifdef HAVE_TAOSWS                /* { */
     {"DSN=TAOS_ODBC_WS_DSN", TAOS_ODBC, __LINE__},
-#endif                            /* } */
   };
 
   for (size_t i=0; i<sizeof(cases)/sizeof(cases[0]); ++i) {
@@ -2571,9 +2569,7 @@ static int test_cases_prepare(SQLHANDLE henv)
 #ifndef FAKE_TAOS
     {"DSN=TAOS_ODBC_DSN", TAOS_ODBC, __LINE__},
 #endif
-#ifdef HAVE_TAOSWS                /* { */
     {"DSN=TAOS_ODBC_WS_DSN", TAOS_ODBC, __LINE__},
-#endif                            /* } */
   };
 
   for (size_t i=0; i<sizeof(cases)/sizeof(cases[0]); ++i) {
@@ -2609,10 +2605,8 @@ static int test_hard_coded_cases(SQLHANDLE henv)
   if (r) return -1;
 #endif
 
-#ifdef HAVE_TAOSWS                /* { */
   r = test_hard_coded(henv, "TAOS_ODBC_WS_DSN", NULL, NULL, NULL, 0);
   if (r) return -1;
-#endif                            /* } */
 
   return 0;
 }
@@ -2707,6 +2701,8 @@ static int test_chars(const char *conn_str)
   return 0;
 }
 
+static const char *s_odbc_dsn_filter = NULL;
+
 static int run(int argc, char *argv[])
 {
   int r = 0;
@@ -2716,10 +2712,8 @@ static int run(int argc, char *argv[])
     r = test_chars("DSN=TAOS_ODBC_DSN");
     if (r) return -1;
 #endif
-#ifdef HAVE_TAOSWS                /* { */
     r = test_chars("DSN=TAOS_ODBC_WS_DSN");
     if (r) return -1;
-#endif                            /* } */
     return 0;
   }
 
@@ -2734,15 +2728,18 @@ static int run(int argc, char *argv[])
     sr = CALL_SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
     if (FAILED(sr)) { r = -1; break; }
 
-    if (0) r = test_cases_prepare(henv);
-    if (r) break;
+    // Skip hard-coded multi-DSN tests when --dsn filter is active
+    if (!s_odbc_dsn_filter) {
+      if (0) r = test_cases_prepare(henv);
+      if (r) break;
 
-    if (1) r = test_cases_get_data(henv);
-    if (r) break;
+      if (1) r = test_cases_get_data(henv);
+      if (r) break;
 
-    // hard_coded_test_cases
-    if (1) r = test_hard_coded_cases(henv);
-    if (r) break;
+      // hard_coded_test_cases
+      if (1) r = test_hard_coded_cases(henv);
+      if (r) break;
+    }
 
     r = process_by_args_env(argc, argv, henv);
   } while (0);
@@ -2755,6 +2752,13 @@ static int run(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
   int r = 0;
+
+  for (int i = 1; i < argc; ++i) {
+    if (strcmp(argv[i], "--dsn") == 0 && i + 1 < argc) {
+      s_odbc_dsn_filter = argv[i + 1];
+      break;
+    }
+  }
 
   r = run(argc, argv);
 
