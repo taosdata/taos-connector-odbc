@@ -530,8 +530,21 @@ static volatile long s_driver_state = DRIVER_UNINIT;
 static SQLRETURN _init_driver_type(conn_t *conn)
 {
   const conn_cfg_t *cfg = &conn->cfg;
+
+#ifdef TODBC_X86
+  // x86: only websocket is supported (no native TDengine client library for 32-bit)
+  if (!cfg->url) {
+    conn_append_err_format(conn, "HY000", 0,
+        "General error:native mode is not supported on x86 platform, "
+        "please configure a WebSocket URL (e.g. URL=http://host:6041)");
+    return SQL_ERROR;
+  }
+  long desired = DRIVER_WEBSOCKET;
+  const char *driver_type = "websocket";
+#else
   long desired = cfg->url ? DRIVER_WEBSOCKET : DRIVER_NATIVE;
   const char *driver_type = cfg->url ? "websocket" : "native";
+#endif
 
   long prev = InterlockedCompareExchange(&s_driver_state, desired, DRIVER_UNINIT);
 
