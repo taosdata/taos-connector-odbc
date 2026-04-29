@@ -521,18 +521,21 @@ static SQLRETURN _conn_post_connected(conn_t *conn)
 }
 
 // Driver initialization states
-#define DRIVER_UNINIT    0
-#define DRIVER_NATIVE    1
-#define DRIVER_WEBSOCKET 2
+#define DRIVER_UNINIT        0
+#define DRIVER_INITIALIZING  1
+#define DRIVER_NATIVE        2
+#define DRIVER_WEBSOCKET     3
 
 static volatile long s_driver_state = DRIVER_UNINIT;
 
 #ifdef _WIN32
 #define ATOMIC_CAS(ptr, expected, desired) InterlockedCompareExchange((ptr), (desired), (expected))
 #define ATOMIC_SET(ptr, val)               InterlockedExchange((ptr), (val))
+#define ATOMIC_LOAD(ptr)                   InterlockedCompareExchange((ptr), 0, 0)
 #else
 #define ATOMIC_CAS(ptr, expected, desired) __sync_val_compare_and_swap((ptr), (expected), (desired))
 #define ATOMIC_SET(ptr, val)               __sync_lock_test_and_set((ptr), (val))
+#define ATOMIC_LOAD(ptr)                   __sync_val_compare_and_swap((ptr), 0, 0)
 #endif
 
 static SQLRETURN _init_driver_type(conn_t *conn)
@@ -554,7 +557,7 @@ static SQLRETURN _init_driver_type(conn_t *conn)
   const char *driver_type = cfg->url ? "websocket" : "native";
 #endif
 
-  long prev = ATOMIC_CAS(&s_driver_state, DRIVER_UNINIT, desired);
+  long prev = ATOMIC_CAS(&s_driver_state, DRIVER_UNINIT, DRIVER_INITIALIZING);
 
   if (prev == DRIVER_UNINIT) {
     // First caller: perform initialization
@@ -576,7 +579,25 @@ static SQLRETURN _init_driver_type(conn_t *conn)
           "General error:taos_options(TSDB_OPTION_DRIVER, \"%s\") failed: %d", driver_type, rc);
       return SQL_ERROR;
     }
+    // Publish the final initialized state so waiting threads can proceed
+    ATOMIC_SET(&s_driver_state, desired);
     return SQL_SUCCESS;
+  }
+
+  // Another thread is currently initializing; spin-wait until it finishes
+  if (prev == DRIVER_INITIALIZING) {
+    while ((prev = ATOMIC_LOAD(&s_driver_state)) == DRIVER_INITIALIZING) {
+#ifdef _WIN32
+      SwitchToThread();
+#else
+      sched_yield();
+#endif
+    }
+    // After spin: prev is now DRIVER_UNINIT (init failed), DRIVER_NATIVE, or DRIVER_WEBSOCKET
+    if (prev == DRIVER_UNINIT) {
+      // Previous initializer failed; retry recursively
+      return _init_driver_type(conn);
+    }
   }
 
   if (prev == desired) {
