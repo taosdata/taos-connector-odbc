@@ -374,7 +374,7 @@ static INT_PTR OnInitDlg(HWND hDlg, WPARAM wParam, LPARAM lParam)
   LPCSTR lpszAttributes = gAttributes;
   CheckRadioButton(hDlg, IDC_RAD_TAOS, IDC_RAD_TAOSWS, IDC_RAD_TAOSWS);
   SwitchTaos(hDlg, FALSE);
-#ifdef FAKE_TAOS
+#ifndef HAVE_NATIVE
   ShowWindow(GetDlgItem(hDlg, IDC_RAD_TAOS), FALSE);
 #endif
 
@@ -404,7 +404,7 @@ static INT_PTR OnInitDlg(HWND hDlg, WPARAM wParam, LPARAM lParam)
             CheckRadioButton(hDlg, IDC_RAD_TAOS, IDC_RAD_TAOSWS, IDC_RAD_TAOSWS);
             SwitchTaos(hDlg, FALSE);
           }
-#ifdef FAKE_TAOS
+#ifndef HAVE_NATIVE
           ShowWindow(GetDlgItem(hDlg, IDC_RAD_TAOS), FALSE);
 #endif
 

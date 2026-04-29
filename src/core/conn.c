@@ -308,7 +308,7 @@ static SQLRETURN _conn_get_configs_from_information_schema_ins_configs(conn_t *c
 {
   int r = 0;
 
-#ifdef FAKE_TAOS            /* { */
+#ifndef HAVE_NATIVE         /* { */
   if (1) return SQL_SUCCESS;
 #endif                      /* } */
 
@@ -344,7 +344,7 @@ static int _conn_setup_iconvs(conn_t *conn)
     tsdb_charset = "UTF-8";  // WebSocket mode only supports UTF-8
   }
 
-#ifdef FAKE_TAOS            /* { */
+#ifndef HAVE_NATIVE         /* { */
   sqlc_charset = "GB18030";
   tsdb_charset = "UTF-8";
 #endif                      /* } */
@@ -431,7 +431,7 @@ static int _conn_get_timezone(conn_t *conn)
 {
   int r = 0;
 
-// #ifdef FAKE_TAOS            /* { */
+// #ifndef HAVE_NATIVE         /* { */
 //   conn->tz = 800;
 //   conn->tz_seconds = 28800;
 //   return 0;

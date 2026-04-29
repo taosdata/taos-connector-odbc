@@ -1702,7 +1702,7 @@ int main(int argc, char *argv[])
     }
   }
 
-#ifndef FAKE_TAOS
+#ifdef HAVE_NATIVE
   if (!dsn_filter || strcmp(dsn_filter, "TAOS_ODBC_DSN") == 0) {
     if (r == 0) r = test("DSN=TAOS_ODBC_DSN", 0);
   }

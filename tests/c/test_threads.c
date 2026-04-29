@@ -607,7 +607,7 @@ int main(int argc, char *argv[])
     r = _run(argc, argv, dsn_from_args);
   } else {
     // Legacy behavior: run both DSNs sequentially
-#ifndef FAKE_TAOS
+#ifdef HAVE_NATIVE
     if (r == 0) r = _run(argc, argv, "TAOS_ODBC_DSN");
 #endif
     if (r == 0) r = _run(argc, argv, "TAOS_ODBC_WS_DSN");

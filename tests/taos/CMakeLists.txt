@@ -43,7 +43,7 @@ else()
 endif()
 target_link_libraries(taos_test ${TAOS_LIB_NAME})
 
-if(NOT FAKE_TAOS)
+if(HAVE_NATIVE)
   add_test(NAME taos_test
         COMMAND "${CMAKE_COMMAND}" -E env
             TAOS_TEST_CASES=${CMAKE_CURRENT_SOURCE_DIR}/taos_test.cases
@@ -77,7 +77,7 @@ else()
 endif()
 target_link_libraries(taos_regression ${TAOS_LIB_NAME})
 
-if(NOT FAKE_TAOS)
+if(HAVE_NATIVE)
   if(DEFINED SERVER_FOR_TEST)
     add_test(NAME taos_regression
         COMMAND taos_regression --ip "${HOST_FOR_TEST}" --port "${PORT_FOR_TEST}")

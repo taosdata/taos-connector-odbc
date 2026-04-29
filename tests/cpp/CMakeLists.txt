@@ -35,7 +35,7 @@ else()
   target_link_libraries(SQLBindCol odbc32)
 endif()
 
-if(NOT FAKE_TAOS)
+if(HAVE_NATIVE)
     add_test(NAME SQLBindCol
         COMMAND SQLBindCol --dsn TAOS_ODBC_DSN)
 endif()

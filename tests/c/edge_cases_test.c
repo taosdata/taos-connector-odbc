@@ -613,7 +613,7 @@ static int test(void)
 #endif               /* } */
 
   int r = 0;
-#ifndef FAKE_TAOS
+#ifdef HAVE_NATIVE
   r = test_with_conn_str("DSN=TAOS_ODBC_DSN", 0);
   if (r) return -1;
 #endif
@@ -637,7 +637,7 @@ int main(int argc, char *argv[])
   CHECK(!test_connect(NULL, "xTAOS_ODBC_DSN", NULL, NULL));
 
   int r = 0;
-#ifndef FAKE_TAOS
+#ifdef HAVE_NATIVE
   if (!dsn_filter || strcmp(dsn_filter, "TAOS_ODBC_DSN") == 0) {
     r = test_with_conn_str("DSN=TAOS_ODBC_DSN", 0);
     if (r) { fprintf(stderr, "==failure==\n"); return 1; }

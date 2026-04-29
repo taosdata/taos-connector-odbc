@@ -156,7 +156,7 @@ namespace ConsoleApp1
 
             String ts = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
             String tsZ = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
-#if HAVE_TAOS
+#if HAVE_NATIVE
             if (dsnFilter == null || dsnFilter == "TAOS_ODBC_DSN") {
                 run(false, ts);
                 run(false, tsZ);

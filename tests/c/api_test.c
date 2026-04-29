@@ -604,7 +604,7 @@ __attribute__((unused)) static const char *s_api_dsn_filter = NULL;
 
 __attribute__((unused)) static int do_sql_driver_conns(SQLHANDLE connh)
 {
-#ifndef FAKE_TAOS
+#ifdef HAVE_NATIVE
   if (!s_api_dsn_filter || strcmp(s_api_dsn_filter, "TAOS_ODBC_DSN") == 0) {
   CHK4(test_sql_conn, connh, "TAOS_ODBC_DSN", NULL, NULL, 0);
   CHK4(test_sql_conn, connh, "TAOS_ODBC_DSN", "root", "taosdata", 0);
@@ -1033,7 +1033,7 @@ static int do_cases(void)
   CHK1(test_so, "libtaos_odbc.so", 0);
 #endif
   CHK0(test_sql_alloc_env, 0);
-#ifndef FAKE_TAOS
+#ifdef HAVE_NATIVE
   CHK0(test_sql_end_tran, 0);
   CHK0(test_sql_diag_rec, 0);
   CHK0(test_sql_diag_field, 0);
