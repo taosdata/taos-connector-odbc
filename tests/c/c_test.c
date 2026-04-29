@@ -1596,38 +1596,36 @@ static int test_json_tag(handles_t *handles, const char *connstr, int ws)
   r = _execute_batches_of_statements(handles, sqls);
   if (r) return -1;
 
-  if (!ws) {
-    sql = "insert into foo.s1_1 using foo.s1 tags (?) values (?, ?)";
-    r = INSERT_WITH_VALUES(handles, sql, 2, 3,
-      "{\"k1\":\"值1\"}", "{\"k1\":\"值1\"}",
-      "2023-05-14 12:13:14.567", "2023-05-14 12:13:14.568",
-      "1", "2");
-    if (r) return -1;
+  sql = "insert into foo.s1_1 using foo.s1 tags (?) values (?, ?)";
+  r = INSERT_WITH_VALUES(handles, sql, 2, 3,
+    "{\"k1\":\"值1\"}", "{\"k1\":\"值1\"}",
+    "2023-05-14 12:13:14.567", "2023-05-14 12:13:14.568",
+    "1", "2");
+  if (r) return -1;
 
-    sql = "select * from foo.s1";
-    r = CHECK_WITH_VALUES(handles, 0, sql, 2, 3,
-      "2023-05-14 12:13:14.567", "1", "{\"k1\":\"值1\"}",
-      "2023-05-14 12:13:14.568", "2", "{\"k1\":\"值1\"}");
-    if (r) return -1;
+  sql = "select * from foo.s1";
+  r = CHECK_WITH_VALUES(handles, 0, sql, 2, 3,
+    "2023-05-14 12:13:14.567", "1", "{\"k1\":\"值1\"}",
+    "2023-05-14 12:13:14.568", "2", "{\"k1\":\"值1\"}");
+  if (r) return -1;
 
-    sql = "select info->'k1' from foo.s1";
-    r = CHECK_WITH_VALUES(handles, 0, sql, 2, 1,
-      "\"值1\"",
-      "\"值1\"");
-    if (r) return -1;
+  sql = "select info->'k1' from foo.s1";
+  r = CHECK_WITH_VALUES(handles, 0, sql, 2, 1,
+    "\"值1\"",
+    "\"值1\"");
+  if (r) return -1;
 
-    sql = "select v1 from foo.s1 where info contains 'k1'";
-    r = CHECK_WITH_VALUES(handles, 0, sql, 2, 1,
-      "1",
-      "2");
-    if (r) return -1;
+  sql = "select v1 from foo.s1 where info contains 'k1'";
+  r = CHECK_WITH_VALUES(handles, 0, sql, 2, 1,
+    "1",
+    "2");
+  if (r) return -1;
 
-    sql = "select v1 from foo.s1 where info->'k1' match '值1'";
-    r = CHECK_WITH_VALUES(handles, 0, sql, 2, 1,
-      "1",
-      "2");
-    if (r) return -1;
-  }
+  sql = "select v1 from foo.s1 where info->'k1' match '值1'";
+  r = CHECK_WITH_VALUES(handles, 0, sql, 2, 1,
+    "1",
+    "2");
+  if (r) return -1;
 
   return 0;
 }

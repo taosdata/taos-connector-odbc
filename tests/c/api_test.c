@@ -741,7 +741,8 @@ static int test_sql_end_tran() {
   sr = CALL_SQLAllocHandle(SQL_HANDLE_DBC, envh, &connh);
   assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
 
-  sr = CALL_SQLConnect(connh, (SQLCHAR*)"TAOS_ODBC_DSN", SQL_NTS, (SQLCHAR*)NULL, SQL_NTS, (SQLCHAR*)NULL, SQL_NTS);
+  const char *dsn = s_api_dsn_filter ? s_api_dsn_filter : "TAOS_ODBC_DSN";
+  sr = CALL_SQLConnect(connh, (SQLCHAR*)dsn, SQL_NTS, (SQLCHAR*)NULL, SQL_NTS, (SQLCHAR*)NULL, SQL_NTS);
   assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
 
   // End transaction (commit)
@@ -781,7 +782,10 @@ static int test_sql_diag_rec() {
   sr = CALL_SQLAllocHandle(SQL_HANDLE_DBC, envh, &connh);
   assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
 
-  sr = CALL_SQLConnect(connh, (SQLCHAR*)"TAOS_ODBC_DSN", SQL_NTS, (SQLCHAR*)NULL, SQL_NTS, (SQLCHAR*)NULL, SQL_NTS);
+  {
+    const char *dsn = s_api_dsn_filter ? s_api_dsn_filter : "TAOS_ODBC_DSN";
+    sr = CALL_SQLConnect(connh, (SQLCHAR*)dsn, SQL_NTS, (SQLCHAR*)NULL, SQL_NTS, (SQLCHAR*)NULL, SQL_NTS);
+  }
   assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
 
   // Intentionally cause an error by setting an invalid attribute
@@ -911,7 +915,10 @@ static void test_sql_diag_field_stmt() {
   sr = CALL_SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
   assert(sr == SQL_SUCCESS);
 
-  sr = CALL_SQLConnect(dbc, (SQLCHAR*)"TAOS_ODBC_DSN", SQL_NTS, (SQLCHAR*)NULL, SQL_NTS, (SQLCHAR*)NULL, SQL_NTS);
+  {
+    const char *dsn = s_api_dsn_filter ? s_api_dsn_filter : "TAOS_ODBC_DSN";
+    sr = CALL_SQLConnect(dbc, (SQLCHAR*)dsn, SQL_NTS, (SQLCHAR*)NULL, SQL_NTS, (SQLCHAR*)NULL, SQL_NTS);
+  }
   assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
 
   sr = CALL_SQLAllocHandle(SQL_HANDLE_STMT, dbc, &stmt);
@@ -955,7 +962,10 @@ static void test_sql_diag_field_desc() {
   sr = CALL_SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
   assert(sr == SQL_SUCCESS);
 
-  sr = CALL_SQLConnect(dbc, (SQLCHAR*)"TAOS_ODBC_DSN", SQL_NTS, (SQLCHAR*)NULL, SQL_NTS, (SQLCHAR*)NULL, SQL_NTS);
+  {
+    const char *dsn = s_api_dsn_filter ? s_api_dsn_filter : "TAOS_ODBC_DSN";
+    sr = CALL_SQLConnect(dbc, (SQLCHAR*)dsn, SQL_NTS, (SQLCHAR*)NULL, SQL_NTS, (SQLCHAR*)NULL, SQL_NTS);
+  }
   assert(sr == SQL_SUCCESS || sr == SQL_SUCCESS_WITH_INFO);
 
   sr = CALL_SQLAllocHandle(SQL_HANDLE_DESC, dbc, &desc);

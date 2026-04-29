@@ -31,7 +31,7 @@
 #define _helper_raw_bit_pos(_n)               ((_n) & ((1 << _HELPER_RAW_BLOCK_NBIT) - 1))
 #define _helper_raw_bitmap_char_pos(bm_, r_)  ((bm_)[(r_) >> _HELPER_RAW_BLOCK_NBIT])
 #define _helper_raw_col_data_is_null(bm_, r_) ((_helper_raw_bitmap_char_pos(bm_, r_) & (1u << (7u - _helper_raw_bit_pos(r_)))) == (1u << (7u - _helper_raw_bit_pos(r_))))
-#define _helper_raw_bitmap_len(_n)            (((_n) + ((1 << _HELPER_RAW_BLOCK_NBIT) - 1)) >> _HELPER_RAW_BLOCK_NBIT)
+#define _helper_raw_bitmap_len(_n)            ((size_t)(((_n) + ((1 << _HELPER_RAW_BLOCK_NBIT) - 1)) >> _HELPER_RAW_BLOCK_NBIT))
 
 typedef struct _helper_raw_block_layout_s {
   int32_t magic;

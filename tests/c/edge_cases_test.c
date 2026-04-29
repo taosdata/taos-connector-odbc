@@ -558,6 +558,7 @@ static int test_with_conn_str(const char *conn_str, int ws)
   return r;
 }
 
+static int test(void) __attribute__((unused));
 static int test(void)
 {
   srand((unsigned int)time(0));

@@ -654,7 +654,9 @@ static SQLRETURN _execute(stmt_base_t *base)
 
   res->affected_row_count = affected_rows;
   res->res = CALL_taos_stmt2_result(stmt->stmt);
-  res->res_needs_free = res->res ? 1 : 0;
+  // stmt2 owns the result internally; taos_stmt2_close will clean it up.
+  // Do NOT call taos_free_result on stmt2 results to avoid double-free.
+  res->res_needs_free = 0;
 
     int e = CALL_taos_errno(res->res);
     if (e) {

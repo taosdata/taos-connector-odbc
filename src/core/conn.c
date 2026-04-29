@@ -527,6 +527,14 @@ static SQLRETURN _conn_post_connected(conn_t *conn)
 
 static volatile long s_driver_state = DRIVER_UNINIT;
 
+#ifdef _WIN32
+#define ATOMIC_CAS(ptr, expected, desired) InterlockedCompareExchange((ptr), (desired), (expected))
+#define ATOMIC_SET(ptr, val)               InterlockedExchange((ptr), (val))
+#else
+#define ATOMIC_CAS(ptr, expected, desired) __sync_val_compare_and_swap((ptr), (expected), (desired))
+#define ATOMIC_SET(ptr, val)               __sync_lock_test_and_set((ptr), (val))
+#endif
+
 static SQLRETURN _init_driver_type(conn_t *conn)
 {
   const conn_cfg_t *cfg = &conn->cfg;
@@ -546,7 +554,7 @@ static SQLRETURN _init_driver_type(conn_t *conn)
   const char *driver_type = cfg->url ? "websocket" : "native";
 #endif
 
-  long prev = InterlockedCompareExchange(&s_driver_state, desired, DRIVER_UNINIT);
+  long prev = ATOMIC_CAS(&s_driver_state, DRIVER_UNINIT, desired);
 
   if (prev == DRIVER_UNINIT) {
     // First caller: perform initialization
@@ -563,7 +571,7 @@ static SQLRETURN _init_driver_type(conn_t *conn)
 
     if (rc) {
       // Reset state so future calls can retry
-      InterlockedExchange(&s_driver_state, DRIVER_UNINIT);
+      ATOMIC_SET(&s_driver_state, DRIVER_UNINIT);
       conn_append_err_format(conn, "HY000", rc,
           "General error:taos_options(TSDB_OPTION_DRIVER, \"%s\") failed: %d", driver_type, rc);
       return SQL_ERROR;
