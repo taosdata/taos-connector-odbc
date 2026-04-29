@@ -248,19 +248,66 @@ static void check_taos_connection(HWND hDlg, config_t *config)
   snprintf(title, sizeof(title), "%s (x86)", title);
 #endif
 
-  int r = ParseServer(hDlg, config);
-  if (r) {
-    LoadString(hInstance, IDS_TEST_CONN_SERVER_INVALID, message, sizeof(message));
-    MessageBox(hDlg, message, title, MB_OK | MB_ICONEXCLAMATION);
-    return;
+  const char *host = NULL;
+  const char *user = NULL;
+  const char *pass = NULL;
+  const char *db   = NULL;
+  uint16_t    port = 0;
+  url_parser_param_t url_param = {0};
+
+  if (config->url_checked && config->url[0]) {
+    // WebSocket mode: parse URL to extract connection parameters
+    char drv_err[256] = {0};
+    if (conn_init_driver_type(1, drv_err, sizeof(drv_err))) {
+      MessageBox(hDlg, drv_err, title, MB_OK | MB_ICONEXCLAMATION);
+      return;
+    }
+
+    int r = url_parser_parse(config->url, strlen(config->url), &url_param);
+    if (r) {
+      char buf[1024];
+      snprintf(buf, sizeof(buf), "Failed to parse URL `%s`:%s", config->url, url_param.ctx.err_msg);
+      MessageBox(hDlg, buf, title, MB_OK | MB_ICONEXCLAMATION);
+      url_parser_param_release(&url_param);
+      return;
+    }
+
+    host = url_param.url.host;
+    port = url_param.url.port;
+    // URL user/pass as fallback; dialog fields take precedence
+    if (config->user[0])     user = config->user;
+    else if (url_param.url.user && url_param.url.user[0]) user = url_param.url.user;
+    if (config->password[0]) pass = config->password;
+    else if (url_param.url.pass && url_param.url.pass[0]) pass = url_param.url.pass;
+    if (config->database[0]) db = config->database;
+    else if (url_param.url.path && url_param.url.path[0]) {
+      const char *p = url_param.url.path;
+      if (p[0] == '/') p++;
+      if (p[0]) db = p;
+    }
+  } else {
+    // Native mode: parse SERVER field for host:port
+    char drv_err[256] = {0};
+    if (conn_init_driver_type(0, drv_err, sizeof(drv_err))) {
+      MessageBox(hDlg, drv_err, title, MB_OK | MB_ICONEXCLAMATION);
+      return;
+    }
+
+    int r = ParseServer(hDlg, config);
+    if (r) {
+      LoadString(hInstance, IDS_TEST_CONN_SERVER_INVALID, message, sizeof(message));
+      MessageBox(hDlg, message, title, MB_OK | MB_ICONEXCLAMATION);
+      return;
+    }
+    host = config->host[0] ? config->host : NULL;
+    port = config->port;
+    user = config->user[0] ? config->user : NULL;
+    pass = config->password[0] ? config->password : NULL;
+    db   = config->database[0] ? config->database : NULL;
   }
+
   TAOS *taos = NULL;
-  taos = taos_connect(
-      config->host[0] ? config->host : NULL,
-      config->user[0] ? config->user : NULL,
-      config->password[0] ? config->password : NULL,
-      config->database[0] ? config->database : NULL,
-      config->port);
+  taos = CALL_taos_connect(host, user, pass, db, port);
   if (!taos) {
     int e = taos_errno(NULL);
     char buf[1024];
@@ -274,6 +321,7 @@ static void check_taos_connection(HWND hDlg, config_t *config)
   if (taos) {
     taos_close(taos);
   }
+  url_parser_param_release(&url_param);
 }
 
 static int validate_url(HWND hDlg, const char *url, url_parser_param_t *param)

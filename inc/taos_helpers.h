@@ -73,6 +73,14 @@ static inline void call_taos_cleanup(const char *file, int line, const char *fun
   LOGD_TAOS(file, line, func, "taos_cleanup() => void");
 }
 
+static inline int call_taos_options(const char *file, int line, const char *func, TSDB_OPTION option, const void *arg)
+{
+  LOGD_TAOS(file, line, func, "taos_options(option:%d,arg:%p) ...", option, arg);
+  int r = taos_options(option, arg);
+  LOGD_TAOS(file, line, func, "taos_options(option:%d,arg:%p) => %d", option, arg, r);
+  return r;
+}
+
 static inline setConfRet call_taos_set_config(const char *file, int line, const char *func, const char *config)
 {
   LOGD_TAOS(file, line, func, "taos_set_config(config:%s) ...", config);
@@ -898,7 +906,7 @@ static inline int call_taos_get_current_db(const char *file, int line, const cha
 }
 
 #define CALL_taos_cleanup(...) call_taos_cleanup(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
-// #define CALL_taos_options(...) call_taos_options(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define CALL_taos_options(...) call_taos_options(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_taos_set_config(...) call_taos_set_config(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_taos_init(...) call_taos_init(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_taos_connect(...) call_taos_connect(__FILE__, __LINE__, __func__, ##__VA_ARGS__)

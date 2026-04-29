@@ -538,6 +538,47 @@ static volatile long s_driver_state = DRIVER_UNINIT;
 #define ATOMIC_LOAD(ptr)                   __sync_val_compare_and_swap((ptr), 0, 0)
 #endif
 
+int conn_init_driver_type(int is_websocket, char *errbuf, size_t errlen)
+{
+  long desired = is_websocket ? DRIVER_WEBSOCKET : DRIVER_NATIVE;
+  const char *driver_type = is_websocket ? "websocket" : "native";
+
+  long prev = ATOMIC_CAS(&s_driver_state, DRIVER_UNINIT, DRIVER_INITIALIZING);
+
+  if (prev == DRIVER_UNINIT) {
+#ifdef _WIN32
+    _tzset();
+#endif
+    int rc = CALL_taos_options(TSDB_OPTION_DRIVER, driver_type);
+    if (rc) {
+      ATOMIC_SET(&s_driver_state, DRIVER_UNINIT);
+      if (errbuf) snprintf(errbuf, errlen, "taos_options(TSDB_OPTION_DRIVER, \"%s\") failed: %d", driver_type, rc);
+      return -1;
+    }
+    ATOMIC_SET(&s_driver_state, desired);
+    return 0;
+  }
+
+  if (prev == DRIVER_INITIALIZING) {
+    while ((prev = ATOMIC_LOAD(&s_driver_state)) == DRIVER_INITIALIZING) {
+#ifdef _WIN32
+      SwitchToThread();
+#else
+      sched_yield();
+#endif
+    }
+    if (prev == DRIVER_UNINIT) {
+      return conn_init_driver_type(is_websocket, errbuf, errlen);
+    }
+  }
+
+  if (prev == desired) return 0;
+
+  const char *existing = (prev == DRIVER_NATIVE) ? "native" : "websocket";
+  if (errbuf) snprintf(errbuf, errlen, "driver already initialized as \"%s\", cannot switch to \"%s\"", existing, driver_type);
+  return -1;
+}
+
 static SQLRETURN _init_driver_type(conn_t *conn)
 {
   const conn_cfg_t *cfg = &conn->cfg;
@@ -550,67 +591,74 @@ static SQLRETURN _init_driver_type(conn_t *conn)
         "please configure a WebSocket URL (e.g. URL=http://host:6041)");
     return SQL_ERROR;
   }
-  long desired = DRIVER_WEBSOCKET;
-  const char *driver_type = "websocket";
-#else
-  long desired = cfg->url ? DRIVER_WEBSOCKET : DRIVER_NATIVE;
-  const char *driver_type = cfg->url ? "websocket" : "native";
 #endif
 
-  long prev = ATOMIC_CAS(&s_driver_state, DRIVER_UNINIT, DRIVER_INITIALIZING);
+  int is_websocket = !!cfg->url;
+  char errbuf[256] = {0};
+  int r = conn_init_driver_type(is_websocket, errbuf, sizeof(errbuf));
+  if (r) {
+    conn_append_err_format(conn, "HY000", 0, "General error:%s", errbuf);
+    return SQL_ERROR;
+  }
+  return SQL_SUCCESS;
+}
 
-  if (prev == DRIVER_UNINIT) {
-    // First caller: perform initialization
-#ifdef _WIN32
-    // Workaround: The unified taos.dll (v3.4+) corrupts the MSVC CRT's internal
-    // timezone state during initialization. Calling _tzset() beforehand forces the
-    // CRT to cache the correct system timezone from the Windows registry, preventing
-    // subsequent localtime_s() calls from returning UTC instead of local time.
-    _tzset();
-#endif
+static int _conn_fill_cfg_from_url(conn_t *conn)
+{
+  conn_cfg_t *cfg = &conn->cfg;
+  if (!cfg->url) return 0;
 
-    int rc = taos_options(TSDB_OPTION_DRIVER, driver_type);
-    OD("taos_options(TSDB_OPTION_DRIVER, \"%s\") => %d", driver_type, rc);
-
-    if (rc) {
-      // Reset state so future calls can retry
-      ATOMIC_SET(&s_driver_state, DRIVER_UNINIT);
-      conn_append_err_format(conn, "HY000", rc,
-          "General error:taos_options(TSDB_OPTION_DRIVER, \"%s\") failed: %d", driver_type, rc);
-      return SQL_ERROR;
-    }
-    // Publish the final initialized state so waiting threads can proceed
-    ATOMIC_SET(&s_driver_state, desired);
-    return SQL_SUCCESS;
+  int rc = -1;
+  url_parser_param_t param = {0};
+  int r = url_parser_parse(cfg->url, strlen(cfg->url), &param);
+  if (r) {
+    conn_append_err_format(conn, "HY000", 0,
+        "General error:failed to parse URL `%s`:%s", cfg->url, param.ctx.err_msg);
+    goto _out;
   }
 
-  // Another thread is currently initializing; spin-wait until it finishes
-  if (prev == DRIVER_INITIALIZING) {
-    while ((prev = ATOMIC_LOAD(&s_driver_state)) == DRIVER_INITIALIZING) {
-#ifdef _WIN32
-      SwitchToThread();
-#else
-      sched_yield();
-#endif
-    }
-    // After spin: prev is now DRIVER_UNINIT (init failed), DRIVER_NATIVE, or DRIVER_WEBSOCKET
-    if (prev == DRIVER_UNINIT) {
-      // Previous initializer failed; retry recursively
-      return _init_driver_type(conn);
+  // Fill cfg fields from URL as fallback (cfg explicit values take precedence)
+  if (param.url.host && param.url.host[0] && (!cfg->ip || !cfg->ip[0])) {
+    TOD_SAFE_FREE(cfg->ip);
+    cfg->ip = strdup(param.url.host);
+    if (!cfg->ip) goto _oom;
+  }
+
+  if (param.url.port && !cfg->port) {
+    cfg->port = param.url.port;
+  }
+
+  if (param.url.user && param.url.user[0] && (!cfg->uid || !cfg->uid[0])) {
+    TOD_SAFE_FREE(cfg->uid);
+    cfg->uid = strdup(param.url.user);
+    if (!cfg->uid) goto _oom;
+  }
+
+  if (param.url.pass && param.url.pass[0] && (!cfg->pwd || !cfg->pwd[0])) {
+    TOD_SAFE_FREE(cfg->pwd);
+    cfg->pwd = strdup(param.url.pass);
+    if (!cfg->pwd) goto _oom;
+  }
+
+  // URL path (without leading '/') is treated as database name
+  if (param.url.path && param.url.path[0] && (!cfg->db || !cfg->db[0])) {
+    const char *path = param.url.path;
+    if (path[0] == '/') path++;
+    if (path[0]) {
+      TOD_SAFE_FREE(cfg->db);
+      cfg->db = strdup(path);
+      if (!cfg->db) goto _oom;
     }
   }
 
-  if (prev == desired) {
-    // Already initialized with the same mode
-    return SQL_SUCCESS;
-  }
+  rc = 0;
+  goto _out;
 
-  // Mismatch: process already initialized with a different mode
-  const char *existing = (prev == DRIVER_NATIVE) ? "native" : "websocket";
-  conn_append_err_format(conn, "HY000", 0,
-      "General error:driver already initialized as \"%s\", cannot switch to \"%s\" within the same process",
-      existing, driver_type);
-  return SQL_ERROR;
+_oom:
+  conn_oom(conn);
+_out:
+  url_parser_param_release(&param);
+  return rc;
 }
 
 static SQLRETURN _do_conn_connect(conn_t *conn)
@@ -621,6 +669,8 @@ static SQLRETURN _do_conn_connect(conn_t *conn)
 
   sr = _init_driver_type(conn);
   if (sr != SQL_SUCCESS) return SQL_ERROR;
+
+  if (_conn_fill_cfg_from_url(conn)) return SQL_ERROR;
 
   const conn_cfg_t *cfg = &conn->cfg;
   const char *db = cfg->db;
@@ -1386,7 +1436,7 @@ SQLRETURN conn_get_info(
     case SQL_CURSOR_COMMIT_BEHAVIOR:
       *(SQLUSMALLINT*)InfoValuePtr = SQL_CB_DELETE; // NOTE: refer to msdn listed above
       return SQL_SUCCESS;
-    case SQL_CURSOR_ROLLBACK_BEHAVIOR: 
+    case SQL_CURSOR_ROLLBACK_BEHAVIOR:
       *(SQLUSMALLINT*)InfoValuePtr = SQL_CB_DELETE; // NOTE: refer to msdn listed above
       return SQL_SUCCESS;
     case SQL_CURSOR_SENSITIVITY:
