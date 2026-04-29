@@ -5535,7 +5535,7 @@ static const sqlc_sql_map_t          _sqlc_sql_map[] = {
     _stmt_param_bind_set_IPD_record_sql_tinyint,
     _stmt_param_get_sqlc_short,
     _stmt_param_check_dummy,
-    _stmt_param_guess_sqlc_short},  
+    _stmt_param_guess_sqlc_short},
 
   {SQL_C_STINYINT, SQL_TINYINT,
     _stmt_param_bind_set_APD_record_sqlc_tinyint,
@@ -7347,7 +7347,7 @@ static const param_bind_map_t _param_bind_map[] = {
 
   {SQL_C_SHORT, SQL_BIT, TSDB_DATA_TYPE_BOOL,
     _stmt_param_adjust_reuse_sqlc_short,
-    _stmt_param_conv_dummy},  
+    _stmt_param_conv_dummy},
 
   {SQL_C_STINYINT, SQL_TINYINT, TSDB_DATA_TYPE_TINYINT,
     _stmt_param_adjust_reuse_sqlc_tinyint,
@@ -7856,7 +7856,14 @@ static SQLRETURN _stmt_pack_stmt2_var_bind(tsdb_param_column_t *param_column, TA
     if (n <= 0) continue;
 
     size_t src = stride * (size_t)i;
-    if (dst != src) memmove(buf + dst, buf + src, (size_t)n);
+    if (dst != src) {
+      // dst is always <= src because we're packing forward;
+      // use faster memcpy when regions don't overlap
+      if (dst + (size_t)n <= src)
+        memcpy(buf + dst, buf + src, (size_t)n);
+      else
+        memmove(buf + dst, buf + src, (size_t)n);
+    }
     dst += (size_t)n;
   }
 
@@ -8333,7 +8340,7 @@ SQLRETURN stmt_set_attr(stmt_t *stmt, SQLINTEGER Attribute, SQLPOINTER ValuePtr,
 #endif                       /* } */
     case SQL_ATTR_CONCURRENCY:
       if (stmt->conn->cfg.customproduct == CUSTP_ADO) {
-        if ((SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_LOCK || (SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_READ_ONLY) 
+        if ((SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_LOCK || (SQLULEN)(uintptr_t)ValuePtr == SQL_CONCUR_READ_ONLY)
         {
           stmt->concurrency_attr = (SQLULEN)ValuePtr;
           return SQL_SUCCESS;
@@ -8602,7 +8609,7 @@ static SQLRETURN _stmt_get_diag_cursor_row_number(
   (void)DiagIdentifier;
   (void)BufferLength;
   (void)StringLengthPtr;
-  
+
   if (RecNumber == 0) {
     *(SQLLEN*)DiagInfoPtr = SQL_ROW_NUMBER_UNKNOWN;
   } else {
