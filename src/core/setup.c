@@ -321,7 +321,7 @@ static void check_taos_connection(HWND hDlg, config_t *config)
         char buf[1024];
         snprintf(buf, sizeof(buf), "taos_set_conn_mode(BI) failed:[%d/0x%x]%s", e, e, taos_errstr(NULL));
         MessageBox(hDlg, buf, title, MB_OK | MB_ICONEXCLAMATION);
-        taos_close(taos);
+        CALL_taos_close(taos);
         url_parser_param_release(&url_param);
         return;
       }
@@ -330,7 +330,7 @@ static void check_taos_connection(HWND hDlg, config_t *config)
     MessageBox(hDlg, message, title, MB_OK | MB_ICONEXCLAMATION);
   }
   if (taos) {
-    taos_close(taos);
+    CALL_taos_close(taos);
   }
   url_parser_param_release(&url_param);
 }

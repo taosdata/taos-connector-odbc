@@ -1726,6 +1726,7 @@ static int _prepare_get_tag_col_fields(const arg_t *arg, const stage_t stage, TA
 
 static int _conn_mode(const arg_t *arg, const stage_t stage, TAOS *taos, TAOS_STMT *stmt)
 {
+  (void)arg;
   (void)stmt;
 
   if (stage != STAGE_CONNECTED) return 0;
