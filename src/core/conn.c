@@ -1031,7 +1031,7 @@ static SQLRETURN _conn_set_string(
     SQLSMALLINT     BufferLength,
     SQLSMALLINT    *StringLengthPtr)
 {
-  int n = snprintf((char*)InfoValuePtr, BufferLength, "%s", value);
+  int n = snprintf((char *)InfoValuePtr, InfoValuePtr ? BufferLength : 0, "%s", value);
   if (StringLengthPtr) *StringLengthPtr = n;
 
   if (n >= BufferLength) {
@@ -1330,7 +1330,7 @@ SQLRETURN conn_get_info(
     case SQL_CURSOR_COMMIT_BEHAVIOR:
       *(SQLUSMALLINT*)InfoValuePtr = SQL_CB_DELETE; // NOTE: refer to msdn listed above
       return SQL_SUCCESS;
-    case SQL_CURSOR_ROLLBACK_BEHAVIOR: 
+    case SQL_CURSOR_ROLLBACK_BEHAVIOR:
       *(SQLUSMALLINT*)InfoValuePtr = SQL_CB_DELETE; // NOTE: refer to msdn listed above
       return SQL_SUCCESS;
     case SQL_CURSOR_SENSITIVITY:
