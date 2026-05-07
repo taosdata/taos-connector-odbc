@@ -504,7 +504,7 @@ static int test_new_user_connect(const char *dsn, const char *uid, const char *p
   if (sr != SQL_SUCCESS && sr != SQL_SUCCESS_WITH_INFO)
     goto end;
 
-  sr = CALL_SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+  sr = CALL_SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
   if (sr != SQL_SUCCESS && sr != SQL_SUCCESS_WITH_INFO)
     goto end;
 
