@@ -92,4 +92,11 @@ if(ENABLE_VALGRIND)
       COMMAND ${CMAKE_SOURCE_DIR}/sh/valgrind.sh ${CMAKE_CURRENT_BINARY_DIR}/taos_regression)
 endif()
 
+add_executable(tzset_repro
+    tzset_repro.c
+    $<TARGET_OBJECTS:os_port_obj>)
+if(TODBC_WINDOWS)
+  set_source_files_properties(tzset_repro.c PROPERTIES COMPILE_OPTIONS "/source-charset:utf-8")
+endif()
+target_link_libraries(tzset_repro ${TAOS_LIB_NAME})
 

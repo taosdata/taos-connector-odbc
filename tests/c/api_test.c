@@ -514,7 +514,7 @@ static int test_new_user_connect(const char *dsn, const char *uid, const char *p
   if (sr != SQL_SUCCESS && sr != SQL_SUCCESS_WITH_INFO)
     goto end;
 
-  sr = CALL_SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+  sr = CALL_SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
   if (sr != SQL_SUCCESS && sr != SQL_SUCCESS_WITH_INFO)
     goto end;
 
@@ -1021,7 +1021,7 @@ static int do_cases(void)
 #endif
   (void)snprintf(dll_fullname, sizeof(dll_fullname), "%s/%s", dll_fullpath, "taos_odbc.dll");
 
-  if (!SetDllDirectory(dll_fullpath)) {  
+  if (!SetDllDirectory(dll_fullpath)) {
     E("set dll directory failed.");
     return -1;
   }
@@ -1313,7 +1313,7 @@ static int run_SQLGetData1(int argc, char *argv[], int *i, SQLHANDLE hstmt)
         return -1;
       }
 
-      Col_or_Param_Num = (SQLUSMALLINT)v; // NOTE: yes, we know it might underflow 
+      Col_or_Param_Num = (SQLUSMALLINT)v; // NOTE: yes, we know it might underflow
 
       continue;
     }
