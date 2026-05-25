@@ -546,9 +546,6 @@ int conn_init_driver_type(int is_websocket, char *errbuf, size_t errlen)
   long prev = ATOMIC_CAS(&s_driver_state, DRIVER_UNINIT, DRIVER_INITIALIZING);
 
   if (prev == DRIVER_UNINIT) {
-#ifdef _WIN32
-    _tzset();
-#endif
     int rc = CALL_taos_options(TSDB_OPTION_DRIVER, driver_type);
     if (rc) {
       ATOMIC_SET(&s_driver_state, DRIVER_UNINIT);
