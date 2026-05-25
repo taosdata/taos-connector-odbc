@@ -337,7 +337,8 @@ static TAOS_FIELD_E* _tsdb_stmt_get_tsdb_field_by_tsdb_params(tsdb_stmt_t *stmt,
 
   if (!stmt->is_insert_stmt) {
     if (i_param >= 0 && i_param < params->nr_col_fields && params->col_fields) {
-      return params->col_fields + i_param;
+      TAOS_FIELD_E *field = params->col_fields + i_param;
+      if (field->type != TSDB_DATA_TYPE_NULL) return field;
     }
     return (TAOS_FIELD_E*)&_default_param_field;
   }
