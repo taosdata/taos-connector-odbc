@@ -204,6 +204,15 @@ static int test_conn_parser(void)
         .customproduct          = 1,
         .charset_for_col_bind   = "UTF-8",
       },
+    },{
+      __LINE__,
+      "DSN=TAOS_ODBC_DSN;URL={ws://localhost:6041};COMPRESSION=1",
+      {
+        .dsn                    = "TAOS_ODBC_DSN",
+        .url                    = "ws://localhost:6041",
+        .compression_set        = 1,
+        .compression            = 1,
+      },
     },
   };
 
@@ -277,6 +286,18 @@ static int test_conn_parser(void)
       if (expected->customproduct != param.conn_cfg->customproduct) {
         E("parsing[@line:%d]:%s", line, s);
         E("customproduct expected to be `%d`, but got ==%d==", expected->customproduct, param.conn_cfg->customproduct);
+        r = -1;
+        break;
+      }
+      if (expected->compression_set != param.conn_cfg->compression_set) {
+        E("parsing[@line:%d]:%s", line, s);
+        E("compression_set expected to be `%d`, but got ==%d==", expected->compression_set, param.conn_cfg->compression_set);
+        r = -1;
+        break;
+      }
+      if (expected->compression != param.conn_cfg->compression) {
+        E("parsing[@line:%d]:%s", line, s);
+        E("compression expected to be `%d`, but got ==%d==", expected->compression, param.conn_cfg->compression);
         r = -1;
         break;
       }
