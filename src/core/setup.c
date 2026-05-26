@@ -145,6 +145,7 @@ struct config_s {
   int8_t                         unsigned_promotion;
   int8_t                         timestamp_as_is;
   int8_t                         conn_mode;
+  int8_t                         compression;
   int8_t                         encoder_param_checked;
   int8_t                         encoder_col_checked;
 
@@ -231,6 +232,7 @@ static void GetConfig(HWND hDlg, config_t *config)
   config->unsigned_promotion = 0;
   config->timestamp_as_is= 0;
   config->conn_mode = 1;
+  config->compression = (IsDlgButtonChecked(hDlg, IDC_CHK_COMPRESSION) == BST_CHECKED) ? 1 : 0;
   config->encoder_param_checked = 0;
   config->encoder_col_checked = 0;
 
@@ -306,8 +308,21 @@ static void check_taos_connection(HWND hDlg, config_t *config)
     db   = config->database[0] ? config->database : NULL;
   }
 
-  TAOS *taos = NULL;
-  taos = CALL_taos_connect(host, user, pass, db, port);
+  OPTIONS options = {0};
+  if (host && host[0]) CALL_taos_set_option(&options, "ip", host);
+  if (user && user[0]) CALL_taos_set_option(&options, "user", user);
+  if (pass && pass[0]) CALL_taos_set_option(&options, "pass", pass);
+  if (db && db[0]) CALL_taos_set_option(&options, "db", db);
+  if (port) {
+    char port_buf[16];
+    snprintf(port_buf, sizeof(port_buf), "%u", (unsigned)port);
+    CALL_taos_set_option(&options, "port", port_buf);
+  }
+  if (config->url_checked) {
+    CALL_taos_set_option(&options, "compression", config->compression ? "1" : "0");
+  }
+
+  TAOS *taos = CALL_taos_connect_with(&options);
   if (!taos) {
     int e = taos_errno(NULL);
     char buf[1024];
@@ -376,6 +391,12 @@ static void SwitchTaos(HWND hDlg, BOOL On)
   ShowWindow(GetDlgItem(hDlg, IDC_EDT_SERVER), On);
   ShowWindow(GetDlgItem(hDlg, IDC_STC_URL), !On);
   ShowWindow(GetDlgItem(hDlg, IDC_EDT_URL), !On);
+  if (On) {
+    CheckDlgButton(hDlg, IDC_CHK_COMPRESSION, BST_UNCHECKED);
+    EnableWindow(GetDlgItem(hDlg, IDC_CHK_COMPRESSION), FALSE);
+  } else {
+    EnableWindow(GetDlgItem(hDlg, IDC_CHK_COMPRESSION), TRUE);
+  }
 }
 
 static INT_PTR OnClickTaos(HWND hDlg, WPARAM wParam, LPARAM lParam)
@@ -522,6 +543,15 @@ static INT_PTR OnInitDlg(HWND hDlg, WPARAM wParam, LPARAM lParam)
             }
           }
 
+          SQLGetPrivateProfileString(v, "COMPRESSION", "0", k, sizeof(k), "Odbc.ini");
+          if (IsDlgButtonChecked(hDlg, IDC_RAD_TAOS) == BST_CHECKED) {
+            CheckDlgButton(hDlg, IDC_CHK_COMPRESSION, BST_UNCHECKED);
+          } else if (k[0] == '1' && k[1] == '\0') {
+            CheckDlgButton(hDlg, IDC_CHK_COMPRESSION, BST_CHECKED);
+          } else {
+            CheckDlgButton(hDlg, IDC_CHK_COMPRESSION, BST_UNCHECKED);
+          }
+
           break;
         }
       }
@@ -630,6 +660,9 @@ static INT_PTR OnOK(HWND hDlg, WPARAM wParam, LPARAM lParam, url_parser_param_t 
 
   snprintf(buf, sizeof(buf), "%u", !!config.conn_mode);
   if (ok) ok = SaveKeyVal(hDlg, config.dsn, "CONN_MODE", buf);
+
+  snprintf(buf, sizeof(buf), "%u", !!config.compression);
+  if (ok) ok = SaveKeyVal(hDlg, config.dsn, "COMPRESSION", buf);
 
   if (ok) ok = SaveKeyVal(hDlg, config.dsn, "CUSTOMPRODUCT", config.customproduct_name);
 
