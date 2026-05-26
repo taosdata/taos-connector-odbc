@@ -684,11 +684,9 @@ static SQLRETURN _do_conn_connect(conn_t *conn)
   CALL_taos_set_option(&options, "user", cfg->uid);
   CALL_taos_set_option(&options, "pass", cfg->pwd);
   CALL_taos_set_option(&options, "db", db);
-  if (cfg->port) {
-    char port_buf[16];
-    snprintf(port_buf, sizeof(port_buf), "%d", cfg->port);
-    CALL_taos_set_option(&options, "port", port_buf);
-  }
+  char port_buf[16];
+  snprintf(port_buf, sizeof(port_buf), "%d", cfg->port);
+  CALL_taos_set_option(&options, "port", port_buf);
   if (cfg->url && cfg->compression_set) {
     CALL_taos_set_option(&options, "compression", cfg->compression ? "1" : "0");
   }

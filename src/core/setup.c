@@ -309,15 +309,13 @@ static void check_taos_connection(HWND hDlg, config_t *config)
   }
 
   OPTIONS options = {0};
-  if (host && host[0]) CALL_taos_set_option(&options, "ip", host);
-  if (user && user[0]) CALL_taos_set_option(&options, "user", user);
-  if (pass && pass[0]) CALL_taos_set_option(&options, "pass", pass);
-  if (db && db[0]) CALL_taos_set_option(&options, "db", db);
-  if (port) {
-    char port_buf[16];
-    snprintf(port_buf, sizeof(port_buf), "%u", (unsigned)port);
-    CALL_taos_set_option(&options, "port", port_buf);
-  }
+  CALL_taos_set_option(&options, "ip", host);
+  CALL_taos_set_option(&options, "user", user);
+  CALL_taos_set_option(&options, "pass", pass);
+  CALL_taos_set_option(&options, "db", db);
+  char port_buf[16];
+  snprintf(port_buf, sizeof(port_buf), "%u", (unsigned)port);
+  CALL_taos_set_option(&options, "port", port_buf);
   if (config->url_checked) {
     CALL_taos_set_option(&options, "compression", config->compression ? "1" : "0");
   }
