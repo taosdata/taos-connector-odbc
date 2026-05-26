@@ -676,7 +676,29 @@ static SQLRETURN _do_conn_connect(conn_t *conn)
     db = NULL;
   }
 
-  conn->ds_conn.taos = CALL_taos_connect(cfg->ip, cfg->uid, cfg->pwd, db, cfg->port);
+  OPTIONS options = {0};
+  if (cfg->ip && cfg->ip[0]) {
+    CALL_taos_set_option(&options, "ip", cfg->ip);
+  }
+  if (cfg->uid && cfg->uid[0]) {
+    CALL_taos_set_option(&options, "user", cfg->uid);
+  }
+  if (cfg->pwd && cfg->pwd[0]) {
+    CALL_taos_set_option(&options, "pass", cfg->pwd);
+  }
+  if (db && db[0]) {
+    CALL_taos_set_option(&options, "db", db);
+  }
+  if (cfg->port) {
+    char port_buf[16];
+    snprintf(port_buf, sizeof(port_buf), "%d", cfg->port);
+    CALL_taos_set_option(&options, "port", port_buf);
+  }
+  if (cfg->url && cfg->compression_set) {
+    CALL_taos_set_option(&options, "compression", cfg->compression ? "1" : "0");
+  }
+
+  conn->ds_conn.taos = CALL_taos_connect_with(&options);
   if (!conn->ds_conn.taos) {
     char buf[1024];
     fixed_buf_t buffer = {0};
@@ -813,6 +835,11 @@ static void _conn_fill_out_connection_str(
   }
   if (n>0) count += n;
 
+  if (conn->cfg.compression_set) {
+    fixed_buf_sprintf(n, &buffer, "COMPRESSION=%d;", conn->cfg.compression ? 1 : 0);
+  }
+  if (n>0) count += n;
+
   if (buffer.nr+1 == buffer.cap) {
     char *x = buffer.buf + buffer.nr;
     for (int i=0; i<3 && x>buffer.buf; ++i, --x) x[-1] = '.';
@@ -889,6 +916,21 @@ static int _conn_cfg_init_by_dsn(conn_cfg_t *cfg, char *ebuf, size_t elen)
   buf[0] = '\0';
   r = SQLGetPrivateProfileString((LPCSTR)cfg->dsn, "CONN_MODE", (LPCSTR)"0", (LPSTR)buf, sizeof(buf), "Odbc.ini");
   if (r == 1) cfg->conn_mode = !!atoi(buf);
+
+  buf[0] = '\0';
+  r = SQLGetPrivateProfileString((LPCSTR)cfg->dsn, "COMPRESSION", (LPCSTR)"", (LPSTR)buf, sizeof(buf), "Odbc.ini");
+  if (r) {
+    if (buf[0] == '0' && buf[1] == '\0') {
+      cfg->compression_set = 1;
+      cfg->compression = 0;
+    } else if (buf[0] == '1' && buf[1] == '\0') {
+      cfg->compression_set = 1;
+      cfg->compression = 1;
+    } else {
+      snprintf(ebuf, elen, "@%d:%s():`COMPRESSION=%s` not valid, only 0/1 accepted", __LINE__, __func__, buf);
+      return -1;
+    }
+  }
 
   buf[0] = '\0';
   r = SQLGetPrivateProfileString((LPCSTR)cfg->dsn, "CUSTOMPRODUCT", (LPCSTR)"", (LPSTR)buf, sizeof(buf), "Odbc.ini");

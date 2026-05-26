@@ -471,6 +471,8 @@ struct conn_cfg_s {
 
   // NOTE: default is 0, BI mode : 1
   unsigned int           conn_mode:1;
+  unsigned int           compression_set:1;
+  unsigned int           compression:1;
 };
 
 struct sqls_parser_nterm_s {
