@@ -680,18 +680,10 @@ static SQLRETURN _do_conn_connect(conn_t *conn)
   }
 
   OPTIONS options = {0};
-  if (cfg->ip && cfg->ip[0]) {
-    CALL_taos_set_option(&options, "ip", cfg->ip);
-  }
-  if (cfg->uid && cfg->uid[0]) {
-    CALL_taos_set_option(&options, "user", cfg->uid);
-  }
-  if (cfg->pwd && cfg->pwd[0]) {
-    CALL_taos_set_option(&options, "pass", cfg->pwd);
-  }
-  if (db && db[0]) {
-    CALL_taos_set_option(&options, "db", db);
-  }
+  CALL_taos_set_option(&options, "ip", cfg->ip);
+  CALL_taos_set_option(&options, "user", cfg->uid);
+  CALL_taos_set_option(&options, "pass", cfg->pwd);
+  CALL_taos_set_option(&options, "db", db);
   if (cfg->port) {
     char port_buf[16];
     snprintf(port_buf, sizeof(port_buf), "%d", cfg->port);

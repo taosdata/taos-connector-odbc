@@ -100,9 +100,11 @@ static inline int call_taos_init(const char *file, int line, const char *func)
 static inline void call_taos_set_option(const char *file, int line, const char *func, OPTIONS *options, const char *key,
     const char *value)
 {
-  LOGD_TAOS(file, line, func, "taos_set_option(options:%p,key:%s,value:%s) ...", options, key, value);
+  const char *k = key ? key : "(null)";
+  const char *v = value ? value : "(null)";
+  LOGD_TAOS(file, line, func, "taos_set_option(options:%p,key:%s,value:%s) ...", options, k, v);
   taos_set_option(options, key, value);
-  LOGD_TAOS(file, line, func, "taos_set_option(options:%p,key:%s,value:%s) => void", options, key, value);
+  LOGD_TAOS(file, line, func, "taos_set_option(options:%p,key:%s,value:%s) => void", options, k, v);
 }
 
 static inline TAOS* call_taos_connect(const char *file, int line, const char *func, const char *ip, const char *user, const char *pass, const char *db, uint16_t port)
