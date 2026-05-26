@@ -97,12 +97,29 @@ static inline int call_taos_init(const char *file, int line, const char *func)
   return r;
 }
 
+static inline void call_taos_set_option(const char *file, int line, const char *func, OPTIONS *options, const char *key,
+    const char *value)
+{
+  LOGD_TAOS(file, line, func, "taos_set_option(options:%p,key:%s,value:%s) ...", options, key, value);
+  taos_set_option(options, key, value);
+  LOGD_TAOS(file, line, func, "taos_set_option(options:%p,key:%s,value:%s) => void", options, key, value);
+}
+
 static inline TAOS* call_taos_connect(const char *file, int line, const char *func, const char *ip, const char *user, const char *pass, const char *db, uint16_t port)
 {
   LOGD_TAOS(file, line, func, "taos_connect(ip:%s,user:%s,pass:%s,db:%s,port:%d) ...", ip, user, pass, db, port);
   TAOS *taos = taos_connect(ip, user, pass, db, port);
   if (!taos) diag_res(NULL);
   LOGD_TAOS(file, line, func, "taos_connect(ip:%s,user:%s,pass:%s,db:%s,port:%d) => %p", ip, user, pass, db, port, taos);
+  return taos;
+}
+
+static inline TAOS* call_taos_connect_with(const char *file, int line, const char *func, const OPTIONS *options)
+{
+  LOGD_TAOS(file, line, func, "taos_connect_with(options:%p) ...", options);
+  TAOS *taos = taos_connect_with(options);
+  if (!taos) diag_res(NULL);
+  LOGD_TAOS(file, line, func, "taos_connect_with(options:%p) => %p", options, taos);
   return taos;
 }
 
@@ -915,10 +932,12 @@ static inline int call_taos_set_conn_mode(const char *file, int line, const char
 
 #define CALL_taos_cleanup(...) call_taos_cleanup(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_taos_options(...) call_taos_options(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define CALL_taos_set_option(...) call_taos_set_option(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_taos_set_conn_mode(...) call_taos_set_conn_mode(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_taos_set_config(...) call_taos_set_config(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_taos_init(...) call_taos_init(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_taos_connect(...) call_taos_connect(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define CALL_taos_connect_with(...) call_taos_connect_with(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_taos_connect_auth(...) call_taos_connect_auth(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define CALL_taos_close(...) call_taos_close(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 
