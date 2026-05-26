@@ -64,6 +64,7 @@ CHARSET_FOR_PARAM_BIND (?i:charset_encoder_for_param_bind)
 UNSIGNED_PROMOTION          (?i:unsigned_promotion)
 TIMESTAMP_AS_IS             (?i:timestamp_as_is)
 CONN_MODE                   (?i:conn_mode)
+COMPRESSION                 (?i:compression)
 CUSTOMPRODUCT (?i:customproduct)
 FQDN          [-[:alnum:]]+((\.[-[:alnum:]]+)+)*(\.)?
 ID            [^\[\]{}(),;?*=!@[:space:]]+
@@ -88,6 +89,7 @@ DIGITS        [[:digit:]]+
 {UNSIGNED_PROMOTION}       { R(); C(); return MKT(UNSIGNED_PROMOTION); }
 {TIMESTAMP_AS_IS}          { R(); C(); return MKT(TIMESTAMP_AS_IS); }
 {CONN_MODE}                { R(); C(); return MKT(CONN_MODE); }
+{COMPRESSION}              { R(); C(); return MKT(COMPRESSION); }
 {CUSTOMPRODUCT}            { R(); C(); return MKT(CUSTOMPRODUCT); }
 {DIGITS}      { R(); SET_STR(); C(); return MKT(DIGITS); }
 {ID}          { R(); SET_STR(); C(); return MKT(ID); }
