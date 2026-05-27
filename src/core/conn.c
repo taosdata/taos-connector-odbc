@@ -792,11 +792,13 @@ static void _conn_fill_out_connection_str(
   }
   if (n>0) count += n;
 
+  n = 0;
   if (conn->cfg.charset_for_col_bind) {
     fixed_buf_sprintf(n, &buffer, "CHARSET_ENCODER_FOR_COL_BIND=%s;", conn->cfg.charset_for_col_bind);
   }
   if (n>0) count += n;
 
+  n = 0;
   if (conn->cfg.charset_for_param_bind) {
     fixed_buf_sprintf(n, &buffer, "CHARSET_ENCODER_FOR_PARAM_BIND=%s;", conn->cfg.charset_for_param_bind);
   }
@@ -823,11 +825,13 @@ static void _conn_fill_out_connection_str(
   }
   if (n>0) count += n;
 
+  n = 0;
   if (conn->cfg.customproduct) {
     fixed_buf_sprintf(n, &buffer, "CUSTOMPRODUCT=%s;", conn->cfg.customproduct_name);
   }
   if (n>0) count += n;
 
+  n = 0;
   if (conn->cfg.compression_set) {
     fixed_buf_sprintf(n, &buffer, "COMPRESSION=%d;", conn->cfg.compression ? 1 : 0);
   }
