@@ -47,6 +47,7 @@
 #define IDC_GRP_EXTRA_INFO              1030
 #define IDC_STC_COMPATBL_SOFTWARE       1031
 #define IDC_COMBO_COMPATBL_SOFTWARE     1032
+#define IDC_CHK_COMPRESSION             1033
 
 #define IDS_TEST_CONN_TITLE                  1101
 #define IDS_TEST_CONN_MSG_SUCCESS            1102
@@ -72,7 +73,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        129
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1030
+#define _APS_NEXT_CONTROL_VALUE         1034
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

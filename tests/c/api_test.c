@@ -432,7 +432,7 @@ static int test_sql_driver_conn(SQLHANDLE connh, const char *conn_str)
   SQLCHAR OutConnectionString[1024];
   SQLSMALLINT BufferLength = sizeof(OutConnectionString);
   SQLSMALLINT StringLength2 = 0;
-  SQLUSMALLINT DriverCompletion = SQL_DRIVER_NOPROMPT;
+  SQLUSMALLINT DriverCompletion = SQL_DRIVER_COMPLETE;
 
   OutConnectionString[0] = '\0';
 
@@ -464,6 +464,30 @@ again:
   SQLDisconnect(connh);
 
   return r ? -1 : 0;
+}
+
+__attribute__((unused))
+static int test_sql_driver_conn_out_contains(SQLHANDLE connh, const char *conn_str, const char *needle)
+{
+  SQLRETURN r;
+  SQLHWND WindowHandle = NULL;
+  SQLCHAR *InConnectionString = (SQLCHAR*)conn_str;
+  SQLSMALLINT StringLength1 = (SQLSMALLINT)strlen(conn_str);
+  SQLCHAR OutConnectionString[1024];
+  SQLSMALLINT BufferLength = sizeof(OutConnectionString);
+  SQLSMALLINT StringLength2 = 0;
+  SQLUSMALLINT DriverCompletion = SQL_DRIVER_COMPLETE;
+
+  OutConnectionString[0] = '\0';
+
+  r = CALL_SQLDriverConnect(connh, WindowHandle, InConnectionString, StringLength1, OutConnectionString, BufferLength, &StringLength2, DriverCompletion);
+  if (r != SQL_SUCCESS && r != SQL_SUCCESS_WITH_INFO) return -1;
+
+  r = (strstr((const char*)OutConnectionString, needle) != NULL) ? SQL_SUCCESS : SQL_ERROR;
+
+  SQLDisconnect(connh);
+
+  return (r == SQL_SUCCESS || r == SQL_SUCCESS_WITH_INFO) ? 0 : -1;
 }
 
 __attribute__((unused))
@@ -514,7 +538,7 @@ static int test_new_user_connect(const char *dsn, const char *uid, const char *p
   if (sr != SQL_SUCCESS && sr != SQL_SUCCESS_WITH_INFO)
     goto end;
 
-  sr = CALL_SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+  sr = CALL_SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
   if (sr != SQL_SUCCESS && sr != SQL_SUCCESS_WITH_INFO)
     goto end;
 
@@ -648,6 +672,8 @@ __attribute__((unused)) static int do_sql_driver_conns(SQLHANDLE connh)
   CHK2(test_sql_driver_conn, connh, "DSN=NOT_EXIST", -1);
   CHK2(test_sql_driver_conn, connh, "Driver={TAOS_ODBC_DRIVER};URL={http://www.examples.com};Server=" WS_FOR_TEST "", 0);
   CHK2(test_sql_driver_conn, connh, "DSN=TAOS_ODBC_WS_DSN", 0);
+  CHK3(test_sql_driver_conn_out_contains, connh, "DSN=TAOS_ODBC_WS_DSN;COMPRESSION=1", "COMPRESSION=1", 0);
+  CHK3(test_sql_driver_conn_out_contains, connh, "DSN=TAOS_ODBC_WS_DSN;COMPRESSION=0", "COMPRESSION=0", 0);
   CHK2(test_sql_driver_conn, connh, "Driver={TAOS_ODBC_DRIVER};URL={http://" WS_FOR_TEST "};DB=what", -1);
   CHK2(test_sql_driver_conn, connh, "DSN=TAOS_ODBC_WS_DSN;URL={http://www.examples.com};Server=" WS_FOR_TEST "", 0);
 
@@ -1021,7 +1047,7 @@ static int do_cases(void)
 #endif
   (void)snprintf(dll_fullname, sizeof(dll_fullname), "%s/%s", dll_fullpath, "taos_odbc.dll");
 
-  if (!SetDllDirectory(dll_fullpath)) {  
+  if (!SetDllDirectory(dll_fullpath)) {
     E("set dll directory failed.");
     return -1;
   }
@@ -1313,7 +1339,7 @@ static int run_SQLGetData1(int argc, char *argv[], int *i, SQLHANDLE hstmt)
         return -1;
       }
 
-      Col_or_Param_Num = (SQLUSMALLINT)v; // NOTE: yes, we know it might underflow 
+      Col_or_Param_Num = (SQLUSMALLINT)v; // NOTE: yes, we know it might underflow
 
       continue;
     }

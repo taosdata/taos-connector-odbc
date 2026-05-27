@@ -171,6 +171,17 @@
       param->conn_cfg->conn_mode = !!atoi(_s);                                                  \
     } while (0)
 
+    #define SET_COMPRESSION(_s, _n, _loc) do {                                                  \
+      if (!param) break;                                                                        \
+      OA_NIY(_s[_n] == '\0');                                                                   \
+      if (_n != 1 || (_s[0] != '0' && _s[0] != '1')) {                                          \
+        YLOG(LOG_MALS, &_loc, "invalid compression value:[%.*s]", (int)_n, _s);                 \
+        YYABORT;                                                                                \
+      }                                                                                         \
+      param->conn_cfg->compression_set = 1;                                                     \
+      param->conn_cfg->compression = (_s[0] == '1');                                            \
+    } while (0)
+
     #define SET_CUSTOMPRODUCT(_s, _n, _loc) do {                                                \
       if (!param) break;                                                                        \
       if (conn_cfg_set_custom_product(param->conn_cfg, _s, _n)) {                               \
@@ -205,7 +216,7 @@
 %union { parser_token_t token; }
 %union { char c; }
 
-%token DSN UID PWD DRIVER URL SERVER UNSIGNED_PROMOTION TIMESTAMP_AS_IS CONN_MODE DB
+%token DSN UID PWD DRIVER URL SERVER UNSIGNED_PROMOTION TIMESTAMP_AS_IS CONN_MODE COMPRESSION DB
 %token CUSTOMPRODUCT
 %token CHARSET_FOR_COL_BIND CHARSET_FOR_PARAM_BIND
 %token TOPIC
@@ -307,6 +318,7 @@ attribute:
 | CHARSET_FOR_COL_BIND '=' VALUE               { SET_CHARSET_FOR_COL_BIND($3, @$); }
 | CHARSET_FOR_PARAM_BIND '=' VALUE             { SET_CHARSET_FOR_PARAM_BIND($3, @$); }
 | CONN_MODE '=' DIGITS             { SET_CONN_MODE($3.text, $3.leng, @$); }
+| COMPRESSION '=' DIGITS           { SET_COMPRESSION($3.text, $3.leng, @$); }
 | CUSTOMPRODUCT '=' '{' VALUEX '}' { SET_CUSTOMPRODUCT($4.text, $4.leng, @$); }
 ;
 
