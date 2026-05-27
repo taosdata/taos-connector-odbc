@@ -476,7 +476,7 @@ static int test_sql_driver_conn_out_contains(SQLHANDLE connh, const char *conn_s
   SQLCHAR OutConnectionString[1024];
   SQLSMALLINT BufferLength = sizeof(OutConnectionString);
   SQLSMALLINT StringLength2 = 0;
-  SQLUSMALLINT DriverCompletion = SQL_DRIVER_NOPROMPT;
+  SQLUSMALLINT DriverCompletion = SQL_DRIVER_COMPLETE;
 
   OutConnectionString[0] = '\0';
 
