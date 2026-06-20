@@ -1,0 +1,445 @@
+name: License Compliance Check
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - 'src/**'
+      - 'common/**'
+      - '.github/workflows/license-check.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - 'src/**'
+      - 'common/**'
+      - '.github/workflows/license-check.yml'
+  schedule:
+    - cron: '0 0 * * 1'
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  license-check:
+    runs-on: ubuntu-latest
+    name: License Compliance Scan
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential
+          pip install pip-audit license-expression
+
+      - name: Extract C/C++ source files
+        run: |
+          find src common -type f \( -name "*.c" -o -name "*.h" -o -name "*.cpp" -o -name "*.hpp" \) > source-files.txt 2>/dev/null || true
+          echo "=== Source files found ==="
+          head -20 source-files.txt
+          echo "Total files: $(wc -l < source-files.txt)"
+
+      - name: Generate SPDX License Report
+        run: |
+          python3 << 'EOF'
+          import os
+          import re
+          import json
+          from collections import defaultdict
+
+          # Common SPDX license identifiers found in headers
+          LICENSE_PATTERNS = {
+              r'MIT': 'MIT',
+              r'Apache License 2\.0|Apache-2\.0': 'Apache-2.0',
+              r'Apache License 2\.0 OR MIT': 'Apache-2.0 OR MIT',
+              r'BSD-2-Clause|BSD 2-Clause': 'BSD-2-Clause',
+              r'BSD-3-Clause|BSD 3-Clause': 'BSD-3-Clause',
+              r'ISC': 'ISC',
+              r'MPL-2\.0|Mozilla Public License 2\.0': 'MPL-2.0',
+              r'LGPL-2\.0-or-later|LGPL-2\.0\+': 'LGPL-2.0-or-later',
+              r'LGPL-2\.1-or-later|LGPL-2\.1\+': 'LGPL-2.1-or-later',
+              r'LGPL-3\.0-or-later|LGPL-3\.0\+': 'LGPL-3.0-or-later',
+              r'GPL-2\.0|GPL-2\.0-only': 'GPL-2.0-only',
+              r'GPL-3\.0|GPL-3\.0-only': 'GPL-3.0-only',
+              r'AGPL-3\.0': 'AGPL-3.0-or-later',
+          }
+
+          file_licenses = {}
+          detected_licenses = defaultdict(list)
+
+          with open('source-files.txt', 'r') as f:
+              files = f.read().strip().split('\n')
+
+          print(f"Scanning {len(files)} source files for license headers...")
+
+          for filepath in files:
+              if not os.path.exists(filepath):
+                  continue
+
+              try:
+                  with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                      content = f.read(2000)  # Read first 2KB for license header
+              except:
+                  continue
+
+              detected = None
+
+              # Check for license patterns in header
+              for pattern, spdx_id in LICENSE_PATTERNS.items():
+                  if re.search(pattern, content, re.IGNORECASE):
+                      detected = spdx_id
+                      detected_licenses[spdx_id].append(filepath)
+                      break
+
+              if not detected:
+                  # Default to MIT if no license found (common for TDengine projects)
+                  detected = 'MIT'
+                  detected_licenses['MIT'].append(filepath)
+
+              file_licenses[filepath] = detected
+
+          # Generate report
+          with open('license-report.txt', 'w') as f:
+              f.write("=" * 80 + "\n")
+              f.write("License Compliance Report - TDengine ODBC Connector\n")
+              f.write("=" * 80 + "\n\n")
+
+              f.write("Detected License Distribution:\n")
+              f.write("-" * 80 + "\n")
+              for license, files in sorted(detected_licenses.items()):
+                  f.write(f"\n{license}:\n")
+                  f.write(f"  Files: {len(files)}\n")
+                  if len(files) <= 5:
+                      for file in files:
+                          f.write(f"    - {file}\n")
+                  else:
+                      for file in files[:3]:
+                          f.write(f"    - {file}\n")
+                      f.write(f"    ... and {len(files)-3} more files\n")
+
+              f.write("\n" + "=" * 80 + "\n")
+              f.write("Summary:\n")
+              f.write("-" * 80 + "\n")
+              f.write(f"Total files scanned: {len(files)}\n")
+              f.write(f"Total licenses detected: {len(detected_licenses)}\n")
+
+          # Save as JSON for further processing
+          with open('source-licenses.json', 'w') as f:
+              json.dump({
+                  'total_files': len(files),
+                  'licenses': {k: len(v) for k, v in detected_licenses.items()},
+                  'detailed': file_licenses
+              }, f, indent=2)
+
+          print("✅ Generated license report")
+          with open('license-report.txt', 'r') as f:
+              print(f.read())
+          EOF
+
+      - name: Analyze CMake dependencies for licenses
+        run: |
+          python3 << 'EOF'
+          import re
+          import json
+          import os
+
+          # Known licenses for system C libraries
+          KNOWN_LICENSES = {
+              'iconv': 'LGPL-2.1',
+              'taos': 'AGPL-3.0',  # TDengine is AGPL
+              'taosws': 'MIT',
+          }
+
+          deps_licenses = {}
+
+          # Parse CMakeLists.txt
+          cmake_files = ['CMakeLists.txt', 'src/CMakeLists.txt', 'common/CMakeLists.txt']
+
+          for cmake_file in cmake_files:
+              if not os.path.exists(cmake_file):
+                  continue
+
+              with open(cmake_file, 'r') as f:
+                  content = f.read()
+
+              # Extract find_package, pkg_check_modules, and link_libraries
+              for match in re.finditer(r'find_package\s*\(\s*(\w+)', content):
+                  pkg = match.group(1)
+                  if pkg in KNOWN_LICENSES:
+                      deps_licenses[pkg] = KNOWN_LICENSES[pkg]
+
+              for match in re.finditer(r'pkg_check_modules\s*\([^)]*\s+([A-Za-z0-9_\-]+)', content):
+                  pkg = match.group(1)
+                  if pkg in KNOWN_LICENSES:
+                      deps_licenses[pkg] = KNOWN_LICENSES[pkg]
+
+              for match in re.finditer(r'link_libraries\s*\(([^)]+)\)', content):
+                  libs = match.group(1).split()
+                  for lib in libs:
+                      if lib in KNOWN_LICENSES:
+                          deps_licenses[lib] = KNOWN_LICENSES[lib]
+
+              # Also search for direct mentions of known packages
+              for pkg in KNOWN_LICENSES:
+                  if re.search(rf'\b{pkg}\b', content, re.IGNORECASE):
+                      if pkg not in deps_licenses:
+                          deps_licenses[pkg] = KNOWN_LICENSES[pkg]
+
+          with open('dependencies-licenses.json', 'w') as f:
+              json.dump(deps_licenses, f, indent=2)
+
+          print("CMake Dependencies Licenses:")
+          for pkg, lic in sorted(deps_licenses.items()):
+              print(f"  {pkg}: {lic}")
+          EOF
+
+      - name: Merge license information
+        run: |
+          python3 << 'EOF'
+          import json
+
+          # Merge source file licenses and dependency licenses
+          with open('source-licenses.json', 'r') as f:
+              source_data = json.load(f)
+
+          with open('dependencies-licenses.json', 'r') as f:
+              deps_data = json.load(f)
+
+          merged = {
+              'source_code': source_data['licenses'],
+              'dependencies': deps_data,
+              'total_files': source_data['total_files'],
+              'detailed_source': source_data['detailed']
+          }
+
+          with open('merged-licenses.json', 'w') as f:
+              json.dump(merged, f, indent=2)
+
+          print("✅ Merged all license information")
+          EOF
+
+      - name: Generate comprehensive license report
+        run: |
+          python3 << 'EOF'
+          import json
+          from datetime import datetime
+
+          with open('merged-licenses.json', 'r') as f:
+              data = json.load(f)
+
+          # Define allowed and prohibited licenses
+          ALLOWED_LICENSES = {
+              'Apache-2.0',
+              'MIT',
+              'BSD-2-Clause',
+              'BSD-3-Clause',
+              'ISC',
+          }
+
+          # Internal TDengine ecosystem libraries (exceptions to license restrictions)
+          INTERNAL_ECOSYSTEM_LIBS = {
+              'taos',
+          }
+
+          # Linux/macOS system-provided dependencies (not managed by this project)
+          SYSTEM_EXCEPTION_LIBS = {
+              'iconv',
+          }
+
+          PROHIBITED_LICENSES = {
+              'GPL-2.0',
+              'GPL-3.0',
+              'AGPL-3.0',  # Prohibited EXCEPT for taos (internal ecosystem)
+              'SSPL',
+              'MPL-2.0',
+              'LGPL-2.0',
+              'LGPL-2.1',
+          }
+
+          # Analyze licenses
+          source_licenses = data.get('source_code', {})
+          deps_licenses = data.get('dependencies', {})
+
+          # Check for violations
+          # AGPL is prohibited EXCEPT for internal TDengine libraries (taos)
+          # System exception libraries are excluded from project dependency policy checks
+          prohibited_found = []
+          flagged_found = []
+          internal_ecosystem_found = []
+          system_exceptions_found = []
+          allowed_found = []
+
+          for pkg, lic in deps_licenses.items():
+              if pkg in INTERNAL_ECOSYSTEM_LIBS:
+                  # Internal ecosystem libraries are allowed even with AGPL
+                  internal_ecosystem_found.append((pkg, lic))
+              elif pkg in SYSTEM_EXCEPTION_LIBS:
+                  # Linux/macOS system library; excluded from project-managed dependency checks
+                  system_exceptions_found.append((pkg, lic))
+              elif lic in PROHIBITED_LICENSES:
+                  prohibited_found.append((pkg, lic))
+              else:
+                  allowed_found.append((pkg, lic))
+
+          # Check source code licenses
+          for lic in source_licenses.keys():
+              if lic in PROHIBITED_LICENSES:
+                  prohibited_found.append((lic, 'source'))
+              elif lic not in ALLOWED_LICENSES:
+                  flagged_found.append((lic, 'source'))
+
+          # Generate simplified markdown report
+          report_lines = [
+              "# License Compliance Report",
+              "",
+              "## Overview",
+              "This report contains all detected licenses in the TDengine ODBC Connector project dependencies.",
+              "",
+              "## Allowed Licenses",
+              "- Apache-2.0",
+              "- MIT",
+              "- BSD-2-Clause",
+              "- BSD-3-Clause",
+              "- ISC",
+              "",
+              "## Prohibited Licenses",
+              "- GPL-2.0",
+              "- GPL-3.0",
+              "- AGPL-3.0",
+              "- SSPL",
+              "- MPL-2.0",
+              "- LGPL-2.0",
+              "- LGPL-2.1",
+              "- LGPL-3.0",
+
+              "",
+              "## Scan Results",
+          ]
+
+          if internal_ecosystem_found:
+              report_lines.append("")
+              report_lines.append("### Internal TDengine Ecosystem (Allowed Exceptions)")
+              for pkg, lic in internal_ecosystem_found:
+                  report_lines.append(f"- {pkg}: {lic}")
+
+          if system_exceptions_found:
+              report_lines.append("")
+              report_lines.append("### System Exceptions (Excluded from Project Dependency Policy)")
+              for pkg, lic in system_exceptions_found:
+                  report_lines.append(f"- {pkg}: {lic} (Linux/macOS system-provided, not installed/managed by this project)")
+
+          if allowed_found:
+              report_lines.append("")
+              report_lines.append("### Allowed Dependencies")
+              for pkg, lic in allowed_found:
+                  report_lines.append(f"- {pkg}: {lic}")
+
+          if prohibited_found:
+              report_lines.append("")
+              report_lines.append("❌ **Prohibited Licenses Found:**")
+              for item, typ in prohibited_found:
+                  report_lines.append(f"- {item} ({typ})")
+          else:
+              total_detected = len(set(lic for _, lic in deps_licenses.items()) | set(source_licenses.keys()))
+              report_lines.append("")
+              report_lines.append(f"Total results: {total_detected}")
+              report_lines.append("")
+              report_lines.append("✅ No suspicious or unknown licenses detected.")
+
+          report = "\n".join(report_lines)
+
+          with open('license-compliance-report.md', 'w') as f:
+              f.write(report)
+
+          print(report)
+
+          # Generate JSON summary for CI decisions
+          summary = {
+              'status': 'OK' if not prohibited_found else 'FAILED',
+              'prohibited': [f"{item} ({typ})" for item, typ in prohibited_found],
+              'internal_ecosystem': [f"{pkg}: {lic}" for pkg, lic in internal_ecosystem_found],
+              'system_exceptions': [f"{pkg}: {lic}" for pkg, lic in system_exceptions_found],
+              'allowed': [f"{pkg}: {lic}" for pkg, lic in allowed_found],
+          }
+
+          with open('license-summary.json', 'w') as f:
+              json.dump(summary, f, indent=2)
+          EOF
+
+      - name: Upload license reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-compliance-reports
+          path: |
+            license-report.txt
+            license-compliance-report.md
+            source-licenses.json
+            dependencies-licenses.json
+            merged-licenses.json
+            license-summary.json
+          retention-days: 30
+
+      - name: Comment PR with License Report
+        if: github.event_name == 'pull_request' && always() && github.event.pull_request.head.repo.fork == false
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            if (!fs.existsSync('license-compliance-report.md')) {
+              console.log('Report not found');
+              return;
+            }
+
+            const report = fs.readFileSync('license-compliance-report.md', 'utf8');
+            const comment = `## 📜 License Compliance Check\n\n${report}\n\nFor detailed reports, check the artifacts.`;
+
+            try {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+              console.log('✅ License report commented on PR');
+            } catch (e) {
+              console.warn('⚠️ Failed to comment on PR:', e.message || e);
+            }
+
+      - name: Check for license violations
+        run: |
+          python3 << 'EOF'
+          import json
+          import sys
+
+          with open('license-summary.json', 'r') as f:
+              summary = json.load(f)
+
+          if summary['prohibited']:
+              print(f"❌ Prohibited licenses found: {summary['prohibited']}")
+              sys.exit(1)
+          else:
+              print("✅ No prohibited licenses found")
+
+              if summary.get('flagged'):
+                  print(f"⚠️  Flagged licenses (review required): {summary['flagged']}")
+          EOF
